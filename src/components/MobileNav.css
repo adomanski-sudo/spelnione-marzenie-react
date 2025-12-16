@@ -1,0 +1,22 @@
+/* Domyślnie (czyli na Desktopie) - NIE WYŚWIETLAJ */
+.mobile-nav {
+  display: none;
+}
+
+/* Dopiero jak ekran jest mniejszy niż 1024px - włączamy FLEX */
+@media (max-width: 1024px) {
+  .mobile-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    background: var(--bg-panel); /* Używamy zmiennej globalnej z App.css */
+    border-top: 1px solid #cbd5e1;
+    z-index: 50;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  }
+}

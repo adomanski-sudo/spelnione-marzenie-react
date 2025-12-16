@@ -1,0 +1,19 @@
+.feed {
+  width: 280px;
+  height: 100vh;
+  background-color: var(--bg-panel);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  box-shadow: var(--shadow-depth);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1024px) {
+  .feed {
+    display: none;
+  }
+}

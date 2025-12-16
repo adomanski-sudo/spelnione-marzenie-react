@@ -1,0 +1,56 @@
+/* --- Styl dla paska menu (desktop) --- */
+.sidebar {
+  width: 280px;             /* Stała szerokość */
+  height: 100vh;            /* Pełna wysokość ekranu */
+  background-color: var(--bg-panel);
+  position: sticky;         /* Przyklejenie */
+  top: 0;
+  z-index: 10;              /* Muszą być 'nad' tłem */
+  box-shadow: var(--shadow-depth); /* Cień rzucany na środek */
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  /* BRAK zaokrągleń (wygląd solidnego bloku) */
+  border-radius: 0; 
+  /* Zapobieganie kurczeniu się flexa */
+  flex-shrink: 0; 
+}
+
+
+
+/* --- Styl dla przycisków --- */
+.menu-btn {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 16px;
+  margin-bottom: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.menu-btn:hover {
+  background-color: #f1f5f9;
+  color: var(--text-main);
+}
+
+.menu-btn.active {
+  background-color: #e0f2fe; /* Delikatny błękit */
+  color: #0284c7;            /* Mocniejszy niebieski tekst */
+}
+
+
+
+/* Ukrywanie na małych ekranach */
+@media (max-width: 1024px) {
+  .sidebar {
+    display: none;
+  }
+}

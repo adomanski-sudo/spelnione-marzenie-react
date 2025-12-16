@@ -6,16 +6,8 @@ export default {
   ],
   theme: {
     extend: {
-      colors: {
-        // Nasza paleta "SpelnioneMarzenie":
-        brand: {
-          dark: '#0f172a',  // Ciemne indygo (tło logo)
-          primary: '#3730a3', // Jaśniejsze indygo (akcenty)
-          gold: '#fbbf24',  // Złoto (gwiazda/wstążka)
-          light: '#f1f5f9', // Szary błękit (tło strony)
-          text: '#334155',  // Ciemny szary (tekst czytelny)
-        }
-      },
+      // Tu na razie pusto. Będziemy korzystać z domyślnych klas:
+      // bg-white, bg-gray-50, text-gray-800 itd.
     },
   },
   plugins: [],
