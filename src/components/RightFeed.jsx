@@ -1,17 +1,108 @@
 import React from 'react';
-import './RightFeed.css'; // <--- Import stylu
+import './RightFeed.css';
 
 export default function RightFeed() {
+  
+  // MOCK DATA - Dane testowe dla panelu aktywności
+  const activities = [
+    {
+      id: 1,
+      user: "Kasia K.",
+      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+      type: "success", // Typ: sukces
+      text: "spełniła marzenie:",
+      target: "Lot Balonem nad Mazurami",
+      time: "2 min temu"
+    },
+    {
+      id: 2,
+      user: "Marek Z.",
+      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+      type: "new", // Typ: nowe marzenie
+      text: "dodał nowy cel:",
+      target: "Nauka gry na pianinie",
+      time: "15 min temu"
+    },
+    {
+      id: 3,
+      user: "Anna Nowak",
+      avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+      type: "new",
+      text: "dołączyła do wyzwania:",
+      target: "30 dni bez cukru",
+      time: "1 godz. temu"
+    },
+    {
+      id: 4,
+      user: "Tomek Dev",
+      avatar: "https://randomuser.me/api/portraits/men/86.jpg",
+      type: "success",
+      text: "spełnił marzenie:",
+      target: "Stworzenie własnej gry",
+      time: "3 godz. temu"
+    },
+    {
+      id: 5,
+      user: "Jola B.",
+      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
+      type: "new",
+      text: "dodała marzenie:",
+      target: "Podróż do Japonii",
+      time: "5 godz. temu"
+    }
+  ];
+
   return (
     <aside className="feed">
-      <h3 style={{ textTransform: 'uppercase', fontSize: '12px', color: '#94a3b8', letterSpacing: '1px' }}>
+      <div className="feed-header">
         Co się dzieje teraz?
-      </h3>
+      </div>
       
-      {/* Przykładowa lista */}
-      <div style={{ marginTop: '20px' }}>
-        <p style={{ fontSize: '14px' }}>Kasia spełniła marzenie...</p>
-        <p style={{ fontSize: '14px', marginTop: '10px' }}>Marek dodał cel...</p>
+      <div>
+        {activities.map((item) => (
+          <div key={item.id} className="feed-item">
+            
+            {/* Awatar z ikonką statusu */}
+            <div className="avatar-container">
+              <img src={item.avatar} alt={item.user} className="feed-avatar" />
+              <div className="status-icon">
+                {item.type === 'success' ? '🏆' : '✨'}
+              </div>
+            </div>
+
+            {/* Treść */}
+            <div className="feed-content">
+              <span className="feed-user">{item.user}</span>{' '}
+              <span className="feed-action">{item.text}</span>
+              
+              {/* Jeśli sukces -> zielony kolor, jeśli nowe -> zwykły */}
+              <span className={`feed-target ${item.type === 'success' ? 'success' : ''}`}>
+                {item.target}
+              </span>
+              
+              <span className="feed-time">{item.time}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Dodatek na dole - np. zachęta */}
+      <div style={{ marginTop: 'auto', padding: '15px', background: '#f1f5f9', borderRadius: '12px', textAlign: 'center' }}>
+        <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>
+          Zainspiruj innych swoim sukcesem!
+        </p>
+        <button style={{ 
+          background: '#fff', 
+          border: '1px solid #cbd5e1', 
+          padding: '6px 12px', 
+          borderRadius: '20px', 
+          fontSize: '12px', 
+          fontWeight: 'bold', 
+          cursor: 'pointer',
+          color: '#475569'
+        }}>
+          + Dodaj sukces
+        </button>
       </div>
     </aside>
   );
