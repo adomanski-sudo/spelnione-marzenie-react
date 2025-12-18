@@ -16,15 +16,34 @@
   flex-shrink: 0; 
 }
 
+/* Kontener nawigacji (ten <nav>) */
+.sidebar-nav {
+  flex: 1;              /* Zajmij całe miejsce pod profilem */
+  display: flex;        /* Stań się kontenerem Flex */
+  flex-direction: column; /* Układaj dzieci w pionie */
+  overflow: hidden;     /* Zabezpieczenie */
+  padding-bottom: 20px; /* Mały odstęp od dolnej krawędzi ekranu */
+}
+
+/* Kontener listy przycisków (div .menuList) */
+.menuList {
+  flex: 1;              /* Rozciągnij się na całą wysokość .sidebar-nav */
+  display: flex;        /* Też stań się Flexem */
+  flex-direction: column; /* Układaj przyciski w pionie */
+  gap: 10px;            /* Odstęp między przyciskami (opcjonalnie) */
+  justify-content: space-evenly;
+}
+
 
 
 /* --- Styl dla przycisków --- */
 .menu-btn {
   display: flex;
   align-items: center;
+  flex: 1;             /* Każdy przycisk ma rosnąć, żeby wypełnić miejsce */
   gap: 16px;
   width: 100%;
-  padding: 16px;
+  padding: 0 20px;
   margin-bottom: 8px;
   border: none;
   background: transparent;
@@ -34,6 +53,12 @@
   cursor: pointer;
   border-radius: 12px;
   transition: all 0.2s ease;
+  max-height: 80px;
+}
+
+.menu-btn svg {
+  stroke-width: 1px;
+  transition: stroke 0.2s ease;
 }
 
 .menu-btn:hover {
@@ -44,6 +69,20 @@
 .menu-btn.active {
   background-color: #e0f2fe; /* Delikatny błękit */
   color: #0284c7;            /* Mocniejszy niebieski tekst */
+}
+
+.menu-btn.active svg {
+  stroke-width: 2px;
+  transition: stroke 0.2s ease;
+}
+
+.menu-btn > img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 

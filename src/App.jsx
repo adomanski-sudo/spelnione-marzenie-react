@@ -4,7 +4,6 @@ import DesktopSidebar from "./components/DesktopSidebar";
 import RightFeed from "./components/RightFeed";
 import MobileHeader from "./components/MobileHeader";
 import MobileNav from "./components/MobileNav";
-// IMPORTUJEMY NOWY KOMPONENT:
 import DreamCard from "./components/DreamCard";
 
 function App() {
