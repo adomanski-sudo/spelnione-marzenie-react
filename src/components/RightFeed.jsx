@@ -18,8 +18,8 @@ export default function RightFeed() {
       id: 2,
       user: "Marek Z.",
       avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-      type: "new", // Typ: nowe marzenie
-      text: "dodał nowy cel:",
+      type: "new",
+      text: "dodał marzenie:",
       target: "Nauka gry na pianinie",
       time: "15 min temu"
     },
@@ -28,8 +28,8 @@ export default function RightFeed() {
       user: "Anna Nowak",
       avatar: "https://randomuser.me/api/portraits/women/68.jpg",
       type: "new",
-      text: "dołączyła do wyzwania:",
-      target: "30 dni bez cukru",
+      text: "dodała marzenie:",
+      target: "Zestaw wędkarski",
       time: "1 godz. temu"
     },
     {
@@ -55,7 +55,7 @@ export default function RightFeed() {
   return (
     <aside className="feed">
       <div className="feed-header">
-        Co się dzieje teraz?
+        To się dzieje teraz
       </div>
       
       <div>

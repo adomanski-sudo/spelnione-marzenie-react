@@ -5,6 +5,7 @@ import RightFeed from "./components/RightFeed";
 import MobileHeader from "./components/MobileHeader";
 import MobileNav from "./components/MobileNav";
 import DreamCard from "./components/DreamCard";
+import HowItWorks from './components/HowItWorks';
 
 function App() {
   const [activeView, setActiveView] = useState('home');
@@ -60,18 +61,23 @@ function App() {
         {/* --- TUTAJ ZMIANA: Wyświetlamy listę lub widok --- */}
         <div className="content-container">
            
-           <h2 style={{ marginBottom: '20px', fontSize: '24px', fontWeight: 'bold' }}>
-             {activeView === 'home' ? 'Najnowsze Marzenia ✨' : activeView}
-           </h2>
-
            {/* LOGIKA WYŚWIETLANIA */}
            {activeView === 'home' ? (
-             // Jeśli jesteśmy na HOME -> Wyświetl Grid z kartami
-             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
-                {dreams.map((dream) => (
-                  <DreamCard key={dream.id} dream={dream} />
-                ))}
-             </div>
+            <> {/* Pusty fragment (React Fragment), bo zwracamy dwa elementy obok siebie */}
+                
+                {/* TUTAJ WSTAWIAMY SEKCJE POWITALNĄ */}
+                <HowItWorks />
+                
+                <h2 style={{ marginBottom: '20px', fontSize: '24px', fontWeight: 'bold' }}>
+                  Najnowsze Marzenia 
+                </h2>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+                  {dreams.map((dream) => (
+                    <DreamCard key={dream.id} dream={dream} />
+                  ))}
+                </div>
+             </>
            ) : (
              // Jeśli inny widok -> Wyświetl pustą kartę
              <div className="content-card">

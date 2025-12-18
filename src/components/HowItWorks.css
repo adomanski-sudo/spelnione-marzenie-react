@@ -1,0 +1,75 @@
+.how-it-works {
+  background: linear-gradient(to right, #f8fafc, #eff6ff); /* Subtelny gradient */
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 30px; /* Odstęp od kafelków z marzeniami */
+  text-align: center;
+  border: 1px solid #e2e8f0;
+}
+
+.hiw-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 25px;
+}
+
+.description {
+    padding: 15px;
+}
+
+.hiw-steps {
+  display: flex;
+  justify-content: space-around; /* Rozłożenie kroków równomiernie */
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap; /* Żeby na telefonie spadły pod siebie */
+}
+
+.hiw-step {
+  flex: 1;
+  min-width: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.step-icon-box {
+  width: 50px;
+  height: 50px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  color: #0284c7; /* Kolor przewodni (niebieski) */
+  margin-bottom: 5px;
+}
+
+.step-label {
+  font-weight: 600;
+  color: #334155;
+  font-size: 15px;
+}
+
+.step-desc {
+  font-size: 13px;
+  color: #64748b;
+  max-width: 200px;
+  line-height: 1.4;
+}
+
+/* Strzałeczki między krokami (tylko na desktopie) */
+.step-arrow {
+  display: none;
+  color: #cbd5e1;
+  margin-top: 15px;
+}
+
+@media (min-width: 768px) {
+  .step-arrow {
+    display: block;
+  }
+}
