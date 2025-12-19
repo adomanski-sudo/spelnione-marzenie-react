@@ -1,0 +1,186 @@
+.profile-split-view {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  position: relative;
+}
+
+/* --- LEWA KOLUMNA --- */
+.bio-column {
+  flex: 0 0 320px;
+  position: sticky; 
+  top: 20px; 
+}
+
+.bio-card {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 40px 20px; /* Większy padding góra/dół */
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  border: 1px solid #f1f5f9;
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  width: 100%;
+  height: 93vh; 
+  /* USUNIĘTO justify-content: center -> teraz układamy elementy ręcznie */
+}
+
+/* --- PUNKT ZAKOTWICZENIA (Awatar + Przyciski) --- */
+.avatar-wrapper {
+  position: relative; /* To jest układ odniesienia dla guzików */
+  width: 140px;
+  height: 140px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.bio-avatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #f8fafc;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  z-index: 10; /* Awatar zawsze na wierzchu */
+  background: #fff;
+}
+
+/* --- STABILNE PRZYCISKI (Absolute) --- */
+.circle-action-btn {
+  position: absolute; /* Wyjęte z przepływu - nie przesuwają awatara! */
+  top: 50%;
+  transform: translateY(-50%); /* Idealnie na środku wysokości awatara */
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  height: 44px; /* Nieco mniejsze, zgrabniejsze */
+  min-width: 44px;
+  padding: 0; 
+  
+  border-radius: 22px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  z-index: 5; /* Pod awatarem, ale nad tłem */
+}
+
+.btn-label {
+  max-width: 0;
+  opacity: 0;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+/* --- LEWY PRZYCISK (Edytuj) --- */
+.edit-btn {
+  right: 170px; /* Odsunięcie od środka w lewo */
+  background: #f1f5f9;
+  color: #64748b;
+  /* TO JEST KLUCZOWE: */
+  flex-direction: row-reverse; /* Żeby tekst pojawiał się z LEWEJ strony ikony */
+}
+
+.edit-btn:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+  min-width: 110px; /* Rozszerza się */
+  padding: 0 15px;
+  right: 100px; /* Lekki ruch w stronę awatara przy hoverze */
+}
+
+.edit-btn:hover .btn-label {
+  max-width: 100px;
+  opacity: 1;
+  margin-right: 8px; /* Odstęp od ikony (z prawej, bo reverse) */
+}
+
+/* --- PRAWY PRZYCISK (Dodaj) --- */
+.add-btn {
+  left: 170px; /* Odsunięcie od środka w prawo */
+  background: #0284c7;
+  color: white;
+}
+
+.add-btn:hover {
+  background: #0369a1;
+  min-width: 120px;
+  padding: 0 15px;
+  justify-content: flex-start; /* Tekst normalnie z prawej */
+  left: 100px; /* Lekki ruch */
+}
+
+.add-btn:hover .btn-label {
+  max-width: 100px;
+  opacity: 1;
+  margin-left: 8px;
+}
+
+
+/* --- RESZTA TEKSTÓW --- */
+.bio-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-top: 10px;
+  margin-bottom: 0; /* Margines handled by flex gap or wrapper */
+}
+
+/* --- CENTROWANIE OPISU W PIONIE --- */
+.bio-content-wrapper {
+  /* Magia Flexboxa: */
+  flex: 1; /* Zajmij całą dostępną wysokość poniżej imienia */
+  display: flex;
+  align-items: center; /* Wyśrodkuj tekst w pionie w tej przestrzeni */
+  justify-content: center;
+  width: 100%;
+}
+
+.bio-text {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #64748b;
+  font-style: italic;
+  max-width: 260px; /* Ograniczenie szerokości tekstu dla czytelności */
+}
+
+/* --- PRAWA KOLUMNA --- */
+.dreams-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.dreams-grid-compact {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+/* Responsywność */
+@media (max-width: 900px) {
+  .profile-split-view {
+    flex-direction: column;
+  }
+  .bio-column {
+    flex: auto;
+    width: 100%;
+    position: static;
+  }
+  .bio-card {
+    height: auto;
+    min-height: 400px; /* Żeby na mobile też było trochę oddechu */
+  }
+}

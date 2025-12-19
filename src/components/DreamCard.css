@@ -73,21 +73,12 @@
 .card-footer {
   margin-top: auto; /* Wypycha stopkę na sam dół */
   display: flex;
-  justify-content: space-between;
+  justify-content: right;
   align-items: center;
   padding-top: 15px;
   border-top: 1px solid #f1f5f9;
-}
-
-.btn-fulfill {
-  background-color: #10b981; /* Zielony sukcesu */
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
+  font-size: 14px;
+  color: #64748b;
 }
 
 .btn-fulfill:hover {

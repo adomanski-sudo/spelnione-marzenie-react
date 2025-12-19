@@ -1,0 +1,154 @@
+/* Tło (Backdrop) - przyciemnia resztę strony */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(15, 23, 42, 0.6); /* Ciemny granat, półprzezroczysty */
+  backdrop-filter: blur(4px); /* Rozmycie tła pod spodem */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Okno główne */
+.modal-content {
+  background: white;
+  width: 90%;
+  max-width: 800px; /* Szeroki, wygodny widok */
+  max-height: 90vh; /* Żeby nie uciekł poza ekran na małym laptopie */
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Układ w środku: Zdjęcie + Treść */
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Przewijanie treści jeśli długa */
+}
+
+/* Duże zdjęcie na górze */
+.modal-image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+}
+
+.modal-details {
+  padding: 30px;
+}
+
+/* Typografia */
+.modal-category {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #0284c7; /* Niebieski akcent */
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.modal-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 15px 0;
+  line-height: 1.2;
+}
+
+.modal-desc {
+  font-size: 16px;
+  line-height: 1.7;
+  color: #475569;
+  margin-bottom: 30px;
+}
+
+/* Stopka z przyciskami (Sticky na dole modala) */
+.modal-footer {
+  padding: 20px 30px;
+  border-top: 1px solid #f1f5f9;
+  background: #f8fafc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Przycisk Zamknij (X) w prawym górnym rogu */
+.btn-close-icon {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(255, 255, 255, 0.8);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #333;
+  transition: background 0.2s;
+}
+
+.btn-close-icon:hover {
+  background: white;
+}
+
+/* Przycisk Akcji (Ten główny!) */
+.btn-primary {
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  background-color: #059669;
+}
+
+/* Animacje wejścia */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Media Query dla desktopu - obrazek obok tekstu */
+@media (min-width: 768px) {
+  .modal-body {
+    flex-direction: row; /* Układ poziomy */
+    height: 500px; /* Stała wysokość */
+  }
+  .modal-image {
+    width: 45%; /* Prawie połowa */
+    height: 100%;
+  }
+  .modal-details {
+    width: 55%;
+    overflow-y: auto; /* Przewijanie tylko tekstu */
+  }
+}

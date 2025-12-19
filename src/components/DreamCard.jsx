@@ -1,28 +1,32 @@
 import React from 'react';
 import './DreamCard.css';
 
-// Komponent przyjmuje "props" o nazwie dream (to będzie obiekt z danymi)
-export default function DreamCard({ dream }) {
+// Dodajemy prop 'showAuthor' z wartością domyślną true
+export default function DreamCard({ dream, showAuthor = true }) {
   return (
     <div className="dream-card">
       {/* Obrazek marzenia */}
-      <img src={dream.image} alt={dream.title} className="card-image" />
+      <div className="card-image-wrapper">
+         <img src={dream.image} alt={dream.title} className="card-image" />
+      </div>
       
       <div className="card-content">
-        {/* Kto dodał? */}
-        <div className="card-header">
-          <img src={dream.userAvatar} alt="User" className="user-avatar" />
-          <span className="user-name">{dream.userName}</span>
-        </div>
+        
+        {/* WARUNEK: Wyświetl nagłówek TYLKO jeśli showAuthor jest true */}
+        {showAuthor && (
+          <div className="card-header">
+            <img src={dream.userAvatar} alt="User" className="user-avatar" />
+            <span className="user-name">{dream.userName}</span>
+          </div>
+        )}
 
-        {/* Co to za marzenie? */}
+        {/* Treść */}
         <h3 className="card-title">{dream.title}</h3>
         <p className="card-desc">{dream.description}</p>
 
-        {/* Akcje */}
+        {/* Stopka (teraz tylko z datą, bez przycisku) */}
         <div className="card-footer">
-            <span style={{ fontSize: '12px', color: '#94a3b8' }}>{dream.date}</span>
-            <button className="btn-fulfill">Spełnij to! ✨</button>
+            <span className="card-date">{dream.date}</span>
         </div>
       </div>
     </div>

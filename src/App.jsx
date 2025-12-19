@@ -6,9 +6,12 @@ import MobileHeader from "./components/MobileHeader";
 import MobileNav from "./components/MobileNav";
 import DreamCard from "./components/DreamCard";
 import HowItWorks from './components/HowItWorks';
+import MyProfile from "./components/MyProfile";
+import DreamModal from "./components/DreamModal";
 
 function App() {
   const [activeView, setActiveView] = useState('home');
+  const [selectedDream, setSelectedDream] = useState(null);
 
   // --- MOCK DATA (Udajemy bazę danych) ---
   const dreams = [
@@ -74,11 +77,22 @@ function App() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
                   {dreams.map((dream) => (
-                    <DreamCard key={dream.id} dream={dream} />
+
+                    <div key={dream.id} onClick={() => setSelectedDream(dream)}>
+                        <DreamCard dream={dream} showAuthor={true} />
+                    </div>
+
                   ))}
                 </div>
              </>
-           ) : (
+           ) 
+
+           /* Mój Profil */
+          : activeView === 'myProfil' ? (
+          <MyProfile />
+          )
+           
+           : (
              // Jeśli inny widok -> Wyświetl pustą kartę
              <div className="content-card">
                <p>Widok: {activeView} (w budowie)</p>
@@ -91,6 +105,13 @@ function App() {
       </div>
 
       <RightFeed />
+
+      {selectedDream && (
+        <DreamModal 
+          dream={selectedDream} 
+          onClose={() => setSelectedDream(null)} 
+        />
+      )}
 
     </div>
   )
