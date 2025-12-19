@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState, useEffect } from 'react'; // <--- Dodaj useEffect
 import "./App.css"; // Globalne
 import DesktopSidebar from "./components/DesktopSidebar";
 import RightFeed from "./components/RightFeed";
@@ -9,49 +9,36 @@ import HowItWorks from './components/HowItWorks';
 import MyProfile from "./components/MyProfile";
 import DreamModal from "./components/DreamModal";
 
+
 function App() {
   const [activeView, setActiveView] = useState('home');
   const [selectedDream, setSelectedDream] = useState(null);
 
-  // --- MOCK DATA (Udajemy bazę danych) ---
-  const dreams = [
-    {
-      id: 1,
-      title: "Podróż kamperem po Norwegii",
-      description: "Marzę o tym, żeby wynająć kampera i przejechać trasę atlantycką. Chcę zobaczyć fiordy o wschodzie słońca.",
-      image: "https://plus.unsplash.com/premium_photo-1661964372184-73651adc2f78?q=80&w=1012&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      userAvatar: "https://randomuser.me/api/portraits/men/32.jpg",
-      userName: "Tomek Podróżnik",
-      date: "2 godz. temu"
-    },
-    {
-      id: 2,
-      title: "Profesjonalny kurs baristyczny",
-      description: "Uwielbiam kawę i chciałabym nauczyć się robić idealne latte art. Szukam sponsora na kurs I stopnia.",
-      image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80",
-      userAvatar: "https://randomuser.me/api/portraits/women/44.jpg",
-      userName: "Anna Coffee",
-      date: "5 godz. temu"
-    },
-    {
-      id: 3,
-      title: "Gitara elektryczna Fender",
-      description: "Moja stara gitara już nie stroi. Marzę o Fenderze Stratocasterze, żeby założyć zespół rockowy z kumplami.",
-      image: "https://images.unsplash.com/photo-1520166012956-add9ba0835cb?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      userAvatar: "https://randomuser.me/api/portraits/men/85.jpg",
-      userName: "Rockowy Marek",
-      date: "1 dzień temu"
-    },
-     {
-      id: 4,
-      title: "Skok ze spadochronem",
-      description: "Chcę przełamać swój lęk wysokości. To moje największe marzenie od dzieciństwa!",
-      image: "https://plus.unsplash.com/premium_photo-1664391672112-70a2ad8cccb0?q=80&w=1036&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      userAvatar: "https://randomuser.me/api/portraits/women/65.jpg",
-      userName: "Odważna Jola",
-      date: "2 dni temu"
-    }
-  ];
+  const [dreams, setDreams] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:8081/dreams')
+      .then(res => res.json())
+      .then(data => {
+        const formattedDreams = data.map(item => ({
+          id: item.id,
+          title: item.title,
+          description: item.description,
+          category: item.category,
+          date: "Data z bazy", 
+          
+          // Łączymy imię i nazwisko
+          userName: `${item.first_name} ${item.last_name}`,
+          
+          // Ścieżki do zdjęć
+          userAvatar: item.userImage, 
+          image: item.image
+        }));
+
+        setDreams(formattedDreams);
+      })
+      .catch(err => console.error("Błąd pobierania marzeń:", err));
+  }, []); 
 
   return (
     <div className="app-layout">
