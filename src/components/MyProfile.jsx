@@ -64,8 +64,12 @@ export default function MyProfile() {
           <h2 className="bio-name">Adrian Domański</h2>
           <div className="bio-content-wrapper">
             <p className="bio-text">
-              "Cześć! Jestem Adrian. Na co dzień pracuję w IT, a po godzinach staram się zwolnić tempo. 
-              Szukam inspiracji na proste życie."
+                Lubię proste rzeczy i sensowne marzenia — czasem są to przedmioty, a czasem chwile, które dobrze zapadają w pamięć.
+                Ta lista to zbiór pomysłów na rzeczy, które chciałbym zrobić, przeżyć albo po prostu sprawdzić, czy rzeczywiście są tak dobre, jak mi się wydaje.
+
+                Jeśli trafiłeś tu, bo szukasz prezentu — jesteś w dobrym miejscu.
+                Jeśli z ciekawości — też okej.
+                A jeśli któreś z tych marzeń kiedyś się spełni, to znak, że ten pomysł naprawdę działa 🙂
             </p>
           </div>
         </div>
