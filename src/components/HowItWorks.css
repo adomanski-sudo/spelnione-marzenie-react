@@ -24,6 +24,7 @@
   align-items: flex-start;
   gap: 20px;
   flex-wrap: wrap; /* Żeby na telefonie spadły pod siebie */
+  padding: 15px;
 }
 
 .hiw-step {

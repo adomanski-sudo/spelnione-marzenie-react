@@ -1,6 +1,6 @@
 import React from 'react';
 import './HowItWorks.css';
-import { PenTool, HeartHandshake, Trophy, ArrowRight } from 'lucide-react';
+import { PenTool, ArrowRight, MessageCircleHeart, Gift, Cake, HeartHandshake  } from 'lucide-react';
 
 export default function HowItWorks() {
   return (
@@ -8,7 +8,10 @@ export default function HowItWorks() {
       <h3 className="hiw-title">SpelnioneMarzenie.pl
       </h3>
 
-        <div className="description">Też masz zawsze ten problem? Co dać w przencie? Urodziny, święta i inne okazje. A może Tobie też kiedyś zdażył się nietrafiony prezent? Twoi bliscy nie wiedzą, czego naprawdę potrzebujesz? Nic dziwnego, niełatwo jest mówić o tym wprost. Mamy na to proste rozwiązanie!</div>
+        <span className="up-note"><p>Nie wiesz co dać w prezencie?</p>
+        <p>Masz dość nietrafionych nispodzianek?</p>
+         <p>SpelnioneMarzenie.pl rozwiązuje ten problem w prosty sposób:</p></span>
+
       
       <div className="hiw-steps">
 
@@ -16,33 +19,53 @@ export default function HowItWorks() {
           <div className="step-icon-box">
             <PenTool size={24} />
           </div>
-          <span className="step-label">1. Stwórz swoją listę marzeń</span>
-          <p className="step-desc">Opisz swoje marzenie, dodaj zdjęcie i określ, czego potrzebujesz.</p>
+          <span className="step-label">1. Tworzysz listę swoich marzeń</span>
+          <p className="step-desc">Dodajesz rzeczy, doświadczenia i pomysły — od przedmiotów po wspólne chwile.</p>
         </div>
 
         <ArrowRight className="step-arrow" size={20} />
 
         <div className="hiw-step">
           <div className="step-icon-box">
-            <HeartHandshake size={24} />
+            <MessageCircleHeart size={24} />
           </div>
-          <span className="step-label">2. Udostępnij ją rodzinie i znajomym</span>
-          <p className="step-desc">Niech każdy wie, przecież okazji jest tak wiele.</p>
+          <span className="step-label">2. Bliscy zaglądają na Twój profil</span>
+          <p className="step-desc">Gdy ktoś szuka prezentu, widzi dokładnie to, czego pragniesz.</p>
         </div>
 
         <ArrowRight className="step-arrow" size={20} />
 
         <div className="hiw-step">
           <div className="step-icon-box">
-            <Trophy size={24} />
+            <Cake size={24} />
           </div>
-          <span className="step-label">3. Ciesz się spełnionymi marzeniami</span>
-          <p className="step-desc">Nigdy więcej nietrafionych prezentów!</p>
+          <span className="step-label">3. Rezerwacja bez zdradzania niespodzianki</span>
+          <p className="step-desc">Rezerwują marzenie — Ty o tym nie wiesz,
+          ale inni widzą ostrzeżenie, że prezent jest już zajęty.</p>
+        </div>
+
+        <ArrowRight className="step-arrow" size={20} />
+
+        <div className="hiw-step">
+          <div className="step-icon-box">
+            <HeartHandshake  ft size={24} />
+          </div>
+          <span className="step-label">4. Zrzutka na większe marzenia</span>
+          <p className="step-desc">Kilka osób może wspólnie spełnić jedno marzenie — nawet jeśli się nie znają.</p>
+        </div>
+
+        <ArrowRight className="step-arrow" size={20} />
+
+        <div className="hiw-step">
+          <div className="step-icon-box">
+            <Gift  ft size={24} />
+          </div>
+          <span className="step-label"><p>5. Zero dubli.</p>
+          <p>Zero nietrafionych prezentów.</p></span>
+          <p className="step-desc">Tylko spełnione marzenia.</p>
         </div>
 
       </div>
-
-        <div className="description">Dzięki systemowi rezerwacji, nadal niespodzianka, nie dubliją się i tak dalej...</div>
     </section>
   );
 }
