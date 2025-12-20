@@ -266,7 +266,7 @@
   padding-top: 20px;
 }
 
-.btn-primary-large {
+.btn-primary-large, .btn-primary-large2 {
   background-color: #10b981;
   color: white;
   border: none;
@@ -281,10 +281,20 @@
   transition: background 0.2s, transform 0.2s;
 }
 
-.btn-primary-large:hover {
+.btn-primary-large2 {
+  margin-left: 50px;
+  background-color: #1089b9;
+}
+
+.btn-primary-large:hover, .btn-primary-large2:hover {
   background-color: #059669;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+}
+
+.btn-primary-large2:hover {
+  margin-left: 50px;
+  background-color: #0e7aa5;
 }
 
 /* Responsywność */

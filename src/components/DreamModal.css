@@ -107,7 +107,7 @@
 }
 
 /* Przycisk Akcji (Ten główny!) */
-.btn-primary {
+.btn-primary, .btn-primary2 {
   background-color: #10b981;
   color: white;
   border: none;
@@ -122,8 +122,20 @@
   gap: 8px;
 }
 
+.btn-primary2 {
+background-color: rgb(0, 153, 255);
+}
+
 .btn-primary:hover {
   background-color: #059669;
+}
+
+.btn-primary2:hover {
+  background-color: rgb(0, 136, 226);
+}
+
+.btn-primary {
+  margin-left: 200px;
 }
 
 /* Animacje wejścia */
@@ -151,4 +163,5 @@
     width: 55%;
     overflow-y: auto; /* Przewijanie tylko tekstu */
   }
+
 }

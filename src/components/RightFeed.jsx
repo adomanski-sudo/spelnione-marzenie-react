@@ -89,7 +89,7 @@ export default function RightFeed() {
       {/* Dodatek na dole - np. zachęta */}
       <div style={{ marginTop: 'auto', padding: '15px', background: '#f1f5f9', borderRadius: '12px', textAlign: 'center' }}>
         <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>
-          Zainspiruj innych swoim sukcesem!
+          Zainspiruj innych!
         </p>
         <button style={{ 
           background: '#fff', 
@@ -101,7 +101,7 @@ export default function RightFeed() {
           cursor: 'pointer',
           color: '#475569'
         }}>
-          + Dodaj sukces
+          + Dodaj marzenie
         </button>
       </div>
     </aside>

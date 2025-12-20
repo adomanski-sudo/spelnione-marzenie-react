@@ -9,23 +9,18 @@ app.use(express.json());
 
 // KONFIGURACJA POŁĄCZENIA
 // Teraz pobieramy dane z process.env
-const db = mysql.createConnection({
+// Pula sama zarządza utrzymaniem połączenia przy życiu (Keep-Alive)
+const db = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    port: process.env.DB_PORT || 3306
+    port: process.env.DB_PORT || 3306,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
-// TEST POŁĄCZENIA
-db.connect((err) => {
-    if (err) {
-        console.error('Błąd łączenia z bazą danych:', err.message);
-        // Częsty błąd to zablokowane IP na hostingu - zaraz o tym powiem
-    } else {
-        console.log('Połączono z bazą danych na SeoHost!');
-    }
-});
 
 // ENDPOINTY (bez zmian)
 app.get('/dreams', (req, res) => {
@@ -33,6 +28,7 @@ app.get('/dreams', (req, res) => {
         SELECT dreams.*, users.first_name, users.last_name, users.image as userImage 
         FROM dreams 
         JOIN users ON dreams.idUser = users.id
+        ORDER BY dreams.date desc
     `;
     db.query(sql, (err, data) => {
         if(err) return res.json(err);

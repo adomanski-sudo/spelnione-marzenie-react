@@ -16,21 +16,27 @@ function App() {
 
   const [dreams, setDreams] = useState([]);
 
+  const myDreams = dreams.filter(dream => dream.userId === 2);
+
   useEffect(() => {
     fetch('http://localhost:8081/dreams')
       .then(res => res.json())
       .then(data => {
         const formattedDreams = data.map(item => ({
           id: item.id,
+          userId: item.idUser,
           title: item.title,
           description: item.description,
           category: item.category,
-          date: "Data z bazy", 
           
-          // Łączymy imię i nazwisko
+          date: new Date(item.date).toLocaleDateString('pl-PL', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          }),
+          
           userName: `${item.first_name} ${item.last_name}`,
           
-          // Ścieżki do zdjęć
           userAvatar: item.userImage, 
           image: item.image
         }));
@@ -76,7 +82,9 @@ function App() {
 
            /* Mój Profil */
           : activeView === 'myProfil' ? (
-          <MyProfile />
+            <MyProfile 
+            dreams={myDreams}  /* <--- PRZEKAZUJEMY PRAWDZIWE DANE */
+            />
           )
            
            : (

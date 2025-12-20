@@ -38,7 +38,6 @@ export default function DreamModal({ dream, onClose }) {
             {/* Tu można dodać więcej sekcji, np. komentarze, pasek postępu zbiórki itp. */}
             <div style={{ padding: '15px', background: '#f8fafc', borderRadius: '10px', fontSize: '14px', color: '#475569' }}>
                 💡 <strong>Jak możesz pomóc?</strong><br/>
-                Skontaktuj się z autorem, zaoferuj wsparcie merytoryczne lub dorzuć się do zbiórki.
             </div>
           </div>
         </div>
@@ -49,7 +48,10 @@ export default function DreamModal({ dream, onClose }) {
            </span>
            
            <button className="btn-primary" onClick={() => alert("Tu podepniemy funkcję backendu!")}>
-              Spełnij Marzenie <Sparkles size={18} />
+              Spełnij Marzenie 
+           </button>
+            <button className="btn-primary2" onClick={() => alert("Tu podepniemy funkcję backendu!")}>
+              Zaproponuj zrzutkę
            </button>
         </div>
 

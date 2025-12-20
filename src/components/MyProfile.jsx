@@ -4,44 +4,12 @@ import DreamCard from './DreamCard';
 import avatarImg from '../assets/avatar.jpg'; 
 import { Edit3, Plus, ArrowLeft, Sparkles } from 'lucide-react'; // Ikona strzałki powrotu
 
-export default function MyProfile() {
+export default function MyProfile({ dreams }) {
+
+  console.log(dreams);
   
   // 1. STAN LOKALNY: Które marzenie oglądamy? (null = widok listy)
   const [activeDream, setActiveDream] = useState(null);
-
-  // MOCK DATA (bez zmian)
-  const myDreams = [
-    {
-      id: 101,
-      title: "Własna aplikacja webowa",
-      description: "Chcę stworzyć portal SpelnioneMarzenie.pl. Potrzebuję wsparcia merytorycznego i graficznego, bo frontend idzie mi coraz lepiej, ale backend to czarna magia.",
-      image: "https://images.unsplash.com/photo-1555099962-4199c345e5dd?auto=format&fit=crop&w=800&q=80",
-      category: "IT / Nauka",
-      userAvatar: avatarImg,
-      userName: "Adrian Domański",
-      date: "W trakcie realizacji"
-    },
-    {
-      id: 102,
-      title: "Wyjazd w Bieszczady",
-      description: "Tydzień w drewnianej chacie bez zasięgu. Potrzebuję tylko dobrej książki, ciszy i braku dostępu do internetu. Szukam poleceń sprawdzonych domków na odludziu.",
-      image: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80",
-      category: "Relaks",
-      userAvatar: avatarImg,
-      userName: "Adrian Domański",
-      date: "Dodano tydzień temu"
-    },
-    {
-        id: 103,
-        title: "Kurs Stolarki",
-        description: "Chciałbym nauczyć się robić proste meble. Może ktoś zna dobrego mistrza w okolicy? Mam już kilka narzędzi, ale brakuje mi wiedzy praktycznej.",
-        image: "https://images.unsplash.com/photo-1610555356070-d0efb6505f81?auto=format&fit=crop&w=800&q=80",
-        category: "Hobby",
-        userAvatar: avatarImg,
-        userName: "Adrian Domański",
-        date: "Dodano miesiąc temu"
-      }
-  ];
 
   return (
     <div className="profile-split-view">
@@ -69,7 +37,7 @@ export default function MyProfile() {
 
                 Jeśli trafiłeś tu, bo szukasz prezentu — jesteś w dobrym miejscu.
                 Jeśli z ciekawości — też okej.
-                A jeśli któreś z tych marzeń kiedyś się spełni, to znak, że ten pomysł naprawdę działa 🙂
+                A jeśli któreś z tych marzeń kiedyś się spełni, to znak, że ten pomysł naprawdę działa.
             </p>
           </div>
         </div>
@@ -81,7 +49,7 @@ export default function MyProfile() {
         {/* WARUNEK: Jeśli NIE MA wybranego marzenia -> Pokaż siatkę (LISTA) */}
         {!activeDream ? (
           <div className="dreams-grid-compact fade-in">
-              {myDreams.map(dream => (
+              {dreams.map(dream => (
                   <div 
                     key={dream.id} 
                     onClick={() => setActiveDream(dream)} // Kliknięcie wchodzi w szczegóły
@@ -116,7 +84,10 @@ export default function MyProfile() {
                   
                   <div className="detail-footer">
                     <button className="btn-primary-large">
-                      Spełnij to marzenie <Sparkles size={18} />
+                      Zarezerwuj
+                    </button>
+                    <button className="btn-primary-large2">
+                      Zaproponuj zrzutkę 
                     </button>
                   </div>
                </div>
