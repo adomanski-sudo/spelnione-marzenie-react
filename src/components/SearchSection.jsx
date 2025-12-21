@@ -22,7 +22,7 @@ export default function SearchSection() {
     
     const timer = setTimeout(() => {
         // Usunęliśmy warunek if (query.length > 2) - teraz pobiera zawsze!
-        fetch(`http://localhost:8081/search?q=${query}&type=${searchType}`)
+        fetch(`/api/search?q=${query}&type=${searchType}`)
           .then(res => res.json())
           .then(data => {
             

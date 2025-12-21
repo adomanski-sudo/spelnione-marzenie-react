@@ -35,7 +35,7 @@ function App() {
   const [friendsList, setFriendsList] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:8081/dreams')
+    fetch('/api/dreams')
       .then(res => res.json())
       .then(data => {
         const formattedDreams = data.map(item => ({
@@ -63,7 +63,7 @@ function App() {
   }, []); 
 
   useEffect(() => {
-    fetch('http://localhost:8081/user')
+    fetch('/api/user')
       .then(res => res.json())
       .then(data => {
         if (data && data.length > 0) {
@@ -74,7 +74,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    fetch('http://localhost:8081/friends')
+    fetch('/api/friends')
       .then(res => res.json())
       .then(data => setFriendsList(data))
       .catch(err => console.error(err));
