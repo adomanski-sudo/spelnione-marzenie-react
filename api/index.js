@@ -55,8 +55,8 @@ app.get('/api/search', (req, res) => {
             SELECT dreams.*, users.first_name, users.last_name, users.image as userImage 
             FROM dreams 
             JOIN users ON dreams.idUser = users.id
-            WHERE title LIKE ? OR description LIKE ?
-            ORDER BY dreams.date DESC
+            WHERE dreams.title LIKE ? OR dreams.description LIKE ?
+            ORDER BY dreams.date DESC;
         `;
     }
 
