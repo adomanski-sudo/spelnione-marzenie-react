@@ -4,9 +4,7 @@ import DreamCard from './DreamCard';
 import avatarImg from '../assets/avatar.jpg'; 
 import { Edit3, Plus, ArrowLeft, Sparkles } from 'lucide-react'; // Ikona strzałki powrotu
 
-export default function MyProfile({ dreams }) {
-
-  console.log(dreams);
+export default function MyProfile({ dreams, userData }) {
   
   // 1. STAN LOKALNY: Które marzenie oglądamy? (null = widok listy)
   const [activeDream, setActiveDream] = useState(null);
@@ -25,19 +23,20 @@ export default function MyProfile({ dreams }) {
             <img src={avatarImg} alt="Profil" className="bio-avatar" />
             <button className="circle-action-btn add-btn">
                <Plus size={22} />
-               <span className="btn-label">Dodaj cel</span>
+               <span className="btn-label">Dodaj marzenie</span>
             </button>
           </div>
           
-          <h2 className="bio-name">Adrian Domański</h2>
+          <h2 className="bio-name">
+            {userData ? `${userData.first_name} ${userData.last_name}` : "Ładowanie..."}
+          </h2>
           <div className="bio-content-wrapper">
             <p className="bio-text">
-                Lubię proste rzeczy i sensowne marzenia — czasem są to przedmioty, a czasem chwile, które dobrze zapadają w pamięć.
-                Ta lista to zbiór pomysłów na rzeczy, które chciałbym zrobić, przeżyć albo po prostu sprawdzić, czy rzeczywiście są tak dobre, jak mi się wydaje.
-
-                Jeśli trafiłeś tu, bo szukasz prezentu — jesteś w dobrym miejscu.
-                Jeśli z ciekawości — też okej.
-                A jeśli któreś z tych marzeń kiedyś się spełni, to znak, że ten pomysł naprawdę działa.
+              {userData ? (
+                `${userData.description}`
+              ) : (
+                "Wczytywanie profilu..."
+              )}
             </p>
           </div>
         </div>

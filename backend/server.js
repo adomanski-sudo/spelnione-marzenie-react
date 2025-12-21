@@ -7,6 +7,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Do testów, później będzie tutaj zmienna z systemu logowania
+const activUser = 2;
+
 // KONFIGURACJA POŁĄCZENIA
 // Teraz pobieramy dane z process.env
 // Pula sama zarządza utrzymaniem połączenia przy życiu (Keep-Alive)
@@ -34,7 +37,16 @@ app.get('/dreams', (req, res) => {
         if(err) return res.json(err);
         return res.json(data);
     })
-})
+});
+
+app.get('/user', (req, res) => {
+    const sql = `
+        select * from users where users.id = ${activUser}`;
+    db.query(sql, (err, data) => {
+        if(err) return res.json(err);
+        return res.json(data);
+    })
+});
 
 // WAŻNE DLA VERCEL: Exportujemy aplikację, zamiast tylko nasłuchiwać
 // Lokalnie nadal używamy app.listen

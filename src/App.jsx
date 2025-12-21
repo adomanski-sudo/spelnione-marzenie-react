@@ -9,14 +9,19 @@ import HowItWorks from './components/HowItWorks';
 import MyProfile from "./components/MyProfile";
 import DreamModal from "./components/DreamModal";
 
+const activUser = 2;
 
 function App() {
   const [activeView, setActiveView] = useState('home');
   const [selectedDream, setSelectedDream] = useState(null);
 
   const [dreams, setDreams] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
 
-  const myDreams = dreams.filter(dream => dream.userId === 2);
+  const myDreams = dreams.filter(dream => dream.userId === activUser);
+
+  const userDescription = '';
+  const setDescription = [activUser, userDescription];
 
   useEffect(() => {
     fetch('http://localhost:8081/dreams')
@@ -45,6 +50,17 @@ function App() {
       })
       .catch(err => console.error("Błąd pobierania marzeń:", err));
   }, []); 
+
+  useEffect(() => {
+    fetch('http://localhost:8081/user')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.length > 0) {
+            setCurrentUser(data[0]);
+        }
+      })
+      .catch(err => console.error("Błąd pobierania użytkownika:", err));
+  }, []);
 
   return (
     <div className="app-layout">
@@ -84,6 +100,7 @@ function App() {
           : activeView === 'myProfil' ? (
             <MyProfile 
             dreams={myDreams}  /* <--- PRZEKAZUJEMY PRAWDZIWE DANE */
+            userData={currentUser}  /* <--- PRZEKAZUJEMY DANE */
             />
           )
            
