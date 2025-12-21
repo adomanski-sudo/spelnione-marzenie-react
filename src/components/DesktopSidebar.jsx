@@ -1,6 +1,6 @@
 import React from 'react';
 import './DesktopSidebar.css'; // <--- Import stylu
-import { Home, Search, Bell, Heart, Settings, LogOut, User } from 'lucide-react'; // <--- Biblioteka z ikonami SVG
+import { Home, Search, Bell, Heart, Settings, LogOut } from 'lucide-react'; // <--- Biblioteka z ikonami SVG
 
 import profilImg from '../assets/avatar.jpg';
 

@@ -3,6 +3,25 @@
   display: none;
 }
 
+.btn {
+  display: flex;
+  gap: 15px;
+}
+
+.menu-btn {
+  padding: 0;
+  margin: 0;
+}
+
+.menu-btn > img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
 /* Pokaż na mobile */
 @media (max-width: 1024px) {
   .mobile-header {

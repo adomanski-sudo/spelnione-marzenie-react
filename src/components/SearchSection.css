@@ -80,7 +80,7 @@
 /* Zamiast .users-list robimy GRID */
 .users-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Responsywne kafelki */
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Responsywne kafelki */
   gap: 20px;
   width: 100%;
 }
