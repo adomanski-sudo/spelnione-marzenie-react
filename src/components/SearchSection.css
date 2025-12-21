@@ -1,0 +1,137 @@
+.search-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px 0;
+}
+
+.search-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.search-title {
+  font-size: 28px;
+  color: #1e293b;
+  margin-bottom: 20px;
+  font-weight: 800;
+}
+
+/* --- PRZEŁĄCZNIK (TOGGLE) --- */
+.search-toggle {
+  display: inline-flex;
+  background: #f1f5f9;
+  padding: 5px;
+  border-radius: 30px;
+  margin-bottom: 20px;
+}
+
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  border-radius: 25px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle-btn.active {
+  background: white;
+  color: #0284c7; /* Aktywny kolor */
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* --- DUŻE POLE TEKSTOWE --- */
+.search-input-wrapper {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.search-icon {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+
+.search-input {
+  width: 100%;
+  padding: 16px 20px 16px 55px; /* Duży padding z lewej na ikonę */
+  font-size: 18px;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  outline: none;
+  transition: border-color 0.2s;
+  background: white;
+}
+
+.search-input:focus {
+  border-color: #0284c7;
+  box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.1);
+}
+
+/* --- WYNIKI: UŻYTKOWNICY --- */
+/* Zamiast .users-list robimy GRID */
+.users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* Responsywne kafelki */
+  gap: 20px;
+  width: 100%;
+}
+
+.user-search-card {
+  display: flex;
+  flex-direction: column; /* Układ pionowy (Zdjęcie nad tekstem) lub poziomy - jak wolisz */
+  align-items: center;    /* Centrowanie */
+  text-align: center;
+  background: white;
+  padding: 25px;
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+
+.user-search-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  border-color: #cbd5e1;
+}
+
+.user-search-avatar {
+  width: 80px; /* Większy awatar */
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 15px;
+  border: 3px solid #f8fafc;
+}
+
+.user-search-info {
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.user-search-name {
+  margin: 0 0 5px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.user-search-desc {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.5;
+  height: 80px; /* Stała wysokość na opis */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 4; /* Pokaż max 4 linie */
+  -webkit-box-orient: vertical;
+}

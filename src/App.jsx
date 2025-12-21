@@ -8,11 +8,20 @@ import DreamCard from "./components/DreamCard";
 import HowItWorks from './components/HowItWorks';
 import MyProfile from "./components/MyProfile";
 import DreamModal from "./components/DreamModal";
+import SearchSection from './components/SearchSection';
+import FriendsSection from './components/FriendsSection';
 
 const activUser = 2;
 
 function App() {
-  const [activeView, setActiveView] = useState('home');
+  const [activeView, setActiveView] = useState(() => {
+      return localStorage.getItem('savedActiveView') || 'home';
+  });
+
+  useEffect(() => {
+      localStorage.setItem('savedActiveView', activeView);
+  }, [activeView]); // Uruchom zawsze, gdy zmieni się activeView
+
   const [selectedDream, setSelectedDream] = useState(null);
 
   const [dreams, setDreams] = useState([]);
@@ -22,6 +31,8 @@ function App() {
 
   const userDescription = '';
   const setDescription = [activUser, userDescription];
+
+  const [friendsList, setFriendsList] = useState([]);
 
   useEffect(() => {
     fetch('http://localhost:8081/dreams')
@@ -60,6 +71,13 @@ function App() {
         }
       })
       .catch(err => console.error("Błąd pobierania użytkownika:", err));
+  }, []);
+
+  useEffect(() => {
+    fetch('http://localhost:8081/friends')
+      .then(res => res.json())
+      .then(data => setFriendsList(data))
+      .catch(err => console.error(err));
   }, []);
 
   return (
@@ -102,6 +120,14 @@ function App() {
             dreams={myDreams}  /* <--- PRZEKAZUJEMY PRAWDZIWE DANE */
             userData={currentUser}  /* <--- PRZEKAZUJEMY DANE */
             />
+          )
+
+          : activeView === 'search' ? (
+            <SearchSection />
+          )
+
+          : activeView === 'friends' ? (
+            <FriendsSection friends={friendsList} />
           )
            
            : (

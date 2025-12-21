@@ -48,6 +48,49 @@ app.get('/user', (req, res) => {
     })
 });
 
+// ENDPOINT WYSZUKIWANIA
+app.get('/search', (req, res) => {
+    const { q, type } = req.query; 
+
+    // 1. Zmieniamy logikę: Jeśli 'q' jest puste, szukamy wszystkiego ('%')
+    const searchTerm = q ? `%${q}%` : '%'; 
+
+    let sql = '';
+    let params = [searchTerm, searchTerm];
+
+    if (type === 'users') {
+        // Szukamy użytkowników (Imię LUB Nazwisko)
+        // Jeśli searchTerm to '%', zwróci wszystkich
+        sql = `SELECT * FROM users WHERE first_name LIKE ? OR last_name LIKE ?`;
+    } else {
+        // Szukamy marzeń
+        sql = `
+            SELECT dreams.*, users.first_name, users.last_name, users.image as userImage 
+            FROM dreams 
+            JOIN users ON dreams.idUser = users.id
+            WHERE dreams.title LIKE ? OR dreams.description LIKE ?
+            ORDER BY dreams.date DESC
+            `;
+    }
+
+    db.query(sql, params, (err, data) => {
+        if (err) return res.json(err);
+        return res.json(data);
+    });
+});
+
+// ENDPOINT: Pobierz listę potencjalnych znajomych (wszyscy poza mną)
+app.get('/friends', (req, res) => {
+    // activUser to ta zmienna = 2, którą masz zdefiniowaną na górze pliku
+    const sql = `SELECT * FROM users WHERE id != ?`; 
+    
+    db.query(sql, [activUser], (err, data) => {
+        if (err) return res.json(err);
+        return res.json(data);
+    });
+});
+
+
 // WAŻNE DLA VERCEL: Exportujemy aplikację, zamiast tylko nasłuchiwać
 // Lokalnie nadal używamy app.listen
 const PORT = process.env.PORT || 8081;
