@@ -138,6 +138,19 @@ background-color: rgb(0, 153, 255);
   margin-left: 200px;
 }
 
+.btn-delete { 
+  background: #fee2e2; 
+  color: #ef4444; 
+  border: 1px solid #fecaca; }
+.btn-delete:hover { 
+  background: #fecaca; }
+.btn-edit { background: #f1f5f9; 
+  color: #334155; }
+.btn-reserve { 
+  background: #e0f2fe; 
+  color: #0284c7; }
+.btn-fund { background: #dcfce7; color: #16a34a; }
+
 /* Animacje wejścia */
 @keyframes fadeIn {
   from { opacity: 0; }
