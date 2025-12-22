@@ -1,76 +1,88 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './RightFeed.css';
-import { EyeOff } from 'lucide-react'; // Ikona "tajemnicy"
+import { EyeOff } from 'lucide-react';
 
 export default function RightFeed() {
   const [activities, setActivities] = useState([]);
-  const [userPool, setUserPool] = useState([]); // Pula "aktorów" (prawdziwi userzy)
+  const [dataPool, setDataPool] = useState([]); // Pula wszystkich pobranych marzeń/użytkowników
   
-  // Ref, żeby mieć dostęp do aktualnego stanu wewnątrz timeoutu
+  // Ref potrzebny, aby setTimeout widział aktualny stan
   const activitiesRef = useRef([]);
   activitiesRef.current = activities;
 
-  // 1. Pobieramy prawdziwe dane na start (żeby mieć bazę aktorów i marzeń)
+  // 1. Pobieramy dane na start (to nasza baza do losowania)
   useEffect(() => {
     fetch('/api/feed')
       .then(res => res.json())
       .then(data => {
-        setActivities(data);
-        setUserPool(data); // Zapisujemy ich jako dostępnych aktorów
+        setActivities(data);   // Wyświetl to co mamy w bazie
+        setDataPool(data);     // Zapisz do puli do późniejszego losowania
       })
       .catch(err => console.error("Błąd feedu:", err));
   }, []);
 
-  // 2. Generator Zdarzeń (Symulacja Live)
+  // 2. Generator Zdarzeń (Pętla nieskończona)
   useEffect(() => {
     let timeoutId;
 
     const scheduleNextEvent = () => {
-      // Losowy czas: od 2000ms (2s) do 6000ms (6s)
+      // Losowy czas: od 2s do 6s
       const randomTime = Math.random() * (6000 - 2000) + 2000;
       
       timeoutId = setTimeout(() => {
         addRandomEvent();
-        scheduleNextEvent(); // Rekurencja - zaplanuj kolejne
+        scheduleNextEvent(); // Zaplanuj kolejne
       }, randomTime);
     };
 
-    // Startujemy pętlę tylko jeśli mamy "aktorów"
-    if (userPool.length > 0) {
+    // Startujemy pętlę tylko jeśli mamy z czego losować
+    if (dataPool.length > 0) {
       scheduleNextEvent();
     }
 
     return () => clearTimeout(timeoutId);
-  }, [userPool]); // Uruchom, gdy pobierzemy userów
+  }, [dataPool]); 
 
-  // Funkcja generująca losowe zdarzenie
+  // --- LOGIKA MIESZANA ---
   const addRandomEvent = () => {
-    if (userPool.length === 0) return;
+    if (dataPool.length === 0) return;
 
-    // Losujemy aktora z puli
-    const actor = userPool[Math.floor(Math.random() * userPool.length)];
+    // 1. Wybieramy losowy element z bazy (marzenie + user)
+    const randomItem = dataPool[Math.floor(Math.random() * dataPool.length)];
     
-    // Typy zdarzeń "Tajemniczych"
-    const secretTypes = [
-        { text: "zarezerwował(a) marzenie", icon: "🤫" },
-        { text: "zaproponował(a) zrzutkę", icon: "💰" },
-        { text: "dołączył(a) do zrzutki", icon: "🤝" }
-    ];
+    // 2. Rzut monetą: Czy to tajne zdarzenie (40%), czy zwykłe (60%)?
+    const isSecretEvent = Math.random() > 0.6; 
 
-    const randomType = secretTypes[Math.floor(Math.random() * secretTypes.length)];
-
-    const newEvent = {
-      id: Date.now(), // Unikalne ID
-      first_name: actor.first_name,
-      last_name: actor.last_name,
-      userImage: actor.userImage, // Używamy prawdziwego zdjęcia
-      is_secret: true, // Flaga: to jest tajne zdarzenie
-      secret_text: randomType.text,
-      secret_icon: randomType.icon,
-      date: new Date().toISOString() // Czas: teraz
+    let newEvent = {
+        id: Date.now() + Math.random(), // Unikalne ID
+        first_name: randomItem.first_name,
+        last_name: randomItem.last_name,
+        userImage: randomItem.userImage,
+        date: new Date().toISOString(), // Data: TERAZ
     };
 
-    // Dodajemy nowe zdarzenie na górę listy i ucinamy, żeby nie zapchać pamięci (max 10)
+    if (isSecretEvent) {
+        // --- SCENARIUSZ A: TAJEMNICA ---
+        const secretTypes = [
+            { text: "zarezerwował(a) marzenie", icon: "🤫" },
+            { text: "zaproponował(a) zrzutkę", icon: "💰" },
+            { text: "dołączył(a) do zrzutki", icon: "🤝" }
+        ];
+        const randomType = secretTypes[Math.floor(Math.random() * secretTypes.length)];
+        
+        newEvent.is_secret = true;
+        newEvent.secret_text = randomType.text;
+        newEvent.secret_icon = randomType.icon;
+        
+    } else {
+        // --- SCENARIUSZ B: RECYKLING MARZENIA (Dodał/Spełnił) ---
+        // Udajemy, że to marzenie z bazy zostało dodane/spełnione w tej sekundzie
+        newEvent.is_secret = false;
+        newEvent.title = randomItem.title;
+        newEvent.is_fulfilled = randomItem.is_fulfilled;
+    }
+
+    // Dodajemy na górę listy i trzymamy max 10 elementów
     setActivities(prev => [newEvent, ...prev].slice(0, 10));
   };
 
@@ -104,7 +116,7 @@ export default function RightFeed() {
             />
             
             <div className="feed-content">
-              {/* --- LOGIKA DLA TAJNYCH ZDARZEŃ --- */}
+              {/* --- RENDEROWANIE TAJNE --- */}
               {item.is_secret ? (
                   <>
                     <p className="feed-text">
@@ -120,7 +132,7 @@ export default function RightFeed() {
                     </div>
                   </>
               ) : (
-              /* --- LOGIKA DLA NORMALNYCH ZDARZEŃ (z Bazy) --- */
+              /* --- RENDEROWANIE ZWYKŁE --- */
                   <>
                     <p className="feed-text">
                         <strong>{item.first_name} {item.last_name && item.last_name[0]}.</strong>
