@@ -85,6 +85,29 @@ app.get('/api/friends', (req, res) => {
     });
 });
 
+app.get('/api/feed', (req, res) => {
+    const sql = `
+        SELECT 
+            d.id, 
+            d.title, 
+            d.is_fulfilled, 
+            d.date, 
+            u.first_name, 
+            u.last_name, 
+            u.image as userImage
+        FROM dreams d
+        JOIN users u ON d.idUser = u.id
+        ORDER BY d.date DESC 
+        LIMIT 5
+    `;
+    
+    db.query(sql, (err, data) => {
+        if(err) return res.status(500).json(err);
+        return res.json(data);
+    });
+});
+
+
 // Health Check
 app.get('/api/health', (req, res) => {
     res.json({ status: "Backend działa na Vercel (ES Modules)!", time: new Date() });

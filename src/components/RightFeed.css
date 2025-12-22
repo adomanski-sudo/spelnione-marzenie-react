@@ -1,107 +1,89 @@
-/* Kontener panelu (bazuje na poprzednim, ale dodajemy detale) */
-.feed {
-  width: 320px; /* Nieco szerszy, żeby tekst się mieścił */
-  height: 100vh;
-  background-color: var(--bg-panel);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  box-shadow: var(--shadow-depth);
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  overflow-y: auto; /* Przewijanie, jeśli lista jest długa */
+.right-feed {
+    padding: 20px;
+    background: #fff; /* lub przezroczysty, zależy od designu */
 }
 
 .feed-header {
-  text-transform: uppercase;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text-muted);
-  letter-spacing: 1px;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #e2e8f0;
+    font-size: 12px;
+    font-weight: 700;
+    color: #94a3b8;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
 }
 
-/* Pojedynczy element listy */
+.feed-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
 .feed-item {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-  align-items: start;
-  transition: transform 0.2s;
-  cursor: pointer;
-}
-
-.feed-item:hover {
-  transform: translateX(5px); /* Lekki ruch w prawo po najechaniu */
-}
-
-/* Kontener na awatar + ikonkę statusu */
-.avatar-container {
-  position: relative;
-  flex-shrink: 0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
 }
 
 .feed-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-/* Mała ikonka na awatarze (gwiazdka lub puchar) */
-.status-icon {
-  position: absolute;
-  bottom: -4px;
-  right: -4px;
-  width: 18px;
-  height: 18px;
-  background: #fff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-/* Treść powiadomienia */
 .feed-content {
-  font-size: 13px;
-  line-height: 1.4;
-  color: var(--text-main);
+    flex: 1;
 }
 
-.feed-user {
-  font-weight: 700;
-  color: #334155;
+.feed-text {
+    font-size: 13px;
+    color: #334155;
+    margin: 0;
+    line-height: 1.4;
 }
 
-.feed-action {
-  color: var(--text-muted);
-}
-
-.feed-target {
-  font-weight: 600;
-  color: #0f172a;
-  display: block; /* Przenosi cel do nowej linii lub wyróżnia go */
-}
-
-/* Styl dla sukcesu (zielony tekst) */
-.feed-target.success {
-  color: #059669; /* Zielony szmaragdowy */
+.feed-dream-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f172a;
+    margin: 2px 0 4px 0;
 }
 
 .feed-time {
-  display: block;
-  font-size: 11px;
-  color: #94a3b8;
-  margin-top: 4px;
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.feed-footer {
+    margin-top: 40px;
+    padding: 20px;
+    background: #f8fafc;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.feed-footer p {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 10px;
+}
+
+.btn-small {
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-small:hover {
+    border-color: #0284c7;
+    color: #0284c7;
 }
 
 /* Ukrywanie na małych ekranach */

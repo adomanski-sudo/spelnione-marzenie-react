@@ -1,109 +1,83 @@
-import React from 'react';
-import './RightFeed.css';
+import React, { useState, useEffect } from 'react';
+import './RightFeed.css'; // Zakładam, że masz ten plik, albo użyjemy stylów inline/globalnych
 
 export default function RightFeed() {
-  
-  // MOCK DATA - Dane testowe dla panelu aktywności
-  const activities = [
-    {
-      id: 1,
-      user: "Kasia K.",
-      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-      type: "success", // Typ: sukces
-      text: "spełniła marzenie:",
-      target: "Lot Balonem nad Mazurami",
-      time: "2 min temu"
-    },
-    {
-      id: 2,
-      user: "Marek Z.",
-      avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-      type: "new",
-      text: "dodał marzenie:",
-      target: "Nauka gry na pianinie",
-      time: "15 min temu"
-    },
-    {
-      id: 3,
-      user: "Anna Nowak",
-      avatar: "https://randomuser.me/api/portraits/women/68.jpg",
-      type: "new",
-      text: "dodała marzenie:",
-      target: "Zestaw wędkarski",
-      time: "1 godz. temu"
-    },
-    {
-      id: 4,
-      user: "Tomek Dev",
-      avatar: "https://randomuser.me/api/portraits/men/86.jpg",
-      type: "success",
-      text: "spełnił marzenie:",
-      target: "Stworzenie własnej gry",
-      time: "3 godz. temu"
-    },
-    {
-      id: 5,
-      user: "Jola B.",
-      avatar: "https://randomuser.me/api/portraits/women/12.jpg",
-      type: "new",
-      text: "dodała marzenie:",
-      target: "Podróż do Japonii",
-      time: "5 godz. temu"
-    }
-  ];
+  const [activities, setActivities] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/feed')
+      .then(res => res.json())
+      .then(data => setActivities(data))
+      .catch(err => console.error("Błąd feedu:", err));
+  }, []);
+
+  // Funkcja pomocnicza do liczenia czasu ("X minut temu")
+  const timeAgo = (dateString) => {
+      const date = new Date(dateString);
+      const now = new Date();
+      const seconds = Math.floor((now - date) / 1000);
+      
+      // Obsługa dat z przyszłości (Twoja baza ma losowe daty 2026)
+      // Jeśli data jest w przyszłości, traktujemy to jako "przed chwilą"
+      if (seconds < 0) return "przed chwilą";
+
+      let interval = seconds / 31536000;
+      if (interval > 1) return Math.floor(interval) + " lat temu";
+      interval = seconds / 2592000;
+      if (interval > 1) return Math.floor(interval) + " mies. temu";
+      interval = seconds / 86400;
+      if (interval > 1) return Math.floor(interval) + " dni temu";
+      interval = seconds / 3600;
+      if (interval > 1) return Math.floor(interval) + " godz. temu";
+      interval = seconds / 60;
+      if (interval > 1) return Math.floor(interval) + " min temu";
+      return "przed chwilą";
+  };
 
   return (
-    <aside className="feed">
-      <div className="feed-header">
-        To się dzieje teraz
-      </div>
+    <aside className="right-feed fade-in">
+      <h3 className="feed-header">TO SIĘ DZIEJE TERAZ</h3>
       
-      <div>
-        {activities.map((item) => (
+      <div className="feed-list">
+        {activities.map(item => (
           <div key={item.id} className="feed-item">
+            {/* Awatar */}
+            <img 
+                src={item.userImage} 
+                alt="Avatar" 
+                className="feed-avatar" 
+            />
             
-            {/* Awatar z ikonką statusu */}
-            <div className="avatar-container">
-              <img src={item.avatar} alt={item.user} className="feed-avatar" />
-              <div className="status-icon">
-                {item.type === 'success' ? '🏆' : '✨'}
-              </div>
-            </div>
-
-            {/* Treść */}
             <div className="feed-content">
-              <span className="feed-user">{item.user}</span>{' '}
-              <span className="feed-action">{item.text}</span>
+              <p className="feed-text">
+                <strong>{item.first_name} {item.last_name && item.last_name[0]}.</strong>
+                {' '}
+                {/* Logika tekstu zależna od statusu */}
+                {item.is_fulfilled ? (
+                    <span style={{color: '#10b981', fontWeight: 600}}>spełnił(a) marzenie:</span>
+                ) : (
+                    <span style={{color: '#64748b'}}>dodał(a) marzenie:</span>
+                )}
+              </p>
               
-              {/* Jeśli sukces -> zielony kolor, jeśli nowe -> zwykły */}
-              <span className={`feed-target ${item.type === 'success' ? 'success' : ''}`}>
-                {item.target}
+              <p className="feed-dream-title">
+                {item.title}
+              </p>
+
+              <span className="feed-time">
+                 {timeAgo(item.date)}
               </span>
-              
-              <span className="feed-time">{item.time}</span>
             </div>
           </div>
         ))}
       </div>
-
-      {/* Dodatek na dole - np. zachęta */}
-      <div style={{ marginTop: 'auto', padding: '15px', background: '#f1f5f9', borderRadius: '12px', textAlign: 'center' }}>
-        <p style={{ fontSize: '12px', color: '#64748b', marginBottom: '8px' }}>
-          Zainspiruj innych!
-        </p>
-        <button style={{ 
-          background: '#fff', 
-          border: '1px solid #cbd5e1', 
-          padding: '6px 12px', 
-          borderRadius: '20px', 
-          fontSize: '12px', 
-          fontWeight: 'bold', 
-          cursor: 'pointer',
-          color: '#475569'
-        }}>
-          + Dodaj marzenie
-        </button>
+      
+      {/* Opcjonalny przycisk zachęty */}
+      <div className="feed-footer">
+          <p>Zainspiruj innych swoim sukcesem!</p>
+          <button className="btn-small">+ Dodaj sukces</button>
       </div>
+
     </aside>
   );
 }
