@@ -9,10 +9,10 @@ export default function NotificationsSection() {
   useEffect(() => {
     // Generujemy przykładowe dane
     const mockNotifications = [
-      { id: 1, type: 'donation', user: 'Anna Nowak', text: 'wpłaciła 50 PLN na Twoje marzenie "Podróż do Japonii"', time: '2 min temu', read: false },
-      { id: 2, type: 'follow', user: 'Marek Z.', text: 'zaczął Cię obserwować', time: '15 min temu', read: false },
-      { id: 3, type: 'like', user: 'Kasia Koduje', text: 'polubiła Twój profil', time: '1 godz. temu', read: true },
-      { id: 4, type: 'fulfill', user: 'Tomek Dev', text: 'spełnił marzenie, które obserwujesz: "Własna gra"', time: '3 godz. temu', read: true },
+      { id: 1, type: 'donation', user: 'Anna Nowak', text: 'zaproponowała Ci zrzutkę na prezent "Zestwa farb olejnych" użytkownika Ewa Artystka', time: '2 min temu', read: false },
+      { id: 2, type: 'follow', user: 'Marek Nowacki', text: 'wysłał zaproszenie do grona znajomych', time: '15 min temu', read: false },
+      { id: 3, type: 'like', user: 'Kasia Koduje', text: 'zaakceptowała Twoje zaproszenie', time: '1 godz. temu', read: true },
+      { id: 4, type: 'follow', user: 'Tomek Dev', text: 'wysłał zaproszenie do grona znajomych', time: '3 godz. temu', read: true },
       { id: 5, type: 'system', user: 'Zespół SpelnioneMarzenie.pl', text: 'Witaj w społeczności! Uzupełnij swój profil.', time: '1 dzień temu', read: true },
     ];
     
