@@ -60,8 +60,7 @@ export default function SearchSection() {
     <div className="search-container fade-in">
       
       <div className="search-header">
-        <h2 className="search-title">Znajdź inspirację</h2>
-        
+
         <div className="search-toggle">
            <button 
              className={`toggle-btn ${searchType === 'users' ? 'active' : ''}`}
