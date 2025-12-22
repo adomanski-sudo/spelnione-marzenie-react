@@ -11,6 +11,7 @@ import DreamModal from "./components/DreamModal";
 import SearchSection from './components/SearchSection';
 import FriendsSection from './components/FriendsSection';
 import NotificationsSection from './components/NotificationsSection';
+import UserProfile from './components/UserProfile';
 
 const activUser = 2;
 
@@ -18,6 +19,18 @@ function App() {
   const [activeView, setActiveView] = useState(() => {
       return localStorage.getItem('savedActiveView') || 'home';
   });
+
+  const [selectedUserId, setSelectedUserId] = useState(null);
+
+  const handleOpenProfile = (id) => {
+    // Jeśli kliknęliśmy siebie (ID 2), idź do MyProfile
+    if (id === 2) { 
+        setActiveView('myProfil');
+    } else {
+        setSelectedUserId(id);
+        setActiveView('userProfile');
+    }
+};
 
   useEffect(() => {
       localStorage.setItem('savedActiveView', activeView);
@@ -119,22 +132,29 @@ function App() {
           : activeView === 'myProfil' ? (
             <MyProfile 
             dreams={myDreams}  /* <--- PRZEKAZUJEMY PRAWDZIWE DANE */
+            setDreams={setDreams}
             userData={currentUser}  /* <--- PRZEKAZUJEMY DANE */
             />
           )
 
           : activeView === 'search' ? (
-            <SearchSection />
+            <SearchSection onProfileClick={handleOpenProfile} />
           )
 
           : activeView === 'friends' ? (
-            <FriendsSection friends={friendsList} />
+            <FriendsSection friends={friendsList} onProfileClick={handleOpenProfile} />
           )
 
           : activeView === 'notifications' ? (
             <NotificationsSection />
           )
 
+          : activeView === 'userProfile' ? (
+            <UserProfile 
+            userId={selectedUserId} 
+            onBack={() => setActiveView('home')} // lub poprzedni widok
+            />
+)
            : (
              // Jeśli inny widok -> Wyświetl pustą kartę
              <div className="content-card">
@@ -156,6 +176,8 @@ function App() {
           onClose={() => setSelectedDream(null)} 
         />
       )}
+
+      
 
     </div>
   )

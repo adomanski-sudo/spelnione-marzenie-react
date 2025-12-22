@@ -12,7 +12,7 @@ export default function FriendsSection({ friends }) {
               key={user.id} 
               className="user-search-card"
               style={{ cursor: 'pointer' }}
-              onClick={() => console.log("Otwórz profil:", user.id)}
+              onClick={() => onProfileClick(user.id)}
             >
                <img src={user.image} alt="Avatar" className="user-search-avatar" />
                

@@ -123,7 +123,7 @@ export default function SearchSection() {
                     key={user.id} 
                     className="user-search-card"
                     /* CAŁY KAFEL JEST TERAZ PRZYCISKIEM */
-                    onClick={() => console.log("Tu otworzymy profil usera:", user.id)}
+                    onClick={() => onProfileClick(user.id)}
                     /* Dodajemy style inline lub w CSS, żeby kursor był łapką */
                     style={{ cursor: 'pointer' }}
                   >

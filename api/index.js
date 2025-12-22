@@ -107,6 +107,44 @@ app.get('/api/feed', (req, res) => {
     });
 });
 
+// USUWANIE MARZENIA
+app.delete('/api/dreams/:id', (req, res) => {
+    const id = req.params.id;
+    // W prawdziwej aplikacji sprawdzilibyśmy tu, czy ID usera się zgadza (auth)
+    // Na potrzeby demo usuwamy "jak leci"
+    // const sql = "DELETE FROM dreams WHERE id = ?";
+    db.query(sql, [id], (err, result) => {
+        if(err) return res.status(500).json(err);
+        return res.json({ message: "Usunięto", result });
+    });
+});
+
+// PROFIL INNEGO UŻYTKOWNIKA (Info + Marzenia)
+app.get('/api/users/:id/full', (req, res) => {
+    const userId = req.params.id;
+    
+    // Zapytanie 1: Pobierz dane usera
+    const sqlUser = "SELECT first_name, last_name, description, image FROM users WHERE id = ?";
+    
+    // Zapytanie 2: Pobierz jego marzenia
+    const sqlDreams = "SELECT * FROM dreams WHERE idUser = ? ORDER BY date DESC";
+
+    db.query(sqlUser, [userId], (err, userData) => {
+        if (err) return res.status(500).json(err);
+        if (userData.length === 0) return res.status(404).json("User not found");
+
+        db.query(sqlDreams, [userId], (err, dreamsData) => {
+            if (err) return res.status(500).json(err);
+            
+            // Zwracamy obiekt łączony
+            res.json({
+                user: userData[0],
+                dreams: dreamsData
+            });
+        });
+    });
+});
+
 
 // Health Check
 app.get('/api/health', (req, res) => {

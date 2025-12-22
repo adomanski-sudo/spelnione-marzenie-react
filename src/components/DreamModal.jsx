@@ -1,60 +1,78 @@
 import React from 'react';
 import './DreamModal.css';
-import { X, Sparkles, User } from 'lucide-react'; // Ikony
+import { X, Calendar, Tag, Trash2, Edit, PiggyBank, Lock } from 'lucide-react';
 
-export default function DreamModal({ dream, onClose }) {
-  // Jeśli nie ma marzenia, nie wyświetlaj nic (zabezpieczenie)
+// Dodajemy propsy: isOwner oraz onDelete
+export default function DreamModal({ dream, onClose, isOwner, onDelete }) {
   if (!dream) return null;
+
+  const handleDelete = () => {
+    if (window.confirm("Czy na pewno chcesz usunąć to marzenie?")) {
+        onDelete(dream.id);
+    }
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      {/* onClick na overlay zamyka modal... */}
-      
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        {/* ...ale kliknięcie w sam środek (content) NIE powinno zamykać (stopPropagation) */}
+      <div className="modal-content fade-in" onClick={(e) => e.stopPropagation()}>
         
-        <button className="btn-close-icon" onClick={onClose}>
+        {/* Przycisk Zamknięcia */}
+        <button className="close-btn" onClick={onClose}>
           <X size={24} />
         </button>
 
         <div className="modal-body">
-          <img src={dream.image} alt={dream.title} className="modal-image" />
-          
-          <div className="modal-details">
-            {dream.category && <span className="modal-category">{dream.category}</span>}
-            
-            <h2 className="modal-title">{dream.title}</h2>
-            
-            {/* Informacja o autorze wewnątrz szczegółów */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
-                <img src={dream.userAvatar} alt="User" style={{ width: 24, height: 24, borderRadius: '50%' }} />
-                <span style={{ fontSize: '14px', color: '#64748b', fontWeight: '500' }}>
-                    {dream.userName}
-                </span>
+            {/* Lewa kolumna: Obrazek */}
+            <div className="modal-image-container">
+                <img src={dream.image} alt={dream.title} className="modal-image" />
+                <div className={`status-badge ${dream.is_fulfilled ? 'fulfilled' : 'pending'}`}>
+                    {dream.is_fulfilled ? 'Spełnione ✨' : 'Do spełnienia im waiting...'}
+                </div>
             </div>
 
-            <p className="modal-desc">{dream.description}</p>
-            
-            {/* Tu można dodać więcej sekcji, np. komentarze, pasek postępu zbiórki itp. */}
-            <div style={{ padding: '15px', background: '#f8fafc', borderRadius: '10px', fontSize: '14px', color: '#475569' }}>
-                💡 <strong>Jak możesz pomóc?</strong><br/>
+            {/* Prawa kolumna: Treść */}
+            <div className="modal-info">
+                <h2 className="modal-title">{dream.title}</h2>
+                
+                <div className="modal-meta">
+                    <span className="meta-item">
+                        <Tag size={16} /> {dream.category}
+                    </span>
+                    <span className="meta-item">
+                        <Calendar size={16} /> {dream.date}
+                    </span>
+                </div>
+
+                <p className="modal-desc">{dream.description}</p>
+
+                {/* --- SEKCJA PRZYCISKÓW (ZALEŻNA OD WŁAŚCICIELA) --- */}
+                <div className="modal-actions">
+                    
+                    {isOwner ? (
+                        // WIDOK WŁAŚCICIELA (JA)
+                        <>
+                            <button className="action-btn btn-edit">
+                                <Edit size={18} /> Edytuj
+                            </button>
+                            <button className="action-btn btn-delete" onClick={handleDelete}>
+                                <Trash2 size={18} /> Usuń
+                            </button>
+                        </>
+                    ) : (
+                        // WIDOK GOŚCIA (INNI)
+                        <>
+                           <button className="action-btn btn-reserve">
+                                <Lock size={18} /> Zarezerwuj
+                           </button>
+                           <button className="action-btn btn-fund">
+                                <PiggyBank size={18} /> Zaproponuj zrzutkę
+                           </button>
+                        </>
+                    )}
+
+                </div>
             </div>
-          </div>
         </div>
-
-        <div className="modal-footer">
-           <span style={{ fontSize: '13px', color: '#94a3b8' }}>
-              Dodano: {dream.date}
-           </span>
-           
-           <button className="btn-primary" onClick={() => alert("Tu podepniemy funkcję backendu!")}>
-              Spełnij Marzenie 
-           </button>
-            <button className="btn-primary2" onClick={() => alert("Tu podepniemy funkcję backendu!")}>
-              Zaproponuj zrzutkę
-           </button>
-        </div>
-
       </div>
     </div>
   );
