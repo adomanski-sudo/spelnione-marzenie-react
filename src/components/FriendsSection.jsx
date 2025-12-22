@@ -1,7 +1,7 @@
 import React from 'react';
 import './SearchSection.css'; // <--- RECYKLING STYLÓW! 😎
 
-export default function FriendsSection({ friends }) {
+export default function FriendsSection({ friends, onProfileClick }) {
   return (
     <div className="search-container fade-in">
       
