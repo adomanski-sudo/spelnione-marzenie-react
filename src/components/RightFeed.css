@@ -2,6 +2,18 @@
     padding: 20px;
     background: #fff; /* lub przezroczysty, zależy od designu */
     height: 100dvh;
+    position: sticky; 
+    top: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.right-feed::-webkit-scrollbar {
+    width: 6px;
+}
+.right-feed::-webkit-scrollbar-thumb {
+    background-color: #e2e8f0;
+    border-radius: 4px;
 }
 
 .feed-header {
@@ -88,8 +100,41 @@
 }
 
 /* Ukrywanie na małych ekranach */
-@media (max-width: 1200px) {
-  .feed {
+@media (max-width: 800px) {
+  .right-feed {
     display: none;
   }
+}
+
+/* Animacja pojawiania się nowych elementów */
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.feed-item {
+    /* Dodajemy animację do każdego elementu */
+    animation: slideIn 0.4s ease-out;
+}
+
+/* Styl dla tajnego powiadomienia */
+.secret-badge {
+    display: inline-flex;
+    align-items: center;
+    background-color: #f3e8ff; /* Jasny fiolet */
+    color: #7e22ce;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 12px;
+    margin-top: 4px;
+    border: 1px solid #d8b4fe;
+}
+
+/* Opcjonalnie: Delikatne wyróżnienie całego kafelka */
+.secret-item {
+    background: linear-gradient(to right, rgba(255,255,255,0), rgba(243, 232, 255, 0.3));
+    border-radius: 8px;
+    padding: 5px; /* Lekki padding, żeby tło było widoczne */
+    margin: -5px; /* Kompensacja paddingu */
 }
