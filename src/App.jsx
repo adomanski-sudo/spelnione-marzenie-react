@@ -129,13 +129,18 @@ function App() {
           : activeView === 'friends' ? (
             <FriendsSection friends={friendsList} />
           )
-           
+
+          : activeView === 'notifications' ? (
+            <NotificationsSection />
+          )
+
            : (
              // Jeśli inny widok -> Wyświetl pustą kartę
              <div className="content-card">
                <p>Widok: {activeView} (w budowie)</p>
              </div>
            )}
+          
 
         </div>
 
