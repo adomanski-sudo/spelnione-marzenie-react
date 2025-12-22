@@ -1,6 +1,7 @@
 .right-feed {
     padding: 20px;
     background: #fff; /* lub przezroczysty, zależy od designu */
+    height: 100dvh;
 }
 
 .feed-header {
