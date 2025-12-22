@@ -10,6 +10,7 @@ import MyProfile from "./components/MyProfile";
 import DreamModal from "./components/DreamModal";
 import SearchSection from './components/SearchSection';
 import FriendsSection from './components/FriendsSection';
+import NotificationsSection from './components/NotificationsSection';
 
 const activUser = 2;
 
