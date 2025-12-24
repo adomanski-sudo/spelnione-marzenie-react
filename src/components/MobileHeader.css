@@ -50,9 +50,9 @@
 /* Stylizowany tekst */
 .brand-text {
   font-family: 'Dancing Script', cursive; /* Nasza nowa czcionka */
-  font-size: 3.5rem; /* Duży rozmiar na desktopie */
+  font-size: 1rem; /* Duży rozmiar na desktopie */
   margin: 0;
-  font-weight: 700;
+  font-weight: 400;
   
   /* --- Magia Gradientu --- */
   /* Tworzymy tło gradientowe */
