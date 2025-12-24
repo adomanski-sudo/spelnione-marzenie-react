@@ -22,21 +22,6 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* Pokaż na mobile */
-@media (max-width: 1024px) {
-  .mobile-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    background: var(--bg-panel);
-    padding: 15px 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    z-index: 50;
-  }
-}
-
 /* Kontener na logo (żeby wyśrodkować ikonę i tekst) */
 .brand-logo-container {
   display: flex;
@@ -56,7 +41,7 @@
   
   /* --- Magia Gradientu --- */
   /* Tworzymy tło gradientowe */
-  background: linear-gradient(45deg, #3b82f6, #8400ff);
+  background: linear-gradient(45deg, #3b82f6, #9c7df0);
   /* Przycinamy tło do kształtu tekstu */
   -webkit-background-clip: text;
   /* Sprawiamy, że sam kolor tekstu jest przezroczysty, żeby widzieć gradient */
@@ -70,7 +55,7 @@
 
 /* Ikona */
 .brand-icon {
-  color: #8400ff;
+  color: #9c7df0;
   /* Dodajemy delikatną animację pulsowania */
   animation: pulse 2s infinite ease-in-out;
 }
@@ -81,3 +66,19 @@
   50% { transform: scale(1.1); opacity: 0.8; }
   100% { transform: scale(1); opacity: 1; }
 }
+
+/* Pokaż na mobile */
+@media (max-width: 1024px) {
+  .mobile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    background: var(--bg-panel);
+    padding: 15px 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    z-index: 50;
+  }
+}
+
