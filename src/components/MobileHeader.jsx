@@ -12,7 +12,7 @@ export default function MobileHeader({ setView }) {
         <div className="brand-logo-container fade-in">
         <h1 className="brand-text">SpelnioneMarzenie.pl</h1>
         <Gift className="brand-icon" size={32} />
-      </div>
+        </div>
       </div>
       <div className='btn'>
         {/* Profil */}
