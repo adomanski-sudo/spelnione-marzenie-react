@@ -93,7 +93,7 @@ export default function UserProfile({ userId }) {
                       <Lock size={20} style={{marginRight: '8px'}}/> Zarezerwuj
                     </button>
                     <button className="btn-primary-large2" style={{background: '#dcfce7', color: '#16a34a'}}>
-                      <PiggyBank size={20} style={{marginRight: '8px'}}/> Dorzuć się
+                      <PiggyBank size={20} style={{marginRight: '8px'}}/> Zrzutka
                     </button>
                   </div>
                </div>
