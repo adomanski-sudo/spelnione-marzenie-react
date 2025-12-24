@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './MyProfile.css'; // Używamy tych samych stylów layoutu
 import DreamCard from './DreamCard'; 
-import { ArrowLeft, Lock, PiggyBank } from 'lucide-react'; 
+import { ArrowLeft, Heart, Lock, PiggyBank } from 'lucide-react'; 
 
 export default function UserProfile({ userId, onBack }) {
   const [userData, setUserData] = useState(null);
@@ -29,15 +29,6 @@ export default function UserProfile({ userId, onBack }) {
   return (
     <div className="profile-split-view fade-in">
       
-      {/* PRZYCISK POWROTU DO WYSZUKIWARKI */}
-      {/* Ponieważ nie mamy tu menu bocznego, musimy dać opcję wyjścia */}
-      <button 
-        onClick={onBack}
-        style={{position: 'absolute', top: '10px', left: '10px', zIndex: 10, background: 'white', border: 'none', padding: '10px', borderRadius: '50%', cursor: 'pointer', boxShadow: '0 2px 10px rgba(0,0,0,0.1)'}}
-      >
-        <ArrowLeft size={24} color="#64748b"/>
-      </button>
-
       {/* --- LEWA KOLUMNA (BIO - GOŚĆ) --- */}
       <aside className="bio-column">
         <div className="bio-card">
@@ -57,7 +48,7 @@ export default function UserProfile({ userId, onBack }) {
           
           {/* Przycisk obserwowania */}
           <button className="btn-primary-large" style={{marginTop: '20px', width: '100%'}}>
-             Zaproś do znajomych.
+             Zaproś do znajomych <Heart size={20} style={{marginRight: '8px'}}/>
           </button>
         </div>
       </aside>
