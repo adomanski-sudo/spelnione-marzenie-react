@@ -137,3 +137,8 @@
     display: block;
   }
 }
+
+.up-note {
+  color: #334155;
+  font-size: 15px;
+}
