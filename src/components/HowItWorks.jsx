@@ -11,7 +11,7 @@ export default function HowItWorks() {
         <Gift className="brand-icon" size={32} />
       </div>
 
-        <span className="up-note"><p>Nie wiesz co dać w prezencie?</p>
+        <span className="step-label"><p>Nie wiesz co dać w prezencie?</p>
         <p>Masz dość nietrafionych nispodzianek?</p>
          <p>SpelnioneMarzenie.pl rozwiązuje ten problem w prosty sposób:</p></span>
 
