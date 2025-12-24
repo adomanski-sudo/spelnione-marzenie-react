@@ -69,7 +69,7 @@
 
 /* Pokaż na mobile */
  @media (max-width: 800px) {
-  .m-mobile-header {
+  .mobile-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
