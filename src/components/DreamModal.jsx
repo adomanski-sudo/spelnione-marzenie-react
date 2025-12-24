@@ -65,7 +65,7 @@ export default function DreamModal({ dream, onClose, isOwner, onDelete }) {
                                 <Lock size={18} /> Zarezerwuj
                            </button>
                            <button className="action-btn btn-fund">
-                                <PiggyBank size={18} /> Zaproponuj zrzutkę
+                                <PiggyBank size={18} /> Zrzutka
                            </button>
                         </>
                     )}
