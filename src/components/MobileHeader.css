@@ -56,7 +56,7 @@
   
   /* --- Magia Gradientu --- */
   /* Tworzymy tło gradientowe */
-  background: linear-gradient(45deg, #3b82f6, #b645d8);
+  background: linear-gradient(45deg, #3b82f6, #8400ff);
   /* Przycinamy tło do kształtu tekstu */
   -webkit-background-clip: text;
   /* Sprawiamy, że sam kolor tekstu jest przezroczysty, żeby widzieć gradient */
@@ -70,7 +70,7 @@
 
 /* Ikona */
 .brand-icon {
-  color: #920101;
+  color: #8400ff;
   /* Dodajemy delikatną animację pulsowania */
   animation: pulse 2s infinite ease-in-out;
 }
