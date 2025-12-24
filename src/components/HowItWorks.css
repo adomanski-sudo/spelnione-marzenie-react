@@ -57,6 +57,7 @@
   .brand-logo-container {
     flex-direction: column; /* Na małym ekranie ikona nad tekstem */
     gap: 5px;
+    display: none; /* Na telefonie chowamy */
   }
   
   .brand-text {
