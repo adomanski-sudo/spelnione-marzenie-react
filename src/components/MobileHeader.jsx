@@ -7,7 +7,7 @@ import profilImg from '../assets/avatar.jpg';
 
 export default function MobileHeader({ setView }) {
   return (
-    <header className="m-mobile-header">
+    <header className="mobile-header">
       <div onClick={() => setView('home')}>
         <div className="m-brand-logo-container fade-in">
           <h1 className="m-brand-text">SpelnioneMarzenie.pl</h1>
