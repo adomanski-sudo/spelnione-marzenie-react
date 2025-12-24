@@ -57,7 +57,7 @@ export default function UserProfile({ userId, onBack }) {
           
           {/* Przycisk obserwowania */}
           <button className="btn-primary-large" style={{marginTop: '20px', width: '100%'}}>
-             Zaobserwuj
+             Zaproś do znajomych.
           </button>
         </div>
       </aside>
