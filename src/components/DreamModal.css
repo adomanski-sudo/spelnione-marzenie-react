@@ -1,180 +1,196 @@
-/* Tło (Backdrop) - przyciemnia resztę strony */
+/* TŁO I KONTENER */
 .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(15, 23, 42, 0.6); /* Ciemny granat, półprzezroczysty */
-  backdrop-filter: blur(4px); /* Rozmycie tła pod spodem */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  animation: fadeIn 0.2s ease-out;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); /* Przyciemnienie tła */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px); /* Rozmycie tła pod spodem */
+    padding: 20px;
 }
 
-/* Okno główne */
 .modal-content {
-  background: white;
-  width: 90%;
-  max-width: 800px; /* Szeroki, wygodny widok */
-  max-height: 90vh; /* Żeby nie uciekł poza ekran na małym laptopie */
-  border-radius: 20px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  position: relative;
-  animation: slideUp 0.3s ease-out;
+    background: white;
+    width: 100%;
+    max-width: 900px; /* Szerokość na desktopie */
+    max-height: 90vh;
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden; /* Żeby obrazek nie wystawał poza zaokrąglenia */
+    display: flex;
+    flex-direction: column;
 }
 
-/* Układ w środku: Zdjęcie + Treść */
+/* X - ZAMYKANIE */
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.close-btn:hover {
+    transform: rotate(90deg);
+    background: white;
+}
+
+/* UKŁAD WEWNĄTRZ (Dwie kolumny) */
 .modal-body {
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto; /* Przewijanie treści jeśli długa */
+    display: flex;
+    flex-direction: row; /* Domyślnie obok siebie */
+    height: 100%;
+    overflow-y: auto; /* Przewijanie jeśli treść za długa */
 }
 
-/* Duże zdjęcie na górze */
+/* LEWA STRONA - OBRAZEK */
+.modal-image-container {
+    flex: 1; /* Zajmuje 50% miejsca */
+    min-height: 300px;
+    position: relative;
+}
+
 .modal-image {
-  width: 100%;
-  height: 300px;
-  object-fit: cover;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
-.modal-details {
-  padding: 30px;
+/* Badge statusu na obrazku */
+.status-badge {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-/* Typografia */
-.modal-category {
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: #0284c7; /* Niebieski akcent */
-  letter-spacing: 1px;
-  margin-bottom: 10px;
-  display: block;
+.status-badge.fulfilled { color: #10b981; }
+.status-badge.pending { color: #64748b; }
+
+/* PRAWA STRONA - TREŚĆ */
+.modal-info {
+    flex: 1; /* Zajmuje drugie 50% */
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
 }
 
 .modal-title {
-  font-size: 28px;
-  font-weight: 800;
-  color: #1e293b;
-  margin: 0 0 15px 0;
-  line-height: 1.2;
+    font-size: 28px;
+    margin: 0 0 15px 0;
+    color: #0f172a;
+    line-height: 1.2;
+}
+
+.modal-meta {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+    background: #f1f5f9;
+    padding: 4px 10px;
+    border-radius: 6px;
 }
 
 .modal-desc {
-  font-size: 16px;
-  line-height: 1.7;
-  color: #475569;
-  margin-bottom: 30px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #334155;
+    flex-grow: 1; /* Rozpycha się, spychając przyciski na dół */
+    margin-bottom: 30px;
 }
 
-/* Stopka z przyciskami (Sticky na dole modala) */
-.modal-footer {
-  padding: 20px 30px;
-  border-top: 1px solid #f1f5f9;
-  background: #f8fafc;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* PRZYCISKI (To co się rozjechało) */
+.modal-actions {
+    display: flex;
+    gap: 15px; /* Odstęp między przyciskami */
+    margin-top: auto; /* Dopycha do dołu kontenera */
 }
 
-/* Przycisk Zamknij (X) w prawym górnym rogu */
-.btn-close-icon {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: rgba(255, 255, 255, 0.8);
-  border: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  color: #333;
-  transition: background 0.2s;
+.action-btn {
+    flex: 1; /* Każdy przycisk zajmuje po równo miejsca */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap; /* Tekst w jednej linii */
 }
 
-.btn-close-icon:hover {
-  background: white;
-}
+/* Kolory przycisków */
+.btn-reserve { background: #e0f2fe; color: #0284c7; }
+.btn-reserve:hover { background: #bae6fd; }
 
-/* Przycisk Akcji (Ten główny!) */
-.btn-primary, .btn-primary2 {
-  background-color: #10b981;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.btn-primary2 {
-background-color: rgb(0, 153, 255);
-}
-
-.btn-primary:hover {
-  background-color: #059669;
-}
-
-.btn-primary2:hover {
-  background-color: rgb(0, 136, 226);
-}
-
-.btn-primary {
-  margin-left: 200px;
-}
-
-.btn-delete { 
-  background: #fee2e2; 
-  color: #ef4444; 
-  border: 1px solid #fecaca; }
-.btn-delete:hover { 
-  background: #fecaca; }
-.btn-edit { background: #f1f5f9; 
-  color: #334155; }
-.btn-reserve { 
-  background: #e0f2fe; 
-  color: #0284c7; }
 .btn-fund { background: #dcfce7; color: #16a34a; }
+.btn-fund:hover { background: #bbf7d0; }
 
-/* Animacje wejścia */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+.btn-edit { background: #f1f5f9; color: #334155; }
+.btn-edit:hover { background: #e2e8f0; }
 
-@keyframes slideUp {
-  from { transform: translateY(50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
+.btn-delete { background: #fee2e2; color: #ef4444; }
+.btn-delete:hover { background: #fecaca; }
 
-/* Media Query dla desktopu - obrazek obok tekstu */
-@media (min-width: 768px) {
-  .modal-body {
-    flex-direction: row; /* Układ poziomy */
-    height: 500px; /* Stała wysokość */
-  }
-  .modal-image {
-    width: 45%; /* Prawie połowa */
-    height: 100%;
-  }
-  .modal-details {
-    width: 55%;
-    overflow-y: auto; /* Przewijanie tylko tekstu */
-  }
+/* --- RESPANSYWNOŚĆ (MOBILE) --- */
+@media (max-width: 768px) {
+    .modal-body {
+        flex-direction: column; /* Jeden pod drugim */
+    }
 
+    .modal-image-container {
+        flex: none; /* Wyłączamy rozciąganie flex */
+        height: 250px; /* Sztywna wysokość obrazka */
+    }
+
+    .modal-info {
+        padding: 25px;
+    }
+
+    .modal-title {
+        font-size: 22px;
+    }
+
+    .modal-actions {
+        flex-direction: column; /* Przyciski jeden pod drugim na małym ekranie */
+        gap: 10px;
+    }
+    
+    .action-btn {
+        width: 100%; /* Pełna szerokość */
+    }
 }
