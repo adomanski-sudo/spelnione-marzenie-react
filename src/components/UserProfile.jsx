@@ -3,7 +3,7 @@ import './MyProfile.css'; // Używamy tych samych stylów layoutu
 import DreamCard from './DreamCard'; 
 import { ArrowLeft, Heart, Lock, PiggyBank } from 'lucide-react'; 
 
-export default function UserProfile({ userId, onBack }) {
+export default function UserProfile({ userId }) {
   const [userData, setUserData] = useState(null);
   const [dreams, setDreams] = useState([]);
   const [activeDream, setActiveDream] = useState(null);
