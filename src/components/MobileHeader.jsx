@@ -10,8 +10,8 @@ export default function MobileHeader({ setView }) {
     <header className="mobile-header">
       <div onClick={() => setView('home')}>
         <div className="brand-logo-container fade-in">
-        <h1 className="brand-text">SpelnioneMarzenie.pl</h1>
-        <Gift className="brand-icon" size={32} />
+          <h1 className="brand-text">SpelnioneMarzenie.pl</h1>
+          <Gift className="brand-icon" size={32} />
         </div>
       </div>
       <div className='btn'>
