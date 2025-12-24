@@ -43,6 +43,7 @@
   color: #3b82f6; /* Kolor ikony (można dopasować do gradientu) */
   /* Dodajemy delikatną animację pulsowania */
   animation: pulse 2s infinite ease-in-out;
+  background: linear-gradient(45deg, #3b82f6, #e078ff);
 }
 
 /* Animacja dla ikony */
