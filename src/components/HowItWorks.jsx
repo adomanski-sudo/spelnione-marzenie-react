@@ -8,22 +8,7 @@ export default function HowItWorks() {
     <section className="how-it-works">
       <div className="brand-logo-container fade-in">
         <h1 className="brand-text">SpelnioneMarzenie.pl</h1>
-
-        <svg width="0" height="0">
-        <linearGradient id="brand-gradient" x1="100%" y1="100%" x2="0%" y2="0%">
-        <stop stopColor="#3b82f6" offset="0%" /> {/* Kolor początkowy (niebieski) */}
-        <stop stopColor="#e078ff" offset="100%" /> {/* Kolor końcowy (fiolet) */}
-        </linearGradient>
-        </svg>
-
-        {/* 2. Ikona używająca tego gradientu jako "farby" */}
-        {/* Zauważ: stroke="url(#id)" zamiast color w CSS */}
-        <Gift 
-        className="brand-icon" 
-        size={32} 
-        stroke="url(#brand-gradient)" 
-  />
-        
+        <Gift className="brand-icon" size={32} />
       </div>
 
         <span className="up-note"><p>Nie wiesz co dać w prezencie?</p>
