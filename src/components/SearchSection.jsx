@@ -3,7 +3,7 @@ import './SearchSection.css';
 import DreamCard from './DreamCard';
 import { Search, User, Sparkles } from 'lucide-react';
 
-export default function SearchSection( onProfileClick ) {
+export default function SearchSection({ onProfileClick }) {
   const [query, setQuery] = useState('');
   const [searchType, setSearchType] = useState('users'); 
   const [results, setResults] = useState([]);
