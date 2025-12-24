@@ -1,12 +1,15 @@
 import React from 'react';
 import './HowItWorks.css';
-import { PenTool, ArrowRight, MessageCircleHeart, Gift, Cake, HeartHandshake  } from 'lucide-react';
+import { PenTool, ArrowRight, MessageCircleHeart, Gift, Cake, HeartHandshake, Sparkles } from 'lucide-react';
+
 
 export default function HowItWorks() {
   return (
     <section className="how-it-works">
-      <h3 className="hiw-title">SpelnioneMarzenie.pl
-      </h3>
+      <div className="brand-logo-container fade-in">
+        <Sparkles className="brand-icon" size={32} />
+        <h1 className="brand-text">SpelnioneMarzenie.pl</h1>
+      </div>
 
         <span className="up-note"><p>Nie wiesz co dać w prezencie?</p>
         <p>Masz dość nietrafionych nispodzianek?</p>

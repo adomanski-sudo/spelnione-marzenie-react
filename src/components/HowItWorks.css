@@ -7,6 +7,67 @@
   border: 1px solid #e2e8f0;
 }
 
+/* Kontener na logo (żeby wyśrodkować ikonę i tekst) */
+.brand-logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px; /* Odstęp między ikoną a tekstem */
+  margin-bottom: 20px; /* Odstęp od tekstu "Nie wiesz co dać..." */
+  padding-top: 20px;
+}
+
+/* Stylizowany tekst */
+.brand-text {
+  font-family: 'Dancing Script', cursive; /* Nasza nowa czcionka */
+  font-size: 3.5rem; /* Duży rozmiar na desktopie */
+  margin: 0;
+  font-weight: 700;
+  
+  /* --- Magia Gradientu --- */
+  /* Tworzymy tło gradientowe */
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+  /* Przycinamy tło do kształtu tekstu */
+  -webkit-background-clip: text;
+  /* Sprawiamy, że sam kolor tekstu jest przezroczysty, żeby widzieć gradient */
+  -webkit-text-fill-color: transparent;
+  
+  /* --- Cień --- */
+  /* Używamy filter: drop-shadow, bo działa lepiej z gradientowym tekstem niż text-shadow */
+  filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.15));
+}
+
+/* Ikona */
+.brand-icon {
+  color: #3b82f6; /* Kolor ikony (można dopasować do gradientu) */
+  /* Dodajemy delikatną animację pulsowania */
+  animation: pulse 2s infinite ease-in-out;
+}
+
+/* Animacja dla ikony */
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* --- WERSJA MOBILNA --- */
+@media (max-width: 768px) {
+  .brand-logo-container {
+    flex-direction: column; /* Na małym ekranie ikona nad tekstem */
+    gap: 5px;
+  }
+  
+  .brand-text {
+    font-size: 2.5rem; /* Mniejszy tekst na telefonie */
+  }
+  
+  .brand-icon {
+    width: 28px;
+    height: 28px;
+  }
+}
+
 .hiw-title {
   font-size: 18px;
   font-weight: 700;
