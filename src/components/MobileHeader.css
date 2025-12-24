@@ -23,7 +23,7 @@
 }
 
 /* Kontener na logo (żeby wyśrodkować ikonę i tekst) */
-.brand-logo-container {
+.m-brand-logo-container {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -33,7 +33,7 @@
 }
 
 /* Stylizowany tekst */
-.brand-text {
+.m-brand-text {
   font-family: 'Dancing Script', cursive; /* Nasza nowa czcionka */
   font-size: 1.25rem; /* Rozmiar na mobile */
   margin: 0;
@@ -54,7 +54,7 @@
 }
 
 /* Ikona */
-.brand-icon {
+.m-brand-icon {
   color: #9c7df0;
   /* Dodajemy delikatną animację pulsowania */
   animation: pulse 2s infinite ease-in-out;
@@ -69,7 +69,7 @@
 
 /* Pokaż na mobile */
 @media (max-width: 1024px) {
-  .mobile-header {
+  .m-mobile-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
