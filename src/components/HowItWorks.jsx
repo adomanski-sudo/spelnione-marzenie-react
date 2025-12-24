@@ -7,8 +7,8 @@ export default function HowItWorks() {
   return (
     <section className="how-it-works">
       <div className="brand-logo-container fade-in">
-        <Gift className="brand-icon" size={32} />
         <h1 className="brand-text">SpelnioneMarzenie.pl</h1>
+        <Gift className="brand-icon" size={32} />
       </div>
 
         <span className="up-note"><p>Nie wiesz co dać w prezencie?</p>
