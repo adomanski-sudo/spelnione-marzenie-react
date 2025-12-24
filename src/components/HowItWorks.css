@@ -138,7 +138,7 @@
   }
 }
 
-.up-note {
+.up-note > .p {
   color: #334155;
-  font-size: 15px;
+  font-size: 150px;
 }
