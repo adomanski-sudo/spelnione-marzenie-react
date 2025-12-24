@@ -26,7 +26,7 @@
   
   /* --- Magia Gradientu --- */
   /* Tworzymy tło gradientowe */
-  background: linear-gradient(45deg, #3b82f6, #fa3a5a);
+  background: linear-gradient(45deg, #3b82f6, #e078ff);
   /* Przycinamy tło do kształtu tekstu */
   -webkit-background-clip: text;
   /* Sprawiamy, że sam kolor tekstu jest przezroczysty, żeby widzieć gradient */
@@ -35,6 +35,7 @@
   /* --- Cień --- */
   /* Używamy filter: drop-shadow, bo działa lepiej z gradientowym tekstem niż text-shadow */
   filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.15));
+  padding-right: 10px;
 }
 
 /* Ikona */
