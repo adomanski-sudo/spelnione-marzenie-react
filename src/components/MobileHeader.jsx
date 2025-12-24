@@ -1,6 +1,6 @@
 import React from 'react';
 import './MobileHeader.css'; // <--- Import stylu
-import {Settings, LogOut} from 'lucide-react'; // <--- Biblioteka z ikonami SVG
+import {Settings, LogOut, Gift} from 'lucide-react'; // <--- Biblioteka z ikonami SVG
 
 import profilImg from '../assets/avatar.jpg';
 
