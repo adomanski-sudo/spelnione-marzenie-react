@@ -8,8 +8,11 @@ import profilImg from '../assets/avatar.jpg';
 export default function MobileHeader({ setView }) {
   return (
     <header className="mobile-header">
-      <div style={{ fontWeight: 'bold'}} onClick={() => setView('home')}>
-        SpelnioneMarzenie.pl
+      <div onClick={() => setView('home')}>
+        <div className="brand-logo-container fade-in">
+        <h1 className="brand-text">SpelnioneMarzenie.pl</h1>
+        <Gift className="brand-icon" size={32} />
+      </div>
       </div>
       <div className='btn'>
         {/* Profil */}

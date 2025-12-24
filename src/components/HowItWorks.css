@@ -26,7 +26,7 @@
   
   /* --- Magia Gradientu --- */
   /* Tworzymy tło gradientowe */
-  background: linear-gradient(45deg, #3b82f6, #920101);
+  background: linear-gradient(45deg, #3b82f6, #b645d8);
   /* Przycinamy tło do kształtu tekstu */
   -webkit-background-clip: text;
   /* Sprawiamy, że sam kolor tekstu jest przezroczysty, żeby widzieć gradient */
