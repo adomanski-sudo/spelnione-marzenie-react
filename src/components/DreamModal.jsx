@@ -26,7 +26,7 @@ export default function DreamModal({ dream, onClose, isOwner, onDelete }) {
             <div className="modal-image-container">
                 <img src={dream.image} alt={dream.title} className="modal-image" />
                 <div className={`status-badge ${dream.is_fulfilled ? 'fulfilled' : 'pending'}`}>
-                    {dream.is_fulfilled ? 'Spełnione ✨' : 'Do spełnienia im waiting...'}
+                    {dream.is_fulfilled ? 'Spełnione ✨' : 'Do spełnienia'}
                 </div>
             </div>
 
