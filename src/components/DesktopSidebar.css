@@ -1,95 +1,128 @@
-/* --- Styl dla paska menu (desktop) --- */
+/* GŁÓWNY KONTENER PASKA */
 .sidebar {
-  width: 280px;             /* Stała szerokość */
-  height: 100vh;            /* Pełna wysokość ekranu */
-  background-color: var(--bg-panel);
-  position: sticky;         /* Przyklejenie */
-  top: 0;
-  z-index: 10;              /* Muszą być 'nad' tłem */
-  box-shadow: var(--shadow-depth); /* Cień rzucany na środek */
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  /* BRAK zaokrągleń (wygląd solidnego bloku) */
-  border-radius: 0; 
-  /* Zapobieganie kurczeniu się flexa */
-  flex-shrink: 0; 
+    width: 280px; /* Sztywna szerokość */
+    height: 100vh; /* Pełna wysokość */
+    background: #ffffff;
+    border-right: 1px solid #f1f5f9;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    position: sticky; /* Przyklejony do lewej */
+    top: 0;
+    left: 0;
+    overflow-y: auto; /* Jak ekran jest niski, pasek się przewija */
 }
 
-/* Kontener nawigacji (ten <nav>) */
+/* NAGŁÓWEK (Logo / Avatar) */
+.sidebar-header {
+    margin-bottom: 30px;
+}
+
+/* Wersja dla niezalogowanych (Tekst powitalny) */
+.guest-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.guest-header p {
+    margin: 5px 0 0 0;
+    font-size: 13px;
+    color: #64748b;
+}
+
+/* Wersja dla zalogowanych (Mini profil) */
+.user-mini-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+}
+
+.mini-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.mini-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.mini-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.mini-role {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+/* NAWIGACJA */
 .sidebar-nav {
-  flex: 1;              /* Zajmij całe miejsce pod profilem */
-  display: flex;        /* Stań się kontenerem Flex */
-  flex-direction: column; /* Układaj dzieci w pionie */
-  overflow: hidden;     /* Zabezpieczenie */
-  padding-bottom: 20px; /* Mały odstęp od dolnej krawędzi ekranu */
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Odstęp między przyciskami */
+    flex: 1; /* Rozciągnij, żeby wypchnąć logout na dół */
 }
 
-/* Kontener listy przycisków (div .menuList) */
-.menuList {
-  flex: 1;              /* Rozciągnij się na całą wysokość .sidebar-nav */
-  display: flex;        /* Też stań się Flexem */
-  flex-direction: column; /* Układaj przyciski w pionie */
-  gap: 10px;            /* Odstęp między przyciskami (opcjonalnie) */
-  justify-content: space-evenly;
+/* STYL POJEDYNCZEGO PRZYCISKU */
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left; /* Ważne, żeby tekst był po lewej */
+    width: 100%;
 }
 
-
-
-/* --- Styl dla przycisków --- */
-.menu-btn {
-  display: flex;
-  align-items: center;
-  flex: 1;             /* Każdy przycisk ma rosnąć, żeby wypełnić miejsce */
-  gap: 16px;
-  width: 100%;
-  padding: 0 20px;
-  margin-bottom: 8px;
-  border: none;
-  background: transparent;
-  color: var(--text-muted);
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  border-radius: 12px;
-  transition: all 0.2s ease;
-  max-height: 80px;
+.nav-item:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    transform: translateX(3px); /* Mały ruch w prawo przy najechaniu */
 }
 
-.menu-btn svg {
-  stroke-width: 1px;
-  transition: stroke 0.2s ease;
+/* Aktywny przycisk (zaznaczony na niebiesko) */
+.nav-item.active {
+    background: #eff6ff;
+    color: #3b82f6;
+    font-weight: 600;
 }
 
-.menu-btn:hover {
-  background-color: #f1f5f9;
-  color: var(--text-main);
+/* FORMULARZ NA DOLE */
+.sidebar-footer-auth {
+    margin-top: 20px;
+    /* To sprawia, że formularz nie przykleja się do nawigacji */
 }
 
-.menu-btn.active {
-  background-color: #e0f2fe; /* Delikatny błękit */
-  color: #0284c7;            /* Mocniejszy niebieski tekst */
+/* PRZYCISK WYLOGUJ (Na samym dole) */
+.sidebar-footer {
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+    margin-top: 20px;
 }
 
-.menu-btn.active svg {
-  stroke-width: 2px;
-  transition: stroke 0.2s ease;
+.logout-btn {
+    color: #ef4444;
 }
 
-.menu-btn > img {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ffffff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-
-
-/* Ukrywanie na małych ekranach */
-@media (max-width: 1024px) {
-  .sidebar {
-    display: none;
-  }
+.logout-btn:hover {
+    background: #fef2f2;
+    color: #dc2626;
 }
