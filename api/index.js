@@ -3,6 +3,7 @@ import express from 'express';
 import mysql from 'mysql2';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
 
 // Konfiguracja zmiennych środowiskowych
 dotenv.config();
