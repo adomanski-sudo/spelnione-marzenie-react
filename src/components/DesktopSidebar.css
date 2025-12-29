@@ -133,3 +133,10 @@
     display: none;
   }
 }
+
+/* --- RESPANSYWNOŚĆ --- */
+@media (max-width: 1000px) {
+    .sidebar {
+        display: none !important; /* Ukryj panel siłowo */
+    }
+}
