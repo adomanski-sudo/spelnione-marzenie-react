@@ -71,22 +71,23 @@
 .sidebar-nav {
     display: flex;
     flex-direction: column;
-    gap: 8px; /* Odstęp między przyciskami */
+    gap: 25px; /* Odstęp między przyciskami */
     flex: 1; /* Rozciągnij, żeby wypchnąć logout na dół */
+    padding-top: 20px;
 }
 
 /* STYL POJEDYNCZEGO PRZYCISKU */
 .nav-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    border-radius: 12px;
+    gap: 16px;
+    padding: 16px 20px;
+    border-radius: 16px;
     border: none;
     background: transparent;
     color: #64748b;
-    font-size: 15px;
-    font-weight: 500;
+    font-size: 16px;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: left; /* Ważne, żeby tekst był po lewej */
