@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Search, LogOut, Settings, Bell, Users, User } from 'lucide-react';
+import { Home, Search, LogOut, Settings, Bell, User, Heart } from 'lucide-react';
 import './DesktopSidebar.css';
 import AuthForm from './AuthForm'; // Import nowego formularza
 
@@ -10,11 +10,12 @@ export default function DesktopSidebar({ activeView, setActiveView, currentUser,
       <div className="sidebar-header">
          {/* Jeśli zalogowany -> Pokaż Avatar */}
          {currentUser ? (
-             <div className="user-mini-profile fade-in">
+             <div className="user-mini-profile fade-in" 
+             onClick={() => setActiveView('myProfil')}>
                 <img src={currentUser.image} className="mini-avatar" alt="User" />
                 <div className="mini-info">
                     <span className="mini-name">{currentUser.first_name}</span>
-                    <span className="mini-role">Marzyciel</span>
+                    <span className="mini-role">{currentUser.last_name}</span>
                 </div>
              </div>
          ) : (
@@ -55,7 +56,7 @@ export default function DesktopSidebar({ activeView, setActiveView, currentUser,
                     className={`nav-item ${activeView === 'friends' ? 'active' : ''}`}
                     onClick={() => setActiveView('friends')}
                 >
-                    <Users size={20} /> Znajomi
+                    <Heart size={20} /> Znajomi
                 </button>
                 <button 
                     className={`nav-item ${activeView === 'myProfil' ? 'active' : ''}`}
