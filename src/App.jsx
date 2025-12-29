@@ -97,7 +97,12 @@ function App() {
   return (
     <div className="app-layout">
       
-      <DesktopSidebar setView={setActiveView} activeView={activeView} />
+      <DesktopSidebar 
+      activeView={activeView}
+      setActiveView={setActiveView}  // <--- TO JEST KLUCZOWE!
+      currentUser={currentUser}
+      onLogin={handleLogin}
+      />
 
       <div className="main-content">
         <MobileHeader setView={setActiveView} />
