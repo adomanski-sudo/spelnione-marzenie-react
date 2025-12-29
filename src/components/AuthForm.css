@@ -1,0 +1,117 @@
+.auth-sidebar-container {
+    background: #f8fafc; /* Lekko szare tło wyróżniające formularz */
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Zakładki na górze */
+.auth-tabs {
+    display: flex;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.auth-tab {
+    flex: 1;
+    background: none;
+    border: none;
+    padding-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.auth-tab.active {
+    color: #3b82f6;
+    border-bottom: 2px solid #3b82f6;
+}
+
+/* Formularz */
+.auth-form-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.auth-row-compact {
+    display: flex;
+    gap: 8px;
+}
+
+.input-compact {
+    width: 100%;
+    padding: 8px 10px 8px 30px; /* Miejsce na ikonę */
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+}
+
+.input-compact:focus {
+    border-color: #3b82f6;
+    background: white;
+}
+
+.input-icon-wrapper {
+    position: relative;
+}
+
+.field-icon {
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+}
+
+/* Przyciski */
+.btn-submit-compact {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    margin-top: 5px;
+}
+
+.btn-submit-compact:hover {
+    background: #2563eb;
+}
+
+.btn-google-compact {
+    background: white;
+    border: 1px solid #e2e8f0;
+    color: #334155;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s;
+}
+
+.btn-google-compact:hover {
+    background: #f1f5f9;
+}
+
+.auth-error-mini {
+    font-size: 11px;
+    color: #ef4444;
+    margin-bottom: 8px;
+    text-align: center;
+}

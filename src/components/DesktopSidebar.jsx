@@ -1,52 +1,93 @@
 import React from 'react';
-import './DesktopSidebar.css'; // <--- Import stylu
-import { Home, Search, Bell, Heart, Settings, LogOut } from 'lucide-react'; // <--- Biblioteka z ikonami SVG
+import { Home, Search, LogOut, Settings, Bell, Users, User } from 'lucide-react';
+import './DesktopSidebar.css';
+import AuthForm from './AuthForm'; // Import nowego formularza
 
-import profilImg from '../assets/avatar.jpg';
-
-export default function DesktopSidebar({ setView, activeView }) {
-const menuItems = [
-    { id: 'home', label: 'Strona Główna', icon: <Home size={24} /> },
-    { id: 'search', label: 'Szukaj', icon: <Search size={24} /> },
-    { id: 'notifications', label: 'Powiadomienia', icon: <Bell size={24} /> },
-    { id: 'friends', label: 'Znajomi', icon: <Heart size={24} /> },
-    { id: 'settings', label: 'Ustawienia', icon: <Settings size={24} /> },
-    { id: 'logOut', label: 'Wyloguj', icon: <LogOut size={24} /> },
-  ];
+export default function DesktopSidebar({ activeView, setActiveView, currentUser, onLogin }) {
 
   return (
-    <aside className="sidebar">
-
-      <nav className="sidebar-nav">
-
-        <div className="myProfile">
-            <button 
-                key="myProfil" 
-                onClick={() => setView('myProfil')}
-                // Dodajemy klasę active, jeśli widok to 'myProfil'
-                className={`menu-btn ${activeView === 'myProfil' ? 'active' : ''}`}
-            >
-                <img src={profilImg} className="profilImg" alt="Profil" />
-                <span>Adrian Domański</span>
-            </button>
-        </div>
-
-      <div className='menuList'>
-        {menuItems.map((item) => (
-          <button
-            key={item.id}
-            onClick={() => setView(item.id)}
-            // Używamy logicznej klasy .active
-            className={`menu-btn ${activeView === item.id ? 'active' : ''}`}
-          >
-            <span className="icon-wrapper">{item.icon}</span>
-            <span>{item.label}</span>
-          </button>
-        ))}
+    <aside className="sidebar fade-in">
+      <div className="sidebar-header">
+         {/* Jeśli zalogowany -> Pokaż Avatar */}
+         {currentUser ? (
+             <div className="user-mini-profile fade-in">
+                <img src={currentUser.image} className="mini-avatar" alt="User" />
+                <div className="mini-info">
+                    <span className="mini-name">{currentUser.first_name}</span>
+                    <span className="mini-role">Marzyciel</span>
+                </div>
+             </div>
+         ) : (
+             /* Jeśli NIE zalogowany -> Tylko Logo (tekst) */
+             <div className="guest-header">
+                <h3>Dołącz do nas! ✨</h3>
+                <p>Odkryj marzenia znajomych</p>
+             </div>
+         )}
       </div>
 
+      <nav className="sidebar-nav">
+        {/* --- PRZYCISKI DOSTĘPNE DLA KAŻDEGO --- */}
+        <button 
+            className={`nav-item ${activeView === 'home' ? 'active' : ''}`}
+            onClick={() => setActiveView('home')}
+        >
+            <Home size={20} /> Strona Główna
+        </button>
+
+        <button 
+            className={`nav-item ${activeView === 'search' ? 'active' : ''}`}
+            onClick={() => setActiveView('search')}
+        >
+            <Search size={20} /> Szukaj
+        </button>
+
+        {/* --- PRZYCISKI TYLKO DLA ZALOGOWANYCH --- */}
+        {currentUser && (
+            <>
+                <button 
+                    className={`nav-item ${activeView === 'notifications' ? 'active' : ''}`}
+                    onClick={() => setActiveView('notifications')}
+                >
+                    <Bell size={20} /> Powiadomienia
+                </button>
+                <button 
+                    className={`nav-item ${activeView === 'friends' ? 'active' : ''}`}
+                    onClick={() => setActiveView('friends')}
+                >
+                    <Users size={20} /> Znajomi
+                </button>
+                <button 
+                    className={`nav-item ${activeView === 'myProfil' ? 'active' : ''}`}
+                    onClick={() => setActiveView('myProfil')}
+                >
+                    <User size={20} /> Mój Profil
+                </button>
+                 <button 
+                    className={`nav-item ${activeView === 'settings' ? 'active' : ''}`}
+                    onClick={() => setActiveView('settings')}
+                >
+                    <Settings size={20} /> Ustawienia
+                </button>
+            </>
+        )}
       </nav>
 
+      {/* --- FORMULARZ NA DOLE (DLA NIEZALOGOWANYCH) --- */}
+      {!currentUser && (
+          <div className="sidebar-footer-auth">
+              <AuthForm onLoginSuccess={onLogin} />
+          </div>
+      )}
+
+      {/* --- PRZYCISK WYLOGUJ (DLA ZALOGOWANYCH) --- */}
+      {currentUser && (
+        <div className="sidebar-footer">
+            <button className="nav-item logout-btn" onClick={() => window.location.reload()}>
+                <LogOut size={20} /> Wyloguj
+            </button>
+        </div>
+      )}
     </aside>
   );
 }
