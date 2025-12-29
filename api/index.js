@@ -25,7 +25,53 @@ const db = mysql.createPool({
     queueLimit: 0
 });
 
-// --- TWOJE ENDPOINTY (Logika zostaje ta sama) ---
+// 1. REJESTRACJA
+app.post('/api/register', (req, res) => {
+    const { email, password, first_name, last_name } = req.body;
+
+    const checkSql = "SELECT * FROM users WHERE email = ?";
+    db.query(checkSql, [email], (err, data) => {
+        if (err) return res.status(500).json(err);
+        if (data.length > 0) return res.status(409).json("Użytkownik już istnieje!");
+
+        // Szyfrowanie hasła
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync(password, salt);
+
+        // Generowanie awatara
+        const image = `https://ui-avatars.com/api/?name=${first_name}+${last_name}&background=random`;
+        
+        const insertSql = "INSERT INTO users (`email`, `password`, `first_name`, `last_name`, `image`) VALUES (?)";
+        const values = [email, hash, first_name, last_name, image];
+
+        db.query(insertSql, [values], (err, data) => {
+            if (err) return res.status(500).json(err);
+            return res.status(200).json("Użytkownik utworzony.");
+        });
+    });
+});
+
+// 2. LOGOWANIE
+app.post('/api/login', (req, res) => {
+    const sql = "SELECT * FROM users WHERE email = ?";
+    
+    db.query(sql, [req.body.email], (err, data) => {
+        if (err) return res.status(500).json(err);
+        if (data.length === 0) return res.status(404).json("Użytkownik nie znaleziony!");
+
+        // Weryfikacja hasła
+        // UWAGA: Stare konta w bazie mają hasło jako NULL lub tekst jawny.
+        // bcrypt.compareSync wywali błąd na pustym haśle. Dodajemy zabezpieczenie:
+        if (!data[0].password) return res.status(400).json("To konto nie ma ustawionego hasła (stare konto).");
+
+        const checkPassword = bcrypt.compareSync(req.body.password, data[0].password);
+
+        if (!checkPassword) return res.status(400).json("Błędne hasło lub email!");
+
+        const { password, ...others } = data[0]; 
+        res.status(200).json(others);
+    });
+});
 
 // Marzenia
 app.get('/api/dreams', (req, res) => {
