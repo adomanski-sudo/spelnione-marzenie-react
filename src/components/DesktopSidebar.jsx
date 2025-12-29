@@ -20,7 +20,7 @@ export default function DesktopSidebar({ activeView, setActiveView, currentUser,
          ) : (
              /* Jeśli NIE zalogowany -> Tylko Logo (tekst) */
              <div className="guest-header">
-                <h3>Dołącz do nas! ✨</h3>
+                <h3>Dołącz do nas!</h3>
                 <p>Odkryj marzenia znajomych</p>
              </div>
          )}
