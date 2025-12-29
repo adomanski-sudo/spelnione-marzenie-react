@@ -129,7 +129,7 @@
 
 /* Ukrywanie na małych ekranach */
 @media (max-width: 800px) {
-  .right-feed {
+  .sidebar {
     display: none;
   }
 }
