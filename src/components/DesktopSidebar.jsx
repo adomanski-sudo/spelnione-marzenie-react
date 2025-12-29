@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Search, LogOut, Settings, Bell, User, Heart } from 'lucide-react';
+import { Home, Search, LogOut, Settings, Bell, Heart } from 'lucide-react';
 import './DesktopSidebar.css';
 import AuthForm from './AuthForm'; // Import nowego formularza
 
@@ -57,12 +57,6 @@ export default function DesktopSidebar({ activeView, setActiveView, currentUser,
                     onClick={() => setActiveView('friends')}
                 >
                     <Heart size={20} /> Znajomi
-                </button>
-                <button 
-                    className={`nav-item ${activeView === 'myProfil' ? 'active' : ''}`}
-                    onClick={() => setActiveView('myProfil')}
-                >
-                    <User size={20} /> Mój Profil
                 </button>
                  <button 
                     className={`nav-item ${activeView === 'settings' ? 'active' : ''}`}
