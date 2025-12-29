@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react'; // <--- Dodaj useEffect
-import "./App.css"; // Globalne
+import { useState, useEffect } from 'react';
+import "./App.css"; 
+
+// Importy Komponentów
 import DesktopSidebar from "./components/DesktopSidebar";
 import RightFeed from "./components/RightFeed";
 import MobileHeader from "./components/MobileHeader";
@@ -13,41 +15,50 @@ import FriendsSection from './components/FriendsSection';
 import NotificationsSection from './components/NotificationsSection';
 import UserProfile from './components/UserProfile';
 
-const activUser = 2;
-
 function App() {
+  // 1. STAN APLIKACJI
   const [activeView, setActiveView] = useState(() => {
       return localStorage.getItem('savedActiveView') || 'home';
   });
 
+  const [currentUser, setCurrentUser] = useState(null); // Startujemy jako niezalogowany (null)
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [selectedDream, setSelectedDream] = useState(null);
+  const [dreams, setDreams] = useState([]);
+  const [friendsList, setFriendsList] = useState([]);
+
+  // 2. FUNKCJE LOGIKI (To czego brakowało!)
+  
+  // Funkcja logowania przekazywana do Sidebara
+  const handleLogin = (userData) => {
+    console.log("Zalogowano użytkownika:", userData);
+    setCurrentUser(userData); // Zapisujemy dane z backendu
+    setActiveView('home');    // Przenosimy na stronę główną
+  };
 
   const handleOpenProfile = (id) => {
-    // Jeśli kliknęliśmy siebie (ID 2), idź do MyProfile
-    if (id === 2) { 
+    // Jeśli kliknęliśmy siebie (sprawdzamy ID zalogowanego), idź do MyProfile
+    if (currentUser && id === currentUser.id) { 
         setActiveView('myProfil');
     } else {
         setSelectedUserId(id);
         setActiveView('userProfile');
     }
-};
+  };
 
+  // Filtrowanie marzeń dla "Mojego Profilu" (tylko jeśli jesteśmy zalogowani)
+  const myDreams = currentUser 
+    ? dreams.filter(dream => dream.userId === currentUser.id) 
+    : [];
+
+  // 3. EFEKTY (Pobieranie danych)
+
+  // Zapisywanie widoku w pamięci przeglądarki
   useEffect(() => {
       localStorage.setItem('savedActiveView', activeView);
-  }, [activeView]); // Uruchom zawsze, gdy zmieni się activeView
+  }, [activeView]);
 
-  const [selectedDream, setSelectedDream] = useState(null);
-
-  const [dreams, setDreams] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
-
-  const myDreams = dreams.filter(dream => dream.userId === activUser);
-
-  const userDescription = '';
-  const setDescription = [activUser, userDescription];
-
-  const [friendsList, setFriendsList] = useState([]);
-
+  // Pobieranie wszystkich marzeń (Feed na środku)
   useEffect(() => {
     fetch('/api/dreams')
       .then(res => res.json())
@@ -58,35 +69,19 @@ function App() {
           title: item.title,
           description: item.description,
           category: item.category,
-          
           date: new Date(item.date).toLocaleDateString('pl-PL', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
+            year: 'numeric', month: 'long', day: 'numeric'
           }),
-          
           userName: `${item.first_name} ${item.last_name}`,
-          
           userAvatar: item.userImage, 
           image: item.image
         }));
-
         setDreams(formattedDreams);
       })
       .catch(err => console.error("Błąd pobierania marzeń:", err));
   }, []); 
 
-  useEffect(() => {
-    fetch('/api/user')
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.length > 0) {
-            setCurrentUser(data[0]);
-        }
-      })
-      .catch(err => console.error("Błąd pobierania użytkownika:", err));
-  }, []);
-
+  // Pobieranie znajomych (dla sekcji Friends)
   useEffect(() => {
     fetch('/api/friends')
       .then(res => res.json())
@@ -94,27 +89,29 @@ function App() {
       .catch(err => console.error(err));
   }, []);
 
+  // 4. WIDOK (Renderowanie)
   return (
     <div className="app-layout">
       
+      {/* LEWY PASEK */}
       <DesktopSidebar 
-      activeView={activeView}
-      setActiveView={setActiveView}  // <--- TO JEST KLUCZOWE!
-      currentUser={currentUser}
-      onLogin={handleLogin}
+        activeView={activeView}
+        setActiveView={setActiveView}
+        currentUser={currentUser}  // Przekazujemy stan (null lub obiekt)
+        onLogin={handleLogin}      // Przekazujemy funkcję naprawiającą błąd!
       />
 
+      {/* ŚRODKOWA KOLUMNA */}
       <div className="main-content">
         <MobileHeader setView={setActiveView} />
         
-        {/* --- TUTAJ ZMIANA: Wyświetlamy listę lub widok --- */}
         <div className="content-container">
            
-           {/* LOGIKA WYŚWIETLANIA */}
+           {/* LOGIKA WYŚWIETLANIA WIDOKÓW */}
+           
+           {/* 1. STRONA GŁÓWNA */}
            {activeView === 'home' ? (
-            <> {/* Pusty fragment (React Fragment), bo zwracamy dwa elementy obok siebie */}
-                
-                {/* TUTAJ WSTAWIAMY SEKCJE POWITALNĄ */}
+             <>
                 <HowItWorks />
                 
                 <h2 style={{ marginBottom: '20px', fontSize: '24px', fontWeight: 'bold' }}>
@@ -123,69 +120,70 @@ function App() {
 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
                   {dreams.map((dream) => (
-
                     <div key={dream.id} onClick={() => setSelectedDream(dream)}>
                         <DreamCard dream={dream} showAuthor={true} />
                     </div>
-
                   ))}
                 </div>
              </>
            ) 
 
-           /* Mój Profil */
-          : activeView === 'myProfil' ? (
-            <MyProfile 
-            dreams={myDreams}  /* <--- PRZEKAZUJEMY PRAWDZIWE DANE */
-            setDreams={setDreams}
-            userData={currentUser}  /* <--- PRZEKAZUJEMY DANE */
-            />
-          )
+           /* 2. MÓJ PROFIL */
+           : activeView === 'myProfil' ? (
+             <MyProfile 
+               dreams={myDreams} 
+               setDreams={setDreams}
+               userData={currentUser}
+             />
+           )
 
-          : activeView === 'search' ? (
-            <SearchSection onProfileClick={handleOpenProfile} />
-          )
+           /* 3. WYSZUKIWARKA */
+           : activeView === 'search' ? (
+             <SearchSection onProfileClick={handleOpenProfile} />
+           )
 
-          : activeView === 'friends' ? (
-            <FriendsSection friends={friendsList} onProfileClick={handleOpenProfile} />
-          )
+           /* 4. ZNAJOMI */
+           : activeView === 'friends' ? (
+             <FriendsSection friends={friendsList} onProfileClick={handleOpenProfile} />
+           )
 
-          : activeView === 'notifications' ? (
-            <NotificationsSection />
-          )
+           /* 5. POWIADOMIENIA */
+           : activeView === 'notifications' ? (
+             <NotificationsSection />
+           )
 
-          : activeView === 'userProfile' ? (
-            <UserProfile 
-            userId={selectedUserId} 
-            onBack={() => setActiveView('home')} // lub poprzedni widok
-            />
-)
+           /* 6. PROFIL INNEGO UŻYTKOWNIKA */
+           : activeView === 'userProfile' ? (
+             <UserProfile 
+               userId={selectedUserId} 
+               onBack={() => setActiveView('home')}
+             />
+           )
            : (
-             // Jeśli inny widok -> Wyświetl pustą kartę
              <div className="content-card">
                <p>Widok: {activeView} (w budowie)</p>
              </div>
            )}
-          
-
         </div>
 
         <MobileNav setView={setActiveView} />
       </div>
 
+      {/* PRAWY PASEK (FEED) */}
       <RightFeed />
 
+      {/* MODAL SZCZEGÓŁÓW MARZENIA */}
       {selectedDream && (
         <DreamModal 
           dream={selectedDream} 
           onClose={() => setSelectedDream(null)} 
+          // Sprawdzamy, czy to marzenie zalogowanego usera, żeby pokazać edycję
+          isOwner={currentUser && selectedDream.userId === currentUser.id}
         />
       )}
 
-      
-
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
