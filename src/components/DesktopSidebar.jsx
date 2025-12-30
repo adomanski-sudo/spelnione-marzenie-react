@@ -3,7 +3,7 @@ import { Home, Search, LogOut, Settings, Bell, Heart } from 'lucide-react';
 import './DesktopSidebar.css';
 import AuthForm from './AuthForm'; // Import nowego formularza
 
-export default function DesktopSidebar({ activeView, setActiveView, currentUser, onLogin, onLogout={handleLogout} }) {
+export default function DesktopSidebar({ activeView, setActiveView, currentUser, onLogin, handleLogout }) {
 
   return (
     <aside className="sidebar fade-in">
@@ -78,7 +78,7 @@ export default function DesktopSidebar({ activeView, setActiveView, currentUser,
       {/* --- PRZYCISK WYLOGUJ (DLA ZALOGOWANYCH) --- */}
       {currentUser && (
         <div className="sidebar-footer">
-            <button className="nav-item logout-btn" onClick={() => onLogout}>
+            <button className="nav-item logout-btn" onClick={() => handleLogout}>
                 <LogOut size={20} /> Wyloguj
             </button>
         </div>
