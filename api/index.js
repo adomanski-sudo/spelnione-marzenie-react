@@ -4,6 +4,7 @@ import mysql from 'mysql2';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 // Konfiguracja zmiennych środowiskowych
 dotenv.config();
@@ -61,18 +62,20 @@ app.post('/api/login', (req, res) => {
         if (err) return res.status(500).json(err);
         if (data.length === 0) return res.status(404).json("Użytkownik nie znaleziony!");
 
-        // Weryfikacja hasła
-        // UWAGA: Stare konta w bazie mają hasło jako NULL lub tekst jawny.
-        // bcrypt.compareSync wywali błąd na pustym haśle. Dodajemy zabezpieczenie:
-        if (!data[0].password) return res.status(400).json("To konto nie ma ustawionego hasła (stare konto).");
+        // Sprawdzenie czy hasło istnieje (dla starych kont)
+        if (!data[0].password) return res.status(400).json("To konto nie ma hasła.");
 
         const checkPassword = bcrypt.compareSync(req.body.password, data[0].password);
 
         if (!checkPassword) return res.status(400).json("Błędne hasło lub email!");
 
+        // --- TWORZENIE TOKENA ---
+        // Używamy zmiennej środowiskowej JWT_SECRET
         const token = jwt.sign({ id: data[0].id }, process.env.JWT_SECRET, { expiresIn: '12h' });
 
         const { password, ...others } = data[0]; 
+        
+        // Zwracamy dane ORAZ token
         res.status(200).json({ ...others, token });
     });
 });
