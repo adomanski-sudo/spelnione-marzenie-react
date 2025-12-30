@@ -4,32 +4,15 @@ import DreamCard from './DreamCard';
 import avatarImg from '../assets/avatar.jpg'; 
 import { Edit3, Plus, ArrowLeft, Trash2, Edit } from 'lucide-react'; 
 
-// Aby wysłać
-
-// Dodajemy setDreams do propsów, żeby móc aktualizować listę
 export default function MyProfile({ dreams, setDreams, userData }) {
   
   const [activeDream, setActiveDream] = useState(null);
 
-  // Funkcja musi być W ŚRODKU komponentu, żeby mieć dostęp do 'setDreams'
+  // To jest TA JEDYNA, poprawna funkcja usuwania
   const handleDelete = (id) => {
     if (!window.confirm("Czy na pewno chcesz usunąć to marzenie?")) return;
 
-    fetch(`/api/dreams/${id}`, { method: 'DELETE' })
-        .then(() => {
-            // Aktualizujemy listę w App.jsx
-            setDreams(prev => prev.filter(d => d.id !== id));
-            // Wracamy do widoku listy
-            setActiveDream(null); 
-        })
-        .catch(err => console.error(err));
-  };
-
-  const deleteDream = (id) => {
-    if (!window.confirm("Czy na pewno chcesz usunąć to marzenie?")) return;
-
-    // 1. POBIERAMY TOKEN BEZPOŚREDNIO Z LOCAL STORAGE
-    // To najbezpieczniejsza metoda w tym momencie
+    // 1. Pobieramy token
     const storedUser = localStorage.getItem('loggedUser');
     const token = storedUser ? JSON.parse(storedUser).token : null;
 
@@ -38,38 +21,31 @@ export default function MyProfile({ dreams, setDreams, userData }) {
         return;
     }
 
-    // 2. WYSYŁAMY ŻĄDANIE Z NAGŁÓWKIEM
+    // 2. Wysyłamy żądanie z tokenem
     fetch(`/api/dreams/${id}`, { 
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': token  // <--- Tutaj wkładamy "paszport"
+            'Authorization': token  // <--- Klucz do sukcesu!
         }
     })
     .then(res => {
-        if (res.status === 401) {
-            throw new Error("Brak autoryzacji (401). Token nie dotarł.");
-        }
-        if (res.status === 403) {
-            throw new Error("Brak uprawnień (403). To nie Twoje marzenie.");
-        }
-        if (!res.ok) {
-            throw new Error("Wystąpił błąd podczas usuwania.");
-        }
+        if (res.status === 401) throw new Error("Błąd 401: Brak autoryzacji.");
+        if (res.status === 403) throw new Error("Błąd 403: To nie Twoje marzenie.");
+        if (!res.ok) throw new Error("Wystąpił błąd podczas usuwania.");
         return res.json();
     })
-    .then(data => {
-        // Sukces - usuwamy z listy na ekranie
+    .then(() => {
+        // Sukces! Aktualizujemy stan aplikacji
         setDreams(prev => prev.filter(d => d.id !== id));
-        // Jeśli usunięte marzenie było otwarte w modalu, zamknij je (opcjonalnie)
-        // setActiveDream(null); 
+        setActiveDream(null); // Zamykamy szczegóły
         alert("Marzenie usunięte!");
     })
     .catch(err => {
         console.error(err);
         alert(err.message);
     });
-};
+  };
 
   return (
     <div className="profile-split-view fade-in">
@@ -84,7 +60,6 @@ export default function MyProfile({ dreams, setDreams, userData }) {
             </button>
             <img src={avatarImg} alt="Profil" className="bio-avatar" />
             
-            {/* Przycisk dodawania tylko u mnie */}
             <button className="circle-action-btn add-btn">
                <Plus size={22} />
                <span className="btn-label">Dodaj</span>
@@ -119,7 +94,7 @@ export default function MyProfile({ dreams, setDreams, userData }) {
               ))}
           </div>
         ) : (
-          /* WIDOK SZCZEGÓŁÓW (Twoja nowa wersja) */
+          /* WIDOK SZCZEGÓŁÓW */
           <div className="dream-detail-view fade-in">
             
             <button className="btn-back" onClick={() => setActiveDream(null)}>
@@ -138,7 +113,6 @@ export default function MyProfile({ dreams, setDreams, userData }) {
                   <h1 className="detail-title">{activeDream.title}</h1>
                   <p className="detail-desc">{activeDream.description}</p>
                   
-                  {/* PRZYCISKI WŁAŚCICIELA */}
                   <div className="detail-footer">
                     <button className="btn-primary-large" style={{background: '#f1f5f9', color: '#334155'}}>
                       <Edit size={20} style={{marginRight: '8px'}}/> Edytuj
