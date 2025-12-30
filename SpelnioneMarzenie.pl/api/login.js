@@ -54,7 +54,8 @@ export default async function handler(req, res) {
         id: user.id,
         first_name: user.first_name,
         last_name: user.last_name,
-        image: user.image
+        image: user.image,
+        token
     };
 
     res.status(200).json({ message: 'Zalogowano pomyślnie!', user: userData, token });
