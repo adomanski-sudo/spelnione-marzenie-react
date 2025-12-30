@@ -29,7 +29,9 @@ const db = mysql.createPool({
 app.post('/api/register', (req, res) => {
     const { email, password, first_name, last_name } = req.body;
 
+
     const checkSql = "SELECT * FROM users WHERE email = ?";
+
     db.query(checkSql, [email], (err, data) => {
         if (err) return res.status(500).json(err);
         if (data.length > 0) return res.status(409).json("Użytkownik już istnieje!");
@@ -68,8 +70,10 @@ app.post('/api/login', (req, res) => {
 
         if (!checkPassword) return res.status(400).json("Błędne hasło lub email!");
 
+        const token = jwt.sign({ id: data[0].id }, process.env.JWT_SECRET, { expiresIn: '12h' });
+
         const { password, ...others } = data[0]; 
-        res.status(200).json(others);
+        res.status(200).json({ ...others, token });
     });
 });
 
