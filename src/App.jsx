@@ -113,6 +113,7 @@ function App() {
         setActiveView={setActiveView}
         currentUser={currentUser}  // Przekazujemy stan (null lub obiekt)
         onLogin={handleLogin}      // Przekazujemy funkcję naprawiającą błąd!
+        onLogout={handleLogout}
       />
 
       {/* ŚRODKOWA KOLUMNA */}
