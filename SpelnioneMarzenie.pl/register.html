@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Załóż konto | Spełnione Marzenie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="login.css" />
+</head>
+
+<body>
+
+    <div class="main-container">
+        
+        <a href="index.html" class="logo-header">
+            SpelnioneMarzenie.pl
+        </a>
+
+        <div class="login-card">
+            
+            <div class="column left-col">
+                <h2>Dołącz do nas! 🚀</h2>
+                <p class="sub-text">Wypełnij dane, aby założyć konto.</p>
+                
+                <form id="register-form">
+                    <div class="input-group">
+                        <input type="text" id="fname" placeholder="Imię" required>
+                    </div>
+
+                    <div class="input-group">
+                        <input type="text" id="lname" placeholder="Nazwisko" required>
+                    </div>
+
+                    <div class="input-group">
+                        <input type="email" id="email" placeholder="Adres e-mail" required>
+                    </div>
+
+                    <div class="input-group">
+                        <input type="password" id="pass" placeholder="Hasło" required minlength="6">
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">Załóż konto</button>
+                </form>
+
+                <div id="message" style="margin-top: 15px; font-size: 14px; text-align: center;"></div>
+            </div>
+
+            <div class="divider">
+                <span>LUB</span>
+            </div>
+
+            <div class="column right-col">
+                <h2>Masz już konto?</h2>
+                <p class="sub-text">Zaloguj się i wracaj do spełniania marzeń.</p>
+                
+                <a href="login.html" style="text-decoration: none;">
+                    <button class="btn-outline">
+                        Zaloguj się
+                    </button>
+                </a>
+            </div>
+
+        </div>
+        
+    </div>
+
+    <script type="module" src="register.js"></script>
+
+</body>
+</html>

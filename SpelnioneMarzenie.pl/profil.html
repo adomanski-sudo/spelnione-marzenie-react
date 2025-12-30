@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pl">
+    
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spełnione Marzenie</title>
+    <link rel="stylesheet" type="text/css" href="profil-style.css" />
+    <meta name="description" content="Opowiedz o swoich marzeniach i pomóż innym spełnić je dla Ciebie.">
+    <meta name="keywords" content="Prezenty, marzenia, niespodzianki">
+    <meta name="author" content="Laura, Adrian">
+    <link rel="icon" href="img/icons/favicon.ico">
+</head>
+
+<body>
+    <div id = 'container'>
+        <div id = 'header'>
+            <header>
+                <div class="header-left">
+                    <a href="index.html" class="btn-home" title="Wróć do wyboru profilu">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                        </svg>
+                    </a>
+        
+                    <input type="text" id="search" placeholder="Szukaj...">
+                </div>
+
+                <div id="logo">
+                    <a href="index.html" style="text-decoration: none; color: inherit;">
+                        SpelnioneMarzenie.pl
+                    </a>
+                </div>
+                <div id="log"></div>
+            </header>
+        </div>
+        <div id = 'content'>
+            <div id = 'profil'>
+                <div id = 'profil-image'>
+                </div>
+                <div id = 'profil-content'>
+                    <div id = 'profil-name'>
+                        Ładowanie...
+                    </div>
+                    <div id = 'profil-descript'>
+                        Ładowanie...
+                    </div>
+                </div>
+            </div>
+
+        <div id="dreams">
+
+
+        </div>
+
+        </div>
+    </div>
+
+    <div id="add-dream-btn-container" style="display: none; text-align: center; margin: 20px;">
+    <button class="btn-primary" onclick="openDreamModal()">+ Dodaj Nowe Marzenie</button>
+</div>
+
+    <div id="dream-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h2 id="modal-title">Dodaj Marzenie</h2>
+            <form id="dream-form">
+                <input type="hidden" id="dream-db-id"> <div class="input-group">
+                    <input type="text" id="d-title" placeholder="Tytuł (np. Skok ze spadochronem)" required>
+                </div>
+                
+                <div class="input-group">
+                    <select id="d-category">
+                        <option value="Podróże">Podróże</option>
+                        <option value="Sprzęt">Sprzęt</option>
+                        <option value="Edukacja">Edukacja</option>
+                        <option value="Inne">Inne</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="d-icon" placeholder="Ikona (np. ✈️, 🎸, 🎓)" required>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="d-image" placeholder="Link do zdjęcia (URL)" required>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" id="d-price" placeholder="Szacowany koszt (np. 500 zł)">
+                </div>
+
+                <div class="input-group">
+                    <textarea id="d-desc" placeholder="Opisz swoje marzenie..." rows="4"></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary">Zapisz</button>
+                <button type="button" class="btn-outline" onclick="closeDreamModal()" style="margin-top: 10px;">Anuluj</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="profil.js"></script>
+
+</body>
+</html>

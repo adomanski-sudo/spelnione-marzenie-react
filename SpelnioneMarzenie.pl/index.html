@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wybierz Marzyciela | Spełnione Marzenie</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+    <div class="main-split-container">
+        
+        <section class="left-panel">
+
+            <div class="header-top">
+                <div id="auth-container"></div>
+            </div>
+
+            <header class="panel-header">
+                <div id="logo">
+                    <a href="index.html" style="text-decoration: none; color: inherit;">
+                        SpelnioneMarzenie.pl
+                    </a>
+                </div>
+
+                <h1>Czyje marzenie masz ochotę dzisiaj spełnić?</h1>
+
+                <div class="search-wrapper">
+                    <input type="text" id="user-search" placeholder="Szukaj osoby...">
+                    <span class="search-icon">🔍</span>
+                </div>
+            </header>
+            
+            <div id="users-list" class="users-list-container">
+                <img id = 'loader' src = 'img/profil/loader.gif'>
+                </div>
+        </section>
+
+        <section class="right-panel">
+            <header class="panel-header">
+                <h1>Ostatnio spełnione marzenia:</h1>
+                <p>To dzieje się teraz!</p>
+            </header>
+
+            <div class="feed-container">
+                <div id="live-feed-list" class="feed-list">
+                </div>
+                <div class="fade-overlay">
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script type="module" src="index.js"></script>
+</body>
+</html>

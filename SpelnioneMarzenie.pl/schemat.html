@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Dokumentacja Techniczna - Spełnione Marzenie</title>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 210mm; /* Format A4 */
+            margin: 0 auto;
+            padding: 40px;
+            color: #333;
+            background: white;
+        }
+        h1 { border-bottom: 2px solid #2c3e50; padding-bottom: 10px; color: #2c3e50; }
+        h2 { margin-top: 40px; color: #0277bd; border-left: 5px solid #0277bd; padding-left: 10px; }
+        p { line-height: 1.6; color: #555; }
+        
+        .diagram-container {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            background: #f9f9f9;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .page-break { page-break-after: always; }
+        
+        /* Styl dla druku */
+        @media print {
+            body { padding: 0; max-width: 100%; }
+            .diagram-container { border: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div style="text-align: center; margin-top: 100px;">
+        <h1 style="font-size: 3em; border: none;">Dokumentacja Techniczna</h1>
+        <h2 style="border: none; color: #555;">Projekt: SpelnioneMarzenie.pl</h2>
+        <p>Wersja 1.0</p>
+        <p>Autor: Adrian Domański</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h1>1. Mapa Infrastruktury</h1>
+    <p>Schemat przedstawia fizyczne rozmieszczenie usług i przepływ kodu.</p>
+    
+    <div class="diagram-container">
+        <div class="mermaid">
+        graph TD
+            %% Style
+            classDef pc fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:black;
+            classDef git fill:#444,stroke:#000,stroke-width:2px,color:white;
+            classDef vercel fill:#000,stroke:#fff,stroke-width:2px,color:white;
+            classDef db fill:#ffecb3,stroke:#ff6f00,stroke-width:2px,color:black;
+
+            User[💻 TWÓJ KOMPUTER<br/>VS Code]:::pc
+            GitHub[🐱 GITHUB<br/>Repozytorium]:::git
+            Vercel[▲ VERCEL<br/>Frontend + API]:::vercel
+            SeoHost[🗄️ SEOHOST<br/>MySQL]:::db
+
+            User -- "1. git push" --> GitHub
+            GitHub -- "2. Auto Deploy" --> Vercel
+            Vercel -- "3. SQL Query" --> SeoHost
+            SeoHost -- "4. Dane JSON" --> Vercel
+        </div>
+    </div>
+
+    <h2>2. Struktura Plików i Logiki</h2>
+    <p>Wizualizacja zależności między plikami HTML, modułami JS oraz Endpointami API.</p>
+
+    <div class="diagram-container">
+        <div class="mermaid">
+        flowchart LR
+            subgraph FRONTEND ["FRONTEND (Przeglądarka)"]
+                direction TB
+                I_HTML[index.html] --- I_JS[index.js]
+                P_HTML[profil.html] --- P_JS[profil.js]
+                
+                I_JS -.-> API_Client[api.js]
+                P_JS -.-> API_Client
+            end
+
+            subgraph BACKEND ["BACKEND (Vercel API)"]
+                direction TB
+                API_Client ==> API_Feed[api/feed.js]
+                API_Client ==> API_Users[api/users.js]
+                API_Client ==> API_Profile[api/user.js]
+            end
+
+            subgraph DB ["BAZA (SeoHost)"]
+                API_Feed --> T_Dreams[(Tabela: dreams)]
+                API_Users --> T_Users[(Tabela: users)]
+            end
+
+            style FRONTEND fill:#f9f9f9,stroke:#333
+            style BACKEND fill:#e0f2f1,stroke:#00695c
+            style DB fill:#fff3e0,stroke:#e65100
+        </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h1>3. Struktura Bazy Danych (ERD)</h1>
+    <p>Relacje między tabelami użytkowników i marzeń.</p>
+
+    <div class="diagram-container">
+        <div class="mermaid">
+        erDiagram
+            USERS ||--|{ DREAMS : "posiada"
+            
+            USERS {
+                int id PK "Auto Increment"
+                string first_name
+                string last_name
+                text description
+                string image
+            }
+
+            DREAMS {
+                int id PK
+                int idUser FK "Relacja do USERS"
+                string dream_id "np. Krolestwo"
+                string title
+                string price
+                string image
+            }
+        </div>
+    </div>
+
+    <h2>Legenda</h2>
+    <ul>
+        <li><strong>Frontend:</strong> Warstwa wizualna (HTML/CSS/JS) działająca w przeglądarce.</li>
+        <li><strong>Backend:</strong> Serverless Functions na Vercel (Node.js).</li>
+        <li><strong>Baza Danych:</strong> MariaDB/MySQL na hostingu SeoHost.</li>
+    </ul>
+
+</body>
+</html>
