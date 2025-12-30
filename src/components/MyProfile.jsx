@@ -26,27 +26,48 @@ export default function MyProfile({ dreams, setDreams, userData }) {
   const deleteDream = (id) => {
     if (!window.confirm("Czy na pewno chcesz usunąć to marzenie?")) return;
 
-    // Pobieramy token z obecnego usera (lub localStorage)
-    // Zakładam, że userData przekazane do MyProfile ma w sobie token
-    const token = userData.token; 
+    // 1. POBIERAMY TOKEN BEZPOŚREDNIO Z LOCAL STORAGE
+    // To najbezpieczniejsza metoda w tym momencie
+    const storedUser = localStorage.getItem('loggedUser');
+    const token = storedUser ? JSON.parse(storedUser).token : null;
 
+    if (!token) {
+        alert("Błąd: Nie jesteś zalogowany (brak tokena).");
+        return;
+    }
+
+    // 2. WYSYŁAMY ŻĄDANIE Z NAGŁÓWKIEM
     fetch(`/api/dreams/${id}`, { 
         method: 'DELETE',
         headers: {
-            // "Okazujemy paszport"
-            'Authorization': token 
+            'Content-Type': 'application/json',
+            'Authorization': token  // <--- Tutaj wkładamy "paszport"
         }
     })
     .then(res => {
-        if (res.status === 403) {
-            alert("Przyłapany! To nie Twoje marzenie 👮");
-        } else if (res.ok) {
-            setDreams(prev => prev.filter(d => d.id !== id));
-            setActiveDream(null);
+        if (res.status === 401) {
+            throw new Error("Brak autoryzacji (401). Token nie dotarł.");
         }
+        if (res.status === 403) {
+            throw new Error("Brak uprawnień (403). To nie Twoje marzenie.");
+        }
+        if (!res.ok) {
+            throw new Error("Wystąpił błąd podczas usuwania.");
+        }
+        return res.json();
     })
-    .catch(err => console.error(err));
-  };
+    .then(data => {
+        // Sukces - usuwamy z listy na ekranie
+        setDreams(prev => prev.filter(d => d.id !== id));
+        // Jeśli usunięte marzenie było otwarte w modalu, zamknij je (opcjonalnie)
+        // setActiveDream(null); 
+        alert("Marzenie usunięte!");
+    })
+    .catch(err => {
+        console.error(err);
+        alert(err.message);
+    });
+};
 
   return (
     <div className="profile-split-view fade-in">
