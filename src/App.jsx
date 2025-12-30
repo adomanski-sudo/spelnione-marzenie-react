@@ -21,7 +21,11 @@ function App() {
       return localStorage.getItem('savedActiveView') || 'home';
   });
 
-  const [currentUser, setCurrentUser] = useState(null); // Startujemy jako niezalogowany (null)
+  const [currentUser, setCurrentUser] = useState(() => {
+    const savedUser = localStorage.getItem('loggedUser');
+    return savedUser ? JSON.parse(savedUser) : null;
+    });
+
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [selectedDream, setSelectedDream] = useState(null);
   const [dreams, setDreams] = useState([]);
@@ -34,6 +38,8 @@ function App() {
     console.log("Zalogowano użytkownika:", userData);
     setCurrentUser(userData); // Zapisujemy dane z backendu
     setActiveView('home');    // Przenosimy na stronę główną
+    // Zapis do Local Storage
+    localStorage.setItem('loggedUser', JSON.stringify(userData));
   };
 
   const handleOpenProfile = (id) => {
@@ -45,6 +51,14 @@ function App() {
         setActiveView('userProfile');
     }
   };
+
+  // Wylogowanie
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setActiveView('home');
+    // Czyścimy pamięć
+    localStorage.removeItem('loggedUser'); 
+    };
 
   // Filtrowanie marzeń dla "Mojego Profilu" (tylko jeśli jesteśmy zalogowani)
   const myDreams = currentUser 
