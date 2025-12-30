@@ -4,6 +4,8 @@ import DreamCard from './DreamCard';
 import avatarImg from '../assets/avatar.jpg'; 
 import { Edit3, Plus, ArrowLeft, Trash2, Edit } from 'lucide-react'; 
 
+// Aby wysłać
+
 // Dodajemy setDreams do propsów, żeby móc aktualizować listę
 export default function MyProfile({ dreams, setDreams, userData }) {
   
