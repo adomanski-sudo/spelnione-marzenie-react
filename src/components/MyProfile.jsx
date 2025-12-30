@@ -23,6 +23,31 @@ export default function MyProfile({ dreams, setDreams, userData }) {
         .catch(err => console.error(err));
   };
 
+  const deleteDream = (id) => {
+    if (!window.confirm("Czy na pewno chcesz usunąć to marzenie?")) return;
+
+    // Pobieramy token z obecnego usera (lub localStorage)
+    // Zakładam, że userData przekazane do MyProfile ma w sobie token
+    const token = userData.token; 
+
+    fetch(`/api/dreams/${id}`, { 
+        method: 'DELETE',
+        headers: {
+            // "Okazujemy paszport"
+            'Authorization': token 
+        }
+    })
+    .then(res => {
+        if (res.status === 403) {
+            alert("Przyłapany! To nie Twoje marzenie 👮");
+        } else if (res.ok) {
+            setDreams(prev => prev.filter(d => d.id !== id));
+            setActiveDream(null);
+        }
+    })
+    .catch(err => console.error(err));
+  };
+
   return (
     <div className="profile-split-view fade-in">
       

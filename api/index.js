@@ -156,13 +156,36 @@ app.get('/api/feed', (req, res) => {
 
 // USUWANIE MARZENIA
 app.delete('/api/dreams/:id', (req, res) => {
-    const id = req.params.id;
-    // W prawdziwej aplikacji sprawdzilibyśmy tu, czy ID usera się zgadza (auth)
-    // Na potrzeby demo usuwamy "jak leci"
-    // const sql = "DELETE FROM dreams WHERE id = ?";
-    db.query(sql, [id], (err, result) => {
-        if(err) return res.status(500).json(err);
-        return res.json({ message: "Usunięto", result });
+    const dreamId = req.params.id;
+    
+    // 1. Pobierz token z nagłówka (Frontend musi go wysłać)
+    const token = req.headers.authorization;
+    if (!token) return res.status(401).json("Brak uprawnień!");
+
+    // 2. Sprawdź czy token jest prawdziwy
+    jwt.verify(token, SECRET_KEY, (err, decodedUser) => {
+        if (err) return res.status(403).json("Token jest nieważny!");
+
+        // 3. Sprawdź, czy marzenie należy do tego użytkownika!
+        // Najpierw pobieramy marzenie, żeby zobaczyć kto jest właścicielem
+        const checkOwnerSql = "SELECT idUser FROM dreams WHERE id = ?";
+        
+        db.query(checkOwnerSql, [dreamId], (err, data) => {
+            if (err) return res.status(500).json(err);
+            if (data.length === 0) return res.status(404).json("Marzenie nie istnieje");
+
+            // 4. Porównujemy ID z tokena (decodedUser.id) z właścicielem marzenia (data[0].idUser)
+            if (data[0].idUser !== decodedUser.id) {
+                return res.status(403).json("To nie Twoje marzenie! Nie możesz go usunąć.");
+            }
+
+            // 5. Dopiero teraz usuwamy
+            const deleteSql = "DELETE FROM dreams WHERE id = ?";
+            db.query(deleteSql, [dreamId], (err, result) => {
+                if(err) return res.status(500).json(err);
+                return res.json("Marzenie usunięte.");
+            });
+        });
     });
 });
 
