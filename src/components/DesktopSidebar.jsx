@@ -78,7 +78,7 @@ export default function DesktopSidebar({ activeView, setActiveView, currentUser,
       {/* --- PRZYCISK WYLOGUJ (DLA ZALOGOWANYCH) --- */}
       {currentUser && (
         <div className="sidebar-footer">
-            <button className="nav-item logout-btn" onClick={() => handleLogout}>
+            <button className="nav-item logout-btn" onClick={() => handleLogout()}>
                 <LogOut size={20} /> Wyloguj
             </button>
         </div>
