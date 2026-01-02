@@ -2,11 +2,11 @@
 import express from 'express';
 import mysql from 'mysql2';
 import cors from 'cors';
-import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
-// Konfiguracja zmiennych środowiskowych
+// --- ZMIANA TUTAJ: ---
+import dotenv from 'dotenv';
 dotenv.config();
 
 const app = express();
@@ -14,7 +14,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// PULA POŁĄCZEŃ (Tutaj bez zmian w logice, tylko składnia)
+// PULA POŁĄCZEŃ
 const db = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -24,6 +24,17 @@ const db = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
+});
+
+// --- SPRAWDZENIE: ---
+db.getConnection((err, connection) => {
+    if (err) {
+        console.error("❌ BŁĄD POŁĄCZENIA Z BAZĄ DANYCH:", err.message);
+        console.error("Sprawdź czy plik .env jest w GŁÓWNYM katalogu i czy IP jest dodane na SeoHost!");
+    } else {
+        console.log("✅ Połączono z bazą danych MySQL! (Pool działa)");
+        connection.release(); // Bardzo ważne: oddajemy połączenie do puli!
+    }
 });
 
 // 1. REJESTRACJA
@@ -252,6 +263,13 @@ app.get('/api/users/:id/full', (req, res) => {
 app.get('/api/health', (req, res) => {
     res.json({ status: "Backend działa na Vercel (ES Modules)!", time: new Date() });
 });
+
+if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+        console.log(`✅ Backend działa lokalnie na porcie ${PORT}`);
+    });
+}
 
 // ZMIANA 2: Używamy 'export default' zamiast 'module.exports'
 export default app;

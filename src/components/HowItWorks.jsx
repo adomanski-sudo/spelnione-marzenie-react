@@ -51,7 +51,7 @@ export default function HowItWorks() {
 
         <div className="hiw-step">
           <div className="step-icon-box">
-            <HeartHandshake  ft size={24} />
+            <HeartHandshake size={24} />
           </div>
           <span className="step-label">4. Zrzutka na większe marzenia</span>
           <p className="step-desc">Kilka osób może wspólnie spełnić jedno marzenie — nawet jeśli się nie znają.</p>
@@ -61,7 +61,7 @@ export default function HowItWorks() {
 
         <div className="hiw-step">
           <div className="step-icon-box">
-            <Gift  ft size={24} />
+            <Gift size={24} />
           </div>
           <span className="step-label"><p>5. Zero dubli.</p>
           <p>Zero nietrafionych prezentów.</p></span>
