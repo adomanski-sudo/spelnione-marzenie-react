@@ -8,7 +8,7 @@ export default function MyProfile({ dreams, setDreams, userData }) {
   
   const [activeDream, setActiveDream] = useState(null);
 
-  // To jest TA JEDYNA, poprawna funkcja usuwania
+  // Usuwanie mażenia :(
   const handleDelete = (id) => {
     if (!window.confirm("Czy na pewno chcesz usunąć to marzenie?")) return;
 
@@ -58,7 +58,7 @@ export default function MyProfile({ dreams, setDreams, userData }) {
               <Edit3 size={18} />
               <span className="btn-label">Edytuj</span>
             </button>
-            <img src={avatarImg} alt="Profil" className="bio-avatar" />
+            <img src={userData.image} alt="Profil" className="bio-avatar" />
             
             <button className="circle-action-btn add-btn">
                <Plus size={22} />
