@@ -1,50 +1,64 @@
 import React, { useState } from 'react';
 import './MyProfile.css';
 import DreamCard from './DreamCard'; 
+import EditProfile from './EditProfile'; // <--- IMPORTUJEMY TUTAJ
+import AddDreamForm from './AddDreamForm'; // Nowy komponent
 import avatarImg from '../assets/avatar.jpg'; 
 import { Edit3, Plus, ArrowLeft, Trash2, Edit } from 'lucide-react'; 
 
-export default function MyProfile({ dreams, setDreams, userData }) {
+// Dodajemy onUpdateUser do propsów
+export default function MyProfile({ dreams, setDreams, userData, onUpdateUser }) {
   
   const [activeDream, setActiveDream] = useState(null);
+  const [isEditing, setIsEditing] = useState(false); // <--- NOWY STAN: Czy edytujemy?
+  const [isAdding, setIsAdding] = useState(false); // Czy dodajemy marzenie?
 
-  // Usuwanie mażenia :(
+  const refreshDreams = () => {
+    fetch('/api/dreams')
+    .then(res => res.json())
+    .then(data => {
+        // Formatujemy dane tak jak w App.jsx
+        const formatted = data.map(item => ({
+            id: item.id,
+            userId: item.idUser, // Ważne do filtrowania!
+            title: item.title,
+            description: item.description,
+            category: item.category,
+            date: new Date(item.date).toLocaleDateString(),
+            image: item.image,
+            price: item.price
+        }));
+
+        // Filtrujemy, żeby pokazać tylko MOJE marzenia
+        if (userData) {
+            const myOnly = formatted.filter(d => d.userId === userData.id);
+            setDreams(myOnly);
+        }
+    });
+};
+
   const handleDelete = (id) => {
     if (!window.confirm("Czy na pewno chcesz usunąć to marzenie?")) return;
 
-    // 1. Pobieramy token
     const storedUser = localStorage.getItem('loggedUser');
     const token = storedUser ? JSON.parse(storedUser).token : null;
 
-    if (!token) {
-        alert("Błąd: Nie jesteś zalogowany (brak tokena).");
-        return;
-    }
+    if (!token) { alert("Błąd: Brak tokena."); return; }
 
-    // 2. Wysyłamy żądanie z tokenem
     fetch(`/api/dreams/${id}`, { 
         method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token  // <--- Klucz do sukcesu!
-        }
+        headers: { 'Content-Type': 'application/json', 'Authorization': token }
     })
     .then(res => {
-        if (res.status === 401) throw new Error("Błąd 401: Brak autoryzacji.");
-        if (res.status === 403) throw new Error("Błąd 403: To nie Twoje marzenie.");
-        if (!res.ok) throw new Error("Wystąpił błąd podczas usuwania.");
+        if (!res.ok) throw new Error("Błąd usuwania");
         return res.json();
     })
     .then(() => {
-        // Sukces! Aktualizujemy stan aplikacji
         setDreams(prev => prev.filter(d => d.id !== id));
-        setActiveDream(null); // Zamykamy szczegóły
+        setActiveDream(null); 
         alert("Marzenie usunięte!");
     })
-    .catch(err => {
-        console.error(err);
-        alert(err.message);
-    });
+    .catch(err => alert(err.message));
   };
 
   return (
@@ -54,13 +68,27 @@ export default function MyProfile({ dreams, setDreams, userData }) {
       <aside className="bio-column">
         <div className="bio-card">
           <div className="avatar-wrapper">
-            <button className="circle-action-btn edit-btn">
+            
+            {/* PRZYCISK EDYTUJ - Teraz włącza tryb edycji! */}
+            <button 
+                className="circle-action-btn edit-btn"
+                onClick={() => {
+                    setIsEditing(true);   // Włącz edycję
+                    setActiveDream(null); // Wyłącz szczegóły marzenia (jeśli były otwarte)
+                }}
+            >
               <Edit3 size={18} />
               <span className="btn-label">Edytuj</span>
             </button>
-            <img src={userData.image} alt="Profil" className="bio-avatar" />
+
+            <img src={userData?.image || avatarImg} alt="Profil" className="bio-avatar" />
             
-            <button className="circle-action-btn add-btn">
+            <button className="circle-action-btn add-btn"
+            onClick={() => {
+              setIsAdding(true);      // Włączamy dodawanie
+              setIsEditing(false);    // Wyłączamy edycję profilu
+              setActiveDream(null);   // Wyłączamy szczegóły marzenia
+              }}>
                <Plus size={22} />
                <span className="btn-label">Dodaj</span>
             </button>
@@ -77,13 +105,47 @@ export default function MyProfile({ dreams, setDreams, userData }) {
         </div>
       </aside>
 
-      {/* --- PRAWA KOLUMNA --- */}
+      {/* --- PRAWA KOLUMNA (Dynamiczna zawartość) --- */}
+      {/* ... wewnątrz return ... */}
       <main className="dreams-column">
-        
-        {!activeDream ? (
-          /* WIDOK LISTY */
-          <div className="dreams-grid-compact fade-in">
-              {dreams.map(dream => (
+
+      {/* SCENARIUSZ 1: DODAWANIE MARZENIA (Priorytet) */}
+      {isAdding ? (
+        <AddDreamForm 
+            onCancel={() => setIsAdding(false)} 
+            onSuccess={() => {
+                refreshDreams();    // Odśwież listę
+                setIsAdding(false); // Wróć do listy
+            }}
+        />
+
+      /* SCENARIUSZ 2: EDYCJA PROFILU */
+      ) : isEditing ? (
+        <div className="fade-in">
+            <button className="btn-back" onClick={() => setIsEditing(false)} style={{marginBottom: '15px'}}>
+                <ArrowLeft size={20} /> Anuluj edycję
+            </button>
+            <EditProfile 
+                currentUser={userData} 
+                onUpdateUser={(updatedData) => {
+                    onUpdateUser(updatedData);
+                    setIsEditing(false);
+                }}
+            />
+        </div>
+
+      /* SCENARIUSZ 3: SZCZEGÓŁY MARZENIA */
+      ) : activeDream ? (
+         /* ... (Twój stary kod szczegółów bez zmian) ... */
+         <div className="dream-detail-view fade-in">
+            {/* ... kod szczegółów ... */}
+         </div>
+
+      /* SCENARIUSZ 4: LISTA MARZEŃ (Domyślny) */
+      ) : (
+         <div className="dreams-grid-compact fade-in">
+             {dreams && dreams.length > 0 ? (
+                dreams.map(dream => (
                   <div 
                     key={dream.id} 
                     onClick={() => setActiveDream(dream)}
@@ -91,43 +153,13 @@ export default function MyProfile({ dreams, setDreams, userData }) {
                   >
                       <DreamCard dream={dream} showAuthor={false} />
                   </div>
-              ))}
-          </div>
-        ) : (
-          /* WIDOK SZCZEGÓŁÓW */
-          <div className="dream-detail-view fade-in">
-            
-            <button className="btn-back" onClick={() => setActiveDream(null)}>
-              <ArrowLeft size={20} /> Wróć do listy
-            </button>
-
-            <div className="detail-card">
-               <img src={activeDream.image} alt={activeDream.title} className="detail-image" />
-               
-               <div className="detail-content">
-                  <div className="detail-header">
-                      <span className="detail-category">{activeDream.category}</span>
-                      <span className="detail-date">{activeDream.date}</span>
-                  </div>
-
-                  <h1 className="detail-title">{activeDream.title}</h1>
-                  <p className="detail-desc">{activeDream.description}</p>
-                  
-                  <div className="detail-footer">
-                    <button className="btn-primary-large" style={{background: '#f1f5f9', color: '#334155'}}>
-                      <Edit size={20} style={{marginRight: '8px'}}/> Edytuj
-                    </button>
-                    <button 
-                        className="btn-primary-large2" 
-                        style={{background: '#fee2e2', color: '#ef4444', border: '1px solid #fecaca'}}
-                        onClick={() => handleDelete(activeDream.id)}
-                    >
-                      <Trash2 size={20} style={{marginRight: '8px'}}/> Usuń
-                    </button>
-                  </div>
-               </div>
-            </div>
-
+                ))
+             ) : (
+                <div style={{textAlign: 'center', padding: '40px', color: '#94a3b8'}}>
+                   <p>Nie masz jeszcze marzeń na liście.</p>
+                   <p>Kliknij "+" żeby dodać pierwsze!</p>
+                </div>
+             )}
           </div>
         )}
 

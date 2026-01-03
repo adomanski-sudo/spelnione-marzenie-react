@@ -1,26 +1,73 @@
-import React from 'react';
-import './MobileHeader.css'; // <--- Import stylu
-import {Settings, LogOut, Gift} from 'lucide-react'; // <--- Biblioteka z ikonami SVG
+import React, { useState } from 'react';
+import './MobileHeader.css';
+import { LogIn, LogOut, Settings, User, Gift } from 'lucide-react'; 
+import avatarImg from '../assets/avatar.jpg'; 
 
-import profilImg from '../assets/avatar.jpg';
+export default function MobileHeader({ setView, currentUser, onLoginClick, onLogout }) {
+  
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const handleMenuClick = (viewName) => {
+      setView(viewName);
+      setIsMenuOpen(false); // Zamknij menu po kliknięciu
+  };
 
-export default function MobileHeader({ setView }) {
+  const handleLogoutClick = () => {
+      setIsMenuOpen(false);
+      onLogout();
+  };
+
   return (
     <header className="mobile-header">
-      <div onClick={() => setView('home')}>
-        <div className="m-brand-logo-container fade-in">
-          <h1 className="m-brand-text">SpelnioneMarzenie.pl</h1>
-          <Gift className="m-brand-icon" size={32} />
-        </div>
+      {/* LOGO */}
+      <div className="logo-section" onClick={() => setView('home')}>
+         <span className="logo-text">SpełnioneMarzenie.pl</span>
+          <div className="m-brand-icon">
+            <Gift className="brand-icon" size={32} />
+          </div>
       </div>
-      <div className='btn'>
-        {/* Profil */}
-        <button className='menu-btn' onClick={() => setView('myProfil')}><img src={profilImg} className="profilImg" alt="Profil" /></button>
-        {/* Ustawienia */}
-        <button className='menu-btn' onClick={() => setView('settings')}><Settings size={24} /></button>
-        {/* Wyloguj */}
-        <button className='menu-btn' onClick={() => setView('logOut')}><LogOut size={24} /></button>
+
+      {/* PRAWA STRONA (User lub Login) */}
+      <div className="user-section">
+        {currentUser ? (
+          <div className="mobile-user-container">
+            {/* AWATAR (Kliknięcie otwiera menu) */}
+            <img 
+                src={currentUser.image || avatarImg} 
+                alt="Profil" 
+                className="mobile-avatar"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+            />
+
+            {/* ROZWIJANE MENU */}
+            {isMenuOpen && (
+                <div className="mobile-dropdown fade-in">
+                    <div className="dropdown-header">
+                        Cześć, {currentUser.first_name}!
+                    </div>
+                    
+                    <button onClick={() => handleMenuClick('myProfil')}>
+                        <User size={16} /> Mój Profil
+                    </button>
+                    
+                    <button onClick={() => handleMenuClick('settings')}>
+                        <Settings size={16} /> Ustawienia
+                    </button>
+                    
+                    <div className="dropdown-divider"></div>
+                    
+                    <button className="btn-logout" onClick={handleLogoutClick}>
+                        <LogOut size={16} /> Wyloguj
+                    </button>
+                </div>
+            )}
+          </div>
+        ) : (
+          <button className="mobile-login-btn" onClick={onLoginClick}>
+            <LogIn size={18} style={{marginRight: '5px'}}/>
+            <span>Wejdź</span>
+          </button>
+        )}
       </div>
     </header>
   );

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Lock, User, ArrowRight, Chrome } from 'lucide-react';
-import './AuthForm.css'; // Zaraz stworzymy ten CSS
+import './AuthForm.css';
 
 export default function AuthForm({ onLoginSuccess }) {
   const [mode, setMode] = useState('login'); // 'login' lub 'register'

@@ -32,8 +32,21 @@
   padding-top: 20px;
 }
 
-/* Stylizowany tekst */
-.m-brand-text {
+/* Ikona */
+.brand-icon {
+  color: #9c7df0;
+  /* Dodajemy delikatną animację pulsowania */
+  animation: pulse 2s infinite ease-in-out;
+}
+
+/* Animacja dla ikony */
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.logo-text {
   font-family: 'Dancing Script', cursive; /* Nasza nowa czcionka */
   font-size: 1.25rem; /* Rozmiar na mobile */
   margin: 0;
@@ -53,32 +66,106 @@
   padding-right: 10px;
 }
 
-/* Ikona */
-.m-brand-icon {
-  color: #9c7df0;
-  /* Dodajemy delikatną animację pulsowania */
-  animation: pulse 2s infinite ease-in-out;
+.logo-section{
+  display: inline-flex;
 }
 
-/* Animacja dla ikony */
-@keyframes pulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.1); opacity: 0.8; }
-  100% { transform: scale(1); opacity: 1; }
+/* --- KONTENER UŻYTKOWNIKA --- */
+.mobile-user-container {
+    position: relative; /* Ważne dla pozycjonowania menu */
+    display: flex;
+    align-items: center;
+}
+
+/* --- NAPRAWA AWATARA --- */
+.mobile-avatar {
+    width: 40px;       /* Sztywna szerokość */
+    height: 40px;      /* Sztywna wysokość */
+    border-radius: 50%; /* Idealne koło */
+    object-fit: cover;  /* Żeby zdjęcie się nie rozciągało */
+    border: 2px solid #ffffff;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.mobile-avatar:active {
+    transform: scale(0.95);
+}
+
+/* --- ROZWIJANE MENU (DROPDOWN) --- */
+.mobile-dropdown {
+    position: absolute;
+    top: 50px;       /* Odsunięcie od góry */
+    right: 0;        /* Przyklejone do prawej */
+    width: 200px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    border: 1px solid #f1f5f9;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dropdown-header {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    color: #94a3b8;
+    font-weight: 600;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 4px;
+}
+
+.mobile-dropdown button {
+    background: none;
+    border: none;
+    padding: 10px 12px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    color: #334155;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.mobile-dropdown button:hover {
+    background-color: #f8fafc;
+    color: #2563eb;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: #f1f5f9;
+    margin: 4px 0;
+}
+
+.mobile-dropdown .btn-logout {
+    color: #ef4444; /* Czerwony kolor dla wyloguj */
+}
+
+.mobile-dropdown .btn-logout:hover {
+    background-color: #fef2f2;
+    color: #dc2626;
 }
 
 /* Pokaż na mobile */
  @media (max-width: 800px) {
   .mobile-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     position: sticky;
     top: 0;
-    background: var(--bg-panel);
-    padding: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    z-index: 50;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid #e2e8f0;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between; /* Rozsuwa logo i avatar na boki */
+    align-items: center;
+    height: 60px;
   }
 } 
 

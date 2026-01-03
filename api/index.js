@@ -131,22 +131,56 @@ app.get('/api/search', (req, res) => {
     });
 });
 
-// Użytkownik (Twój profil - ID 2)
+// 2. POBIERANIE DANYCH ZALOGOWANEGO UŻYTKOWNIKA (Mój Profil)
 app.get('/api/user', (req, res) => {
-    // Zakładamy na sztywno ID 2, tak jak miałeś w zmiennej activUser
-    const sql = `SELECT * FROM users WHERE id = 2`;
-    db.query(sql, (err, data) => {
-        if(err) return res.status(500).json(err);
-        return res.json(data);
-    })
+    const token = req.headers.authorization;
+
+    // Jeśli brak tokena (użytkownik niezalogowany), nie zwracamy błędu 500,
+    // tylko pustą odpowiedź lub null. Frontend sobie z tym poradzi (pokaże przycisk "Zaloguj").
+    if (!token) {
+        return res.json(null); 
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decodedUser) => {
+        if (err) return res.status(403).json("Token nieważny");
+
+        const userId = decodedUser.id; // To jest to magiczne ID z tokena!
+
+        const sql = "SELECT * FROM users WHERE id = ?";
+        db.query(sql, [userId], (err, data) => {
+            if (err) return res.status(500).json(err);
+            // Nie chcemy odsyłać hasła, nawet zaszyfrowanego, dla bezpieczeństwa
+            // (opcjonalnie można usunąć data[0].password)
+            return res.json(data);
+        });
+    });
 });
 
-// Znajomi (wszyscy poza ID 2)
+// 3. POBIERANIE ZNAJOMYCH (Wszyscy OPRÓCZ mnie)
 app.get('/api/friends', (req, res) => {
-    const sql = `SELECT * FROM users WHERE id != 2`;
-    db.query(sql, (err, data) => {
-        if(err) return res.status(500).json(err);
-        return res.json(data);
+    const token = req.headers.authorization;
+    
+    // Jeśli ktoś nie jest zalogowany, pokazujemy mu wszystkich użytkowników
+    if (!token) {
+        const sqlAll = "SELECT * FROM users";
+        db.query(sqlAll, (err, data) => {
+            if (err) return res.status(500).json(err);
+            return res.json(data);
+        });
+        return;
+    }
+
+    // Jeśli JEST zalogowany, pokazujemy wszystkich OPRÓCZ niego samego
+    jwt.verify(token, process.env.JWT_SECRET, (err, decodedUser) => {
+        if (err) return res.status(403).json("Token nieważny");
+
+        const userId = decodedUser.id;
+        const sql = "SELECT * FROM users WHERE id != ?"; // Pokaż wszystkich, którzy NIE są mną
+
+        db.query(sql, [userId], (err, data) => {
+            if (err) return res.status(500).json(err);
+            return res.json(data);
+        });
     });
 });
 
@@ -172,7 +206,7 @@ app.get('/api/feed', (req, res) => {
     });
 });
 
-// USUWANIE MARZENIA
+// USUWANIE MARZENIA :(
 // USUWANIE MARZENIA (Wersja Debuggowalna)
 app.delete('/api/dreams/:id', (req, res) => {
     const dreamId = req.params.id;
@@ -227,6 +261,86 @@ app.delete('/api/dreams/:id', (req, res) => {
                 
                 console.log(`[DELETE] Sukces! Usunięto marzenie ID ${dreamId}`);
                 return res.json("Marzenie usunięte.");
+            });
+        });
+    });
+});
+
+// DODAWANIE NOWEGO MARZENIA
+app.post('/api/dreams', (req, res) => {
+    const token = req.headers.authorization;
+    if (!token) return res.status(401).json("Brak autoryzacji!");
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decodedUser) => {
+        if (err) return res.status(403).json("Token nieważny!");
+
+        const { title, description, category, image, price } = req.body;
+        const userId = decodedUser.id;
+        const date = new Date().toISOString().slice(0, 10);
+
+        // Prosta logika ikon
+        let icon = '✨';
+        if (category === 'Podróże') icon = '✈️';
+        if (category === 'Elektronika') icon = '💻';
+        if (category === 'Sport') icon = '⚽';
+        if (category === 'Edukacja') icon = '📚';
+        if (category === 'Motoryzacja') icon = '🚗';
+
+        const sql = "INSERT INTO dreams (`idUser`, `title`, `description`, `category`, `image`, `price`, `date`, `icon`, `is_fulfilled`) VALUES (?)";
+        
+        const values = [
+            userId, title, description, category || 'Inne', 
+            image || 'https://images.unsplash.com/photo-1499750310159-5b600aaf0327', 
+            price || '', date, icon, 0
+        ];
+
+        db.query(sql, [values], (err, result) => {
+            if (err) return res.status(500).json(err);
+            return res.json({ message: "Marzenie dodane!", id: result.insertId });
+        });
+    });
+});
+
+// AKTUALIZACJA DANYCH UŻYTKOWNIKA
+app.put('/api/user', (req, res) => {
+    const token = req.headers.authorization;
+    if (!token) return res.status(401).json("Brak autoryzacji!");
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decodedUser) => {
+        if (err) return res.status(403).json("Token nieważny!");
+
+        // Pobieramy dane z formularza
+        const { first_name, last_name, description, image, password } = req.body;
+        const userId = decodedUser.id;
+
+        // Logika dla hasła: Jeśli użytkownik wpisał nowe hasło, szyfrujemy je.
+        // Jeśli pole jest puste, nie ruszamy hasła w bazie.
+        let sql = "";
+        let values = [];
+
+        if (password && password.length > 0) {
+            const salt = bcrypt.genSaltSync(10);
+            const hashedPassword = bcrypt.hashSync(password, salt);
+            
+            sql = "UPDATE users SET first_name=?, last_name=?, description=?, image=?, password=? WHERE id=?";
+            values = [first_name, last_name, description, image, hashedPassword, userId];
+        } else {
+            sql = "UPDATE users SET first_name=?, last_name=?, description=?, image=? WHERE id=?";
+            values = [first_name, last_name, description, image, userId];
+        }
+
+        db.query(sql, values, (err, result) => {
+            if (err) return res.status(500).json(err);
+
+            // Pobieramy zaktualizowanego użytkownika, żeby odesłać go do Frontendu
+            // (Dzięki temu awatar w rogu zmieni się od razu po zapisaniu!)
+            const getUserSql = "SELECT * FROM users WHERE id = ?";
+            db.query(getUserSql, [userId], (err, data) => {
+                if (err) return res.status(500).json(err);
+                
+                const { password, ...updatedUser } = data[0];
+                // Doklejamy token, żeby nie wylogowało usera
+                res.status(200).json({ ...updatedUser, token }); 
             });
         });
     });

@@ -14,12 +14,16 @@ import SearchSection from './components/SearchSection';
 import FriendsSection from './components/FriendsSection';
 import NotificationsSection from './components/NotificationsSection';
 import UserProfile from './components/UserProfile';
+import AuthForm from "./components/AuthForm";
+import { X } from 'lucide-react'; // Ikona krzyżyka do zamykania
 
 function App() {
   // 1. STAN APLIKACJI
   const [activeView, setActiveView] = useState(() => {
       return localStorage.getItem('savedActiveView') || 'home';
   });
+
+  const [showMobileLogin, setShowMobileLogin] = useState(false);
 
   const [currentUser, setCurrentUser] = useState(() => {
     const savedUser = localStorage.getItem('loggedUser');
@@ -31,7 +35,7 @@ function App() {
   const [dreams, setDreams] = useState([]);
   const [friendsList, setFriendsList] = useState([]);
 
-  // 2. FUNKCJE LOGIKI (To czego brakowało!)
+  // 2. FUNKCJE LOGIKI 
   
   // Funkcja logowania przekazywana do Sidebara
   const handleLogin = (userData) => {
@@ -42,15 +46,26 @@ function App() {
     localStorage.setItem('loggedUser', JSON.stringify(userData));
   };
 
-  const handleOpenProfile = (id) => {
-    // Jeśli kliknęliśmy siebie (sprawdzamy ID zalogowanego), idź do MyProfile
-    if (currentUser && id === currentUser.id) { 
-        setActiveView('myProfil');
-    } else {
-        setSelectedUserId(id);
-        setActiveView('userProfile');
-    }
-  };
+  // Ta funkcja zaktualizuje dane w locie, po zapisaniu formularza
+  const handleUpdateUser = (updatedData) => {
+    console.log("Aktualizacja usera:", updatedData);
+    setCurrentUser(updatedData);
+    // Nadpisujemy też localStorage, żeby po F5 było nowe info
+    localStorage.setItem('loggedUser', JSON.stringify(updatedData));
+
+    // Opcjonalnie: wróć do profilu po zapisaniu
+    // setActiveView('myProfil'); 
+};
+
+const handleOpenProfile = (id) => {
+  // Jeśli kliknęliśmy siebie (sprawdzamy ID zalogowanego), idź do MyProfile
+  if (currentUser && id === currentUser.id) { 
+      setActiveView('myProfil');
+  } else {
+      setSelectedUserId(id);
+      setActiveView('userProfile');
+  }
+};
 
   // Wylogowanie
   const handleLogout = () => {
@@ -71,6 +86,33 @@ function App() {
   useEffect(() => {
       localStorage.setItem('savedActiveView', activeView);
   }, [activeView]);
+  
+  // POBIERANIE ZALOGOWANEGO UŻYTKOWNIKA
+  useEffect(() => {
+    // Najpierw sprawdzamy, czy mamy zapisany token w przeglądarce
+    const storedUser = localStorage.getItem('loggedUser');
+    const token = storedUser ? JSON.parse(storedUser).token : null;
+
+    if (token) {
+        // Jeśli jest token, wysyłamy go do serwera
+        fetch('/api/user', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token 
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            // Serwer odsyła nam dane konkretnie tego użytkownika, do którego należy token
+            if (data && data.length > 0) {
+                setCurrentUser(data[0]); 
+            }
+        })
+        .catch(err => console.error("Błąd weryfikacji sesji:", err));
+    }
+  }, []); // Pusta tablica [] oznacza: wykonaj tylko raz po odświeżeniu strony
+  
 
   // Pobieranie wszystkich marzeń (Feed na środku)
   useEffect(() => {
@@ -97,7 +139,13 @@ function App() {
 
   // Pobieranie znajomych (dla sekcji Friends)
   useEffect(() => {
-    fetch('/api/friends')
+    const storedUser = localStorage.getItem('loggedUser');
+    const token = storedUser ? JSON.parse(storedUser).token : null;
+    
+    // Tutaj też dodajemy nagłówek, jeśli user jest zalogowany
+    fetch('/api/friends', {
+        headers: token ? { 'Authorization': token } : {} 
+    })
       .then(res => res.json())
       .then(data => setFriendsList(data))
       .catch(err => console.error(err));
@@ -118,7 +166,18 @@ function App() {
 
       {/* ŚRODKOWA KOLUMNA */}
       <div className="main-content">
-        <MobileHeader setView={setActiveView} />
+        <MobileHeader 
+          setView={setActiveView} 
+          currentUser={currentUser}
+          onLoginClick={() => setShowMobileLogin(true)}
+          onLogout={() => {
+            setCurrentUser(null);
+            localStorage.removeItem('loggedUser');
+            setActiveView('home');
+            window.location.reload();
+          }}
+          
+        />
         
         <div className="content-container">
            
@@ -149,6 +208,7 @@ function App() {
                dreams={myDreams} 
                setDreams={setDreams}
                userData={currentUser}
+               onUpdateUser={handleUpdateUser}
              />
            )
 
@@ -174,6 +234,7 @@ function App() {
                onBack={() => setActiveView('home')}
              />
            )
+
            : (
              <div className="content-card">
                <p>Widok: {activeView} (w budowie)</p>
@@ -196,6 +257,22 @@ function App() {
           isOwner={currentUser && selectedDream.userId === currentUser.id}
         />
       )}
+
+      {showMobileLogin && !currentUser && (
+        <div className="mobile-auth-overlay fade-in">
+        <div className="mobile-auth-container">
+        <button className="close-auth-btn" onClick={() => setShowMobileLogin(false)}>
+          <X size={24} />
+       </button>
+
+        {/* Gotowy formularz */}
+        <AuthForm onLoginSuccess={(data) => {
+           handleLogin(data);       // Logujemy
+           setShowMobileLogin(false); // Zamykamy okno
+        }} />
+    </div>
+  </div>
+)}
 
     </div>
   );
