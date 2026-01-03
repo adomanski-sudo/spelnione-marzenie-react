@@ -301,6 +301,32 @@ app.post('/api/dreams', (req, res) => {
     });
 });
 
+// AKTUALIZACJA ISTNIEJĄCEGO MARZENIA
+app.put('/api/dreams/:id', (req, res) => {
+    const token = req.headers.authorization;
+    const dreamId = req.params.id;
+    
+    if (!token) return res.status(401).json("Brak autoryzacji!");
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decodedUser) => {
+        if (err) return res.status(403).json("Token nieważny!");
+
+        const userId = decodedUser.id;
+        const { title, description, category, image, price } = req.body;
+
+        // Ważne: W warunku WHERE sprawdzamy idUser, żeby nikt nie edytował cudzych marzeń!
+        const sql = "UPDATE dreams SET title=?, description=?, category=?, image=?, price=? WHERE id=? AND idUser=?";
+        const values = [title, description, category, image, price, dreamId, userId];
+
+        db.query(sql, values, (err, result) => {
+            if (err) return res.status(500).json(err);
+            if (result.affectedRows === 0) return res.status(404).json("Nie znaleziono marzenia lub brak uprawnień.");
+            
+            return res.json("Marzenie zaktualizowane!");
+        });
+    });
+});
+
 // AKTUALIZACJA DANYCH UŻYTKOWNIKA
 app.put('/api/user', (req, res) => {
     const token = req.headers.authorization;

@@ -1,196 +1,170 @@
-/* TŁO I KONTENER */
+/* TŁO (Overlay) */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.6); /* Przyciemnienie tła */
+    background: rgba(0, 0, 0, 0.6); /* Przyciemnienie */
+    backdrop-filter: blur(5px);      /* Rozmycie tła pod spodem */
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
-    backdrop-filter: blur(4px); /* Rozmycie tła pod spodem */
-    padding: 20px;
+    z-index: 9999;
+    animation: fadeIn 0.2s ease-out;
 }
 
+/* OKNO MODALA */
 .modal-content {
     background: white;
-    width: 100%;
-    max-width: 900px; /* Szerokość na desktopie */
-    max-height: 90vh;
+    width: 90%;
+    max-width: 500px;
     border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    overflow: hidden; /* Żeby zdjęcie nie wystawało */
     position: relative;
-    overflow: hidden; /* Żeby obrazek nie wystawał poza zaokrąglenia */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     display: flex;
-    flex-direction: column;
+    flex-direction: column; /* <--- TO WAŻNE: Układ pionowy */
+    max-height: 90vh; /* Maksymalna wysokość to 90% ekranu */
+    overflow-y: auto; /* Scrollowanie wewnątrz, jeśli treść długa */
 }
 
-/* X - ZAMYKANIE */
-.close-btn {
+/* ZDJĘCIE */
+.modal-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 250px;
+    background: #f1f5f9;
+}
+
+.modal-image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ładne dopasowanie zdjęcia */
+}
+
+.modal-category-badge {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #334155;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* PRZYCISK ZAMKNIĘCIA (X) */
+.close-modal-btn {
     position: absolute;
     top: 15px;
     right: 15px;
-    background: rgba(255, 255, 255, 0.9);
+    background: white;
     border: none;
     border-radius: 50%;
     width: 36px;
     height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     cursor: pointer;
     z-index: 10;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     transition: transform 0.2s;
 }
 
-.close-btn:hover {
-    transform: rotate(90deg);
-    background: white;
+.close-modal-btn:hover {
+    transform: scale(1.1);
 }
 
-/* UKŁAD WEWNĄTRZ (Dwie kolumny) */
+/* TREŚĆ (BODY) - TU BYŁ BŁĄD */
 .modal-body {
+    padding: 25px;
     display: flex;
-    flex-direction: row; /* Domyślnie obok siebie */
-    height: 100%;
-    overflow-y: auto; /* Przewijanie jeśli treść za długa */
-}
-
-/* LEWA STRONA - OBRAZEK */
-.modal-image-container {
-    flex: 1; /* Zajmuje 50% miejsca */
-    min-height: 300px;
-    position: relative;
-}
-
-.modal-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-/* Badge statusu na obrazku */
-.status-badge {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    background: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-.status-badge.fulfilled { color: #10b981; }
-.status-badge.pending { color: #64748b; }
-
-/* PRAWA STRONA - TREŚĆ */
-.modal-info {
-    flex: 1; /* Zajmuje drugie 50% */
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
+    flex-direction: column; /* <--- NAPRAWA: Elementy jeden pod drugim! */
+    gap: 15px; /* Odstępy między elementami */
 }
 
 .modal-title {
-    font-size: 28px;
-    margin: 0 0 15px 0;
-    color: #0f172a;
-    line-height: 1.2;
+    margin: 0;
+    font-size: 1.5rem;
+    color: #1e293b;
+    line-height: 1.3;
 }
 
+/* METADANE (Data, Kategoria) */
 .modal-meta {
     display: flex;
+    flex-direction: row; /* Te chcemy akurat obok siebie */
+    align-items: center;
     gap: 15px;
-    margin-bottom: 25px;
+    color: #64748b;
+    font-size: 0.9rem;
 }
 
 .meta-item {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
-    color: #64748b;
-    font-weight: 500;
-    background: #f1f5f9;
-    padding: 4px 10px;
-    border-radius: 6px;
 }
 
-.modal-desc {
-    font-size: 16px;
+/* OPIS */
+.modal-description {
+    font-size: 1rem;
     line-height: 1.6;
-    color: #334155;
-    flex-grow: 1; /* Rozpycha się, spychając przyciski na dół */
-    margin-bottom: 30px;
+    color: #475569;
+    margin: 10px 0;
 }
 
-/* PRZYCISKI (To co się rozjechało) */
+/* CENA */
+.modal-price {
+    font-size: 1.1rem;
+    color: #2563eb;
+    background: #eff6ff;
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+/* PRZYCISKI AKCJI */
 .modal-actions {
-    display: flex;
-    gap: 15px; /* Odstęp między przyciskami */
-    margin-top: auto; /* Dopycha do dołu kontenera */
+    margin-top: 10px;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+    display: flex; /* Przyciski obok siebie */
+    gap: 10px;
 }
 
 .action-btn {
-    flex: 1; /* Każdy przycisk zajmuje po równo miejsca */
+    flex: 1; /* Rozciągnij przyciski po równo */
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 12px 20px;
-    border: none;
+    padding: 12px;
     border-radius: 12px;
-    font-size: 14px;
+    border: none;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap; /* Tekst w jednej linii */
+    transition: 0.2s;
 }
 
-/* Kolory przycisków */
-.btn-reserve { background: #e0f2fe; color: #0284c7; }
-.btn-reserve:hover { background: #bae6fd; }
+.action-btn.edit {
+    background: #f1f5f9;
+    color: #334155;
+}
+.action-btn.edit:hover { background: #e2e8f0; }
 
-.btn-fund { background: #dcfce7; color: #16a34a; }
-.btn-fund:hover { background: #bbf7d0; }
+.action-btn.delete {
+    background: white;
+    color: #ef4444;
+    border: 1px solid #fecaca;
+}
+.action-btn.delete:hover { background: #fef2f2; }
 
-.btn-edit { background: #f1f5f9; color: #334155; }
-.btn-edit:hover { background: #e2e8f0; }
-
-.btn-delete { background: #fee2e2; color: #ef4444; }
-.btn-delete:hover { background: #fecaca; }
-
-/* --- RESPANSYWNOŚĆ (MOBILE) --- */
-@media (max-width: 768px) {
-    .modal-body {
-        flex-direction: column; /* Jeden pod drugim */
-    }
-
-    .modal-image-container {
-        flex: none; /* Wyłączamy rozciąganie flex */
-        height: 250px; /* Sztywna wysokość obrazka */
-    }
-
-    .modal-info {
-        padding: 25px;
-    }
-
-    .modal-title {
-        font-size: 22px;
-    }
-
-    .modal-actions {
-        flex-direction: column; /* Przyciski jeden pod drugim na małym ekranie */
-        gap: 10px;
-    }
-    
-    .action-btn {
-        width: 100%; /* Pełna szerokość */
-    }
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
 }

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import './MyProfile.css';
 import DreamCard from './DreamCard'; 
-import EditProfile from './EditProfile'; // <--- IMPORTUJEMY TUTAJ
-import AddDreamForm from './AddDreamForm'; // Nowy komponent
+import EditProfile from './EditProfile'; 
+import AddDreamForm from './AddDreamForm'; 
+import EditDreamForm from './EditDreamForm';
 import avatarImg from '../assets/avatar.jpg'; 
 import { Edit3, Plus, ArrowLeft, Trash2, Edit } from 'lucide-react'; 
 
@@ -10,8 +11,9 @@ import { Edit3, Plus, ArrowLeft, Trash2, Edit } from 'lucide-react';
 export default function MyProfile({ dreams, setDreams, userData, onUpdateUser }) {
   
   const [activeDream, setActiveDream] = useState(null);
-  const [isEditing, setIsEditing] = useState(false); // <--- NOWY STAN: Czy edytujemy?
+  const [isEditing, setIsEditing] = useState(false); // Czy edytujemy?
   const [isAdding, setIsAdding] = useState(false); // Czy dodajemy marzenie?
+  const [isEditingDream, setIsEditingDream] = useState(false); // Edycja marzenia
 
   const refreshDreams = () => {
     fetch('/api/dreams')
@@ -106,44 +108,96 @@ export default function MyProfile({ dreams, setDreams, userData, onUpdateUser })
       </aside>
 
       {/* --- PRAWA KOLUMNA (Dynamiczna zawartość) --- */}
-      {/* ... wewnątrz return ... */}
       <main className="dreams-column">
-
-      {/* SCENARIUSZ 1: DODAWANIE MARZENIA (Priorytet) */}
-      {isAdding ? (
-        <AddDreamForm 
-            onCancel={() => setIsAdding(false)} 
-            onSuccess={() => {
-                refreshDreams();    // Odśwież listę
-                setIsAdding(false); // Wróć do listy
-            }}
-        />
-
-      /* SCENARIUSZ 2: EDYCJA PROFILU */
-      ) : isEditing ? (
-        <div className="fade-in">
-            <button className="btn-back" onClick={() => setIsEditing(false)} style={{marginBottom: '15px'}}>
-                <ArrowLeft size={20} /> Anuluj edycję
-            </button>
-            <EditProfile 
-                currentUser={userData} 
-                onUpdateUser={(updatedData) => {
-                    onUpdateUser(updatedData);
-                    setIsEditing(false);
+        
+        {/* SCENARIUSZ 1: DODAWANIE MARZENIA */}
+        {isAdding ? (
+            <AddDreamForm 
+                onCancel={() => setIsAdding(false)} 
+                onSuccess={() => {
+                    refreshDreams();    
+                    setIsAdding(false); 
                 }}
             />
-        </div>
 
-      /* SCENARIUSZ 3: SZCZEGÓŁY MARZENIA */
-      ) : activeDream ? (
-         /* ... (Twój stary kod szczegółów bez zmian) ... */
-         <div className="dream-detail-view fade-in">
-            {/* ... kod szczegółów ... */}
-         </div>
+        /* SCENARIUSZ 2: EDYCJA PROFILU */
+        ) : isEditing ? (
+            <div className="fade-in">
+                <button className="btn-back" onClick={() => setIsEditing(false)} style={{marginBottom: '15px'}}>
+                    <ArrowLeft size={20} /> Anuluj edycję
+                </button>
+                <EditProfile 
+                    currentUser={userData} 
+                    onUpdateUser={(updatedData) => {
+                        onUpdateUser(updatedData);
+                        setIsEditing(false);
+                    }}
+                />
+            </div>
 
-      /* SCENARIUSZ 4: LISTA MARZEŃ (Domyślny) */
-      ) : (
-         <div className="dreams-grid-compact fade-in">
+        ) : isEditingDream && activeDream ? (
+         <EditDreamForm 
+            dreamData={activeDream}
+            onCancel={() => setIsEditingDream(false)} // Powrót do szczegółów
+            onSuccess={(updatedDream) => {
+                // 1. Aktualizujemy widok szczegółów (activeDream)
+                setActiveDream(updatedDream);
+                // 2. Aktualizujemy listę w tle (dreams)
+                setDreams(prev => prev.map(d => d.id === updatedDream.id ? updatedDream : d));
+                // 3. Zamykamy formularz
+                setIsEditingDream(false);
+            }}
+         />
+
+        /* SCENARIUSZ 3: SZCZEGÓŁY MARZENIA */
+        ) : activeDream ? (
+          
+          <div className="dream-detail-view fade-in">
+            <button className="btn-back" onClick={() => setActiveDream(null)}>
+              <ArrowLeft size={20} /> Wróć do listy
+            </button>
+
+            <div className="detail-card">
+               <img src={activeDream.image} alt={activeDream.title} className="detail-image" />
+               <div className="detail-content">
+                  <div className="detail-header">
+                      <span className="detail-category">{activeDream.category}</span>
+                      <span className="detail-date">{activeDream.date}</span>
+                  </div>
+                  <h1 className="detail-title">{activeDream.title}</h1>
+                  <p className="detail-desc">{activeDream.description}</p>
+                  
+                  {/* {activeDream.price && (
+                     <div className="detail-price" style={{marginBottom: '15px', fontWeight: 'bold', color: '#2563eb'}}>
+                        Koszt: {activeDream.price}
+                     </div>
+                  )} */}
+
+                  <div className="detail-footer">
+                    <button 
+                      className="btn-primary-large" 
+                      style={{background: '#f1f5f9', color: '#334155'}}
+                      onClick={() => setIsEditingDream(true)}
+                    >
+                      <Edit size={20} style={{marginRight: '8px'}}/> Edytuj
+                    </button>
+                    
+                    {/* Przycisk Usuń */}
+                    <button 
+                        className="btn-primary-large2" 
+                        style={{background: '#fee2e2', color: '#ef4444', border: '1px solid #fecaca'}}
+                        onClick={() => handleDelete(activeDream.id)}
+                    >
+                      <Trash2 size={20} style={{marginRight: '8px'}}/> Usuń
+                    </button>
+                  </div>
+               </div>
+            </div>
+          </div>
+
+        /* SCENARIUSZ 4: LISTA MARZEŃ */
+        ) : (
+          <div className="dreams-grid-compact fade-in">
              {dreams && dreams.length > 0 ? (
                 dreams.map(dream => (
                   <div 

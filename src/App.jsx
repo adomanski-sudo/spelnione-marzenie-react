@@ -214,7 +214,9 @@ const handleOpenProfile = (id) => {
 
            /* 3. WYSZUKIWARKA */
            : activeView === 'search' ? (
-             <SearchSection onProfileClick={handleOpenProfile} />
+             <SearchSection 
+             currentUser={currentUser}
+             onProfileClick={handleOpenProfile} />
            )
 
            /* 4. ZNAJOMI */
@@ -252,9 +254,12 @@ const handleOpenProfile = (id) => {
       {selectedDream && (
         <DreamModal 
           dream={selectedDream} 
-          onClose={() => setSelectedDream(null)} 
-          // Sprawdzamy, czy to marzenie zalogowanego usera, żeby pokazać edycję
-          isOwner={currentUser && selectedDream.userId === currentUser.id}
+          onClose={() => setSelectedDream(null)}
+          currentUser={currentUser}  // Żeby wiedział, czy pokazać przyciski
+          onUpdateDream={(updated) => {
+             // Tu opcjonalnie odświeżamy listę główną w App/Feed
+             // np. setDreams(prev => prev.map(d => d.id === updated.id ? updated : d));
+          }}
         />
       )}
 
