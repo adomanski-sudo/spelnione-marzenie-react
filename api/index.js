@@ -206,6 +206,7 @@ app.get('/api/feed', (req, res) => {
             d.title,
             d.is_fulfilled,
             d.date, 
+            d.type,
             u.first_name,
             u.last_name,
             u.image as userImage
@@ -220,7 +221,7 @@ app.get('/api/feed', (req, res) => {
         if (err) {
             console.log("---------------------------------");
             console.error("❌ BŁĄD SQL W /api/feed:");
-            console.error(err.sqlMessage); // To pokaże konkretny powód błędu
+            console.error(err); // To pokaże konkretny powód błędu
             console.log("---------------------------------");
             return res.status(500).json(err);
         }
@@ -308,19 +309,22 @@ app.post('/api/dreams', (req, res) => {
         if (category === 'Edukacja') icon = '📚';
         if (category === 'Motoryzacja') icon = '🚗';
 
-        const sql = "INSERT INTO dreams (`idUser`, `title`, `description`, `category`, `image`, `price`, `date`, `icon`, `is_fulfilled`) VALUES (?)";
-        
-        const values = [
-            userId, title, description, category || 'Inne', 
-            image || 'https://images.unsplash.com/photo-1499750310159-5b600aaf0327', 
-            price || '', date, icon, 0
-        ];
+       const values = [
+        req.body.title,
+        req.body.description,
+        req.body.price,       // Teraz to może być null lub pusty string
+        req.body.category,
+        req.body.date,
+        userInfo.id,
+        req.body.image,
+        req.body.type || 'gift' // Zabezpieczenie: jak frontend zapomni wysłać typu, wpisz 'gift'
+    ];
 
-        db.query(sql, [values], (err, result) => {
-            if (err) return res.status(500).json(err);
-            return res.json({ message: "Marzenie dodane!", id: result.insertId });
+        db.query(q, [values], (err, data) => {
+        if (err) return res.status(500).json(err);
+        return res.status(200).json("Marzenie zostało dodane.");
         });
-    });
+        });
 });
 
 // AKTUALIZACJA ISTNIEJĄCEGO MARZENIA
@@ -337,7 +341,7 @@ app.put('/api/dreams/:id', (req, res) => {
         const { title, description, category, image, price } = req.body;
 
         // Ważne: W warunku WHERE sprawdzamy idUser, żeby nikt nie edytował cudzych marzeń!
-        const sql = "UPDATE dreams SET title=?, description=?, category=?, image=?, price=? WHERE id=? AND idUser=?";
+        const sql = "UPDATE dreams SET title=?, description=?, category=?, image=?, price=?, type=? WHERE id=? AND idUser=?";
         const values = [title, description, category, image, price, dreamId, userId];
 
         db.query(sql, values, (err, result) => {
