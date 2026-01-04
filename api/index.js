@@ -314,8 +314,8 @@ app.post('/api/dreams', (req, res) => {
         req.body.description,
         req.body.price_min || null, 
         req.body.price_max || null,
-        req.body.category,
-        req.body.date,
+        req.body.category || 'Inne',
+        new Date(),
         userInfo.id,
         req.body.image,
         req.body.type || 'gift' // Zabezpieczenie: jak frontend zapomni wysłać typu, wpisz 'gift'

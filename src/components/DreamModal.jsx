@@ -64,11 +64,23 @@ export default function DreamModal({ dream, onClose, currentUser, onUpdateDream,
                         )}
                         <div className="meta-item">
                             <Calendar size={16} /> 
-                            <span>
-                                {/* Jeśli data jest już sformatowana (ma kropki), wyświetl ją. Jeśli nie - sformatuj */}
-                                {currentDream.date && currentDream.date.includes('.') 
-                                    ? currentDream.date 
-                                    : new Date(currentDream.date).toLocaleDateString()}
+                            <span style={{fontSize: '0.9rem', color: '#64748b'}}>
+                                {(() => {
+                                    // 1. Jeśli nie ma daty -> nic nie wyświetlaj (lub napisz "Brak daty")
+                                    if (!currentDream.date) return "";
+
+                                    // 2. Jeśli data ma już kropki (np. z formatowania w bazie) -> wyświetl jak jest
+                                    if (typeof currentDream.date === 'string' && currentDream.date.includes('.')) {
+                                        return currentDream.date;
+                                    }
+
+                                    // 3. Spróbuj sformatować
+                                    const d = new Date(currentDream.date);
+                                    // Jeśli data jest błędna (Invalid Date), nie wyświetlaj jej
+                                    if (isNaN(d.getTime())) return ""; 
+                                    
+                                    return d.toLocaleDateString('pl-PL');
+                                })()}
                             </span>
                         </div>
                     </div>

@@ -40,6 +40,45 @@ export default function MyProfile({ dreams, setDreams, userData, onUpdateUser })
     });
 };
 
+  // --- POPRAWIONA FUNKCJA (Z TOKENEM) ---
+  const handleAddDream = (newDreamData) => {
+    
+    // 1. POBIERZ TOKEN (Tego brakowało!)
+    const storedUser = localStorage.getItem('loggedUser');
+    const token = storedUser ? JSON.parse(storedUser).token : null;
+
+    if (!token) {
+        alert("Błąd: Nie jesteś zalogowany (brak tokena).");
+        return;
+    }
+
+    fetch('/api/dreams', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // 👇 TEJ LINIJKI BRAKUJE U CIEBIE:
+        'Authorization': `Bearer ${token}` 
+      },
+      body: JSON.stringify(newDreamData),
+    })
+    .then(res => {
+      if (!res.ok) {
+        if (res.status === 401) throw new Error("Brak autoryzacji (401)");
+        throw new Error("Błąd serwera");
+      }
+      return res.json();
+    })
+    .then(data => {
+      console.log("Sukces!", data);
+      refreshDreams(); 
+      setIsAdding(false); 
+    })
+    .catch(err => {
+      console.error("Błąd:", err);
+      alert("Nie udało się dodać marzenia. Sprawdź konsolę.");
+    });
+  };
+
   const handleDelete = (id) => {
     if (!window.confirm("Czy na pewno chcesz usunąć to marzenie?")) return;
 
@@ -114,6 +153,7 @@ export default function MyProfile({ dreams, setDreams, userData, onUpdateUser })
         {/* SCENARIUSZ 1: DODAWANIE MARZENIA */}
         {isAdding ? (
             <AddDreamForm 
+                onAdd={handleAddDream}
                 onCancel={() => setIsAdding(false)} 
                 onSuccess={() => {
                     refreshDreams();    
