@@ -1,6 +1,15 @@
 import React from 'react';
 import './DreamCard.css';
 
+// Funkcja pomocnicza do formatowania ceny
+const formatPrice = (min, max) => {
+    if (min === null && max === null) return null;
+    if (min !== null && max === null) return `powyżej ${min} zł`;
+    if (min === 0 && max !== null) return `do ${max} zł`;
+    if (min === max) return `${min} zł`; // Jeśli konkretna cena
+    return `${min} – ${max} zł`;
+};
+
 // Dodajemy prop 'showAuthor' z wartością domyślną true
 export default function DreamCard({ dream, showAuthor = true }) {
   return (
@@ -24,10 +33,9 @@ export default function DreamCard({ dream, showAuthor = true }) {
         <h3 className="card-title">{dream.title}</h3>
         <p className="card-desc">{dream.description}</p>
 
-        {/* --- CENA (Tylko dla typu 'gift') --- */}
-        {dream.type === 'gift' && dream.price && (
+        {dream.type === 'gift' && (
           <div className="dream-price" style={{color: '#64748b', fontSize: '0.9rem', margin: '10px 0'}}>
-              💰 {dream.price}
+            {formatPrice(dream.price_min, dream.price_max)}
           </div>
         )}
 

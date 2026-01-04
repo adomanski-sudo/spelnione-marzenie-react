@@ -1,17 +1,45 @@
 import React, { useState } from 'react';
-import './EditProfile.css'; // Użyjemy tych samych stylów co przy edycji profilu!
-import { Save, ArrowLeft, Type, Tag, DollarSign, Image as ImageIcon, FileText, Gift, Clock, Smile } from 'lucide-react';
+import { Gift, Clock, Smile, Link as LinkIcon, Image as ImageIcon } from 'lucide-react';
+import './AuthForm.css'; // Używamy stylów auth, bo są ładne, albo własnych
+import './AddDreamForm.css';
 
-export default function AddDreamForm({ onCancel, onSuccess }) {
+const PRICE_RANGES = [
+  { label: 'Wybierz budżet...', min: null, max: null },
+  { label: 'do 100 zł', min: 0, max: 100 },
+  { label: '100 – 300 zł', min: 100, max: 300 },
+  { label: '300 – 700 zł', min: 300, max: 700 },
+  { label: '700 – 1500 zł', min: 700, max: 1500 },
+  { label: 'powyżej 1500 zł', min: 1500, max: null } // Max null oznacza brak górnej granicy
+];
+
+export default function AddDreamForm({ onAdd, onCancel }) {
   
+  // Stan dla wariantu prezentu (Pomysł vs Konkret)
+  const [giftVariant, setGiftVariant] = useState('idea'); 
+
+  // Główny stan formularza
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    category: 'Inne',
-    price: '',
-    type: 'gift', // <--- Domyślnie prezent
+    price_min: '',
+    price_max: '',
+    type: 'time',   // Domyślnie prezent
     image: ''
   });
+
+  // Funkcja obsługująca zmianę Selecta z ceną
+  const handlePriceChange = (e) => {
+    // e.target.value zwróci np. "100-300" (musimy to sparsować) lub indeks tablicy
+    // Najbezpieczniej użyć indeksu tablicy PRICE_RANGES
+    const index = e.target.selectedIndex;
+    const selectedRange = PRICE_RANGES[index];
+
+    setFormData({
+      ...formData,
+      price_min: selectedRange.min,
+      price_max: selectedRange.max
+    });
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,156 +47,216 @@ export default function AddDreamForm({ onCancel, onSuccess }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
-    const storedUser = localStorage.getItem('loggedUser');
-    const token = storedUser ? JSON.parse(storedUser).token : null;
+    // Upewniamy się, że wysyłamy odpowiedni typ
+    onAdd(formData);
+  };
 
-    fetch('/api/dreams', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(res => {
-        if (!res.ok) throw new Error("Błąd dodawania");
-        return res.json();
-    })
-    .then(() => {
-        alert("Marzenie dodane! 🌠");
-        onSuccess(); // Odśwież listę i wróć
-    })
-    .catch(err => alert("Błąd: " + err.message));
+  // --- FUNKCJA STERUJĄCA POLAMI ---
+  const renderFields = () => {
+    
+    // 1. SCENARIUSZ: PREZENT - POMYSŁ 💡
+    if (formData.type === 'gift') {
+        return (
+            <div className="fade-in">
+                <div className="form-group">
+                    <label>
+                        {giftVariant === 'model' ? 'Dokładna nazwa produktu' : 'Jaki masz pomysł?'}
+                    </label>
+                    <input 
+                        type="text" name="title" 
+                        placeholder={giftVariant === 'model' ? "np. Sony WH-1000XM5" : "np. Kurs gotowania"} 
+                        value={formData.title} onChange={handleChange} required 
+                    />
+                </div>
+
+                {/* --- NOWY SELECT Z WIDEŁKAMI --- */}
+                <div className="form-group">
+                    <label>Szacowany budżet</label>
+                    <select 
+                        onChange={handlePriceChange}
+                        className="price-select" // Możesz dodać style w CSS
+                        style={{padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0', background: 'white'}}
+                    >
+                        {PRICE_RANGES.map((range, index) => (
+                            <option key={index} value={index}>
+                                {range.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className="form-group">
+                    <label>Opis</label>
+                    <textarea 
+                        name="description" placeholder="Opisz szczegóły..." rows="3"
+                        value={formData.description} onChange={handleChange}
+                    />
+                </div>
+
+                <div className="form-group">
+                    <label>Zdjęcie (URL)</label>
+                    <div className="input-with-icon">
+                        <ImageIcon size={16} />
+                        <input 
+                            type="text" name="image" placeholder="Wklej link do zdjęcia..." 
+                            value={formData.image} onChange={handleChange} 
+                        />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // 3. SCENARIUSZ: WSPÓLNY CZAS 🕰️
+    if (formData.type === 'time') {
+        return (
+            <div className="fade-in">
+                <div className="form-group">
+                    <label>Co zrobimy razem?</label>
+                    <input 
+                        type="text" name="title" placeholder="np. Wyjazd w Bieszczady, Maratona filmowy" 
+                        value={formData.title} onChange={handleChange} required 
+                    />
+                    {/* DODANY INPUT ZDJĘCIA */}
+                <div className="form-group">
+                    <label>Zdjęcie miejsca / inspiracji</label>
+                    <div className="input-with-icon">
+                        <ImageIcon size={16} />
+                        <input 
+                            type="text" name="image" placeholder="Wklej link do zdjęcia..." 
+                            value={formData.image} onChange={handleChange} 
+                        />
+                    </div>
+                </div>
+                </div>
+                <div className="form-group">
+                    <label>Szczegóły planu</label>
+                    <textarea 
+                        name="description" placeholder="Gdzie, kiedy, co trzeba zabrać?..." rows="4"
+                        value={formData.description} onChange={handleChange}
+                    />
+                </div>
+            </div>
+        );
+    }
+
+    // 4. SCENARIUSZ: UŚMIECH 😊
+    if (formData.type === 'smile') {
+        return (
+            <div className="fade-in">
+                <div className="form-group">
+                    <label>Co sprawi Ci radość?</label>
+                    <input 
+                        type="text" name="title" placeholder="np. Ulubiona czekolada, Kwiaty bez okazji" 
+                        value={formData.title} onChange={handleChange} required 
+                    />
+                </div>
+                {/* DODANY INPUT ZDJĘCIA */}
+                <div className="form-group">
+                    <label>Zdjęcie miejsca / inspiracji</label>
+                    <div className="input-with-icon">
+                        <ImageIcon size={16} />
+                        <input 
+                            type="text" name="image" placeholder="Wklej link do zdjęcia..." 
+                            value={formData.image} onChange={handleChange} 
+                        />
+                    </div>
+                </div>
+                <div className="form-group">
+                    <label>Krótka notatka (opcjonalne)</label>
+                    <textarea 
+                        name="description" placeholder="Np. Gorzka z orzechami..." rows="2"
+                        value={formData.description} onChange={handleChange}
+                    />
+                </div>
+            </div>
+        );
+    }
   };
 
   return (
-    <div className="edit-profile-container fade-in" style={{height: '100%', width: '100%'}}>
+    <form onSubmit={handleSubmit} className="add-dream-form fade-in">
       
-      {/* Przycisk powrotu */}
-      <button className="btn-back" onClick={onCancel} style={{marginBottom: '20px'}}>
-        <ArrowLeft size={20} /> Anuluj dodawanie
-      </button>
+      {/* --- 1. WYBÓR TYPU (IKONY) --- */}
+      <div className="type-selector-container" style={{display: 'flex', gap: '10px', marginBottom: '10px'}}>
 
-      <h2 className="section-title">Nowe Marzenie</h2>
-      
-      <form onSubmit={handleSubmit} className="edit-form">
-
-        <div className="type-selector-container" style={{display: 'flex', gap: '10px', marginBottom: '20px'}}>
-
-        {/* Opcja 1: WSPÓLNY CZAS */}
         <button
           type="button"
-          onClick={() => setFormData({...formData, type: 'time', price: ''})} // Czyścimy cenę!
+          onClick={() => setFormData({...formData, type: 'time', price: ''})}
           className={`type-btn ${formData.type === 'time' ? 'active' : ''}`}
-          style={{
-            flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0',
-            background: formData.type === 'time' ? '#eff6ff' : 'white',
-            borderColor: formData.type === 'time' ? '#2563eb' : '#e2e8f0',
-            cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px'
-          }}
         >
-          <Clock size={20} color={formData.type === 'time' ? '#2563eb' : '#64748b'} />
-          <span style={{fontSize: '12px', fontWeight: 600, color: formData.type === 'time' ? '#2563eb' : '#64748b'}}>Wspólny czas</span>
+          <Clock size={20} /> <span>Czas</span>
         </button>
-        
-        {/* Opcja 2: PREZENT */}
+
         <button
-          type="button" // Ważne: żeby nie wysyłało formularza!
+          type="button"
           onClick={() => setFormData({...formData, type: 'gift'})}
           className={`type-btn ${formData.type === 'gift' ? 'active' : ''}`}
-          style={{
-            flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0',
-            background: formData.type === 'gift' ? '#eff6ff' : 'white',
-            borderColor: formData.type === 'gift' ? '#2563eb' : '#e2e8f0',
-            cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px'
-          }}
         >
-          <Gift size={20} color={formData.type === 'gift' ? '#2563eb' : '#64748b'} />
-          <span style={{fontSize: '12px', fontWeight: 600, color: formData.type === 'gift' ? '#2563eb' : '#64748b'}}>Prezent</span>
+          <Gift size={20} /> <span>Prezent</span>
         </button>
 
-        {/* Opcja 3: UŚMIECH */}
+        
+
         <button
           type="button"
-          onClick={() => setFormData({...formData, type: 'smile', price: ''})} // Czyścimy cenę!
+          onClick={() => setFormData({...formData, type: 'smile', price: ''})}
           className={`type-btn ${formData.type === 'smile' ? 'active' : ''}`}
-          style={{
-            flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0',
-            background: formData.type === 'smile' ? '#eff6ff' : 'white',
-            borderColor: formData.type === 'smile' ? '#2563eb' : '#e2e8f0',
-            cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px'
-          }}
         >
-          <Smile size={20} color={formData.type === 'smile' ? '#2563eb' : '#64748b'} />
-          <span style={{fontSize: '12px', fontWeight: 600, color: formData.type === 'smile' ? '#2563eb' : '#64748b'}}>Uśmiech</span>
+          <Smile size={20} /> <span>Uśmiech</span>
         </button>
       </div>
+
+      {/* --- 2. PODTYTUŁ / SWITCH (Zależne od typu) --- */}
+      <div className="type-selector-content" style={{marginBottom: '15px', minHeight: '30px'}}>
         
-        {/* TYTUŁ */}
-        <div className="form-group">
-            <label><Type size={16}/> Tytuł</label>
-            <input 
-                type="text" name="title" placeholder="O czym marzysz?" required 
-                value={formData.title} onChange={handleChange}
-            />
-        </div>
+        {formData.type === 'time' && (
+            <div className="info-text fade-in">
+                Budujemy wspomnienia. 🕰️ Nie musisz wydawać milionów.
+            </div>
+        )}
 
-        {/* KATEGORIA I CENA (Obok siebie) */}
-        <div className="form-row">
-            {/* <div className="form-group">
-                <label><Tag size={16}/> Kategoria</label>
-                <select name="category" value={formData.category} onChange={handleChange} 
-                        style={{padding: '12px', borderRadius: '10px', border: '1px solid #e2e8f0'}}>
-                    <option value="Inne">Inne</option>
-                    <option value="Podróże">Podróże ✈️</option>
-                    <option value="Elektronika">Elektronika 💻</option>
-                    <option value="Sport">Sport ⚽</option>
-                    <option value="Sztuka">Sztuka 🎨</option>
-                    <option value="Motoryzacja">Motoryzacja 🚗</option>
-                    <option value="Dom">Dom 🏠</option>
-                </select>
-            </div> */}
-            <div className="form-group">
-          <label>Przybliżona cena / Zakres</label>
-          <input 
-            type="text" 
-            name="price"
-            value={formData.price}
-            onChange={handleChange}
-            placeholder="np. 100-200 zł"
-          />
-        </div>
-        </div>
+        {formData.type === 'smile' && (
+            <div className="info-text fade-in">
+                Drobne gesty, które robią dzień. 😊
+            </div>
+        )}
 
-        {/* LINK DO ZDJĘCIA */}
-        <div className="form-group">
-            <label><ImageIcon size={16}/> Link do zdjęcia</label>
-            <input 
-                type="text" name="image" placeholder="https://..." 
-                value={formData.image} onChange={handleChange}
-            />
-            {formData.image && (
-                <div className="avatar-preview" style={{borderRadius: '10px'}}>
-                    <img src={formData.image} alt="Podgląd" style={{width: '100%', height: '150px', borderRadius: '10px'}} onError={(e) => e.target.style.display='none'}/>
-                </div>
-            )}
-        </div>
+        {formData.type === 'gift' && (
+            <div className="gift-switch-container fade-in">
+                <button
+                    type="button"
+                    onClick={() => setGiftVariant('idea')}
+                    className={giftVariant === 'idea' ? 'active' : ''}
+                >
+                    💡 Pomysł
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setGiftVariant('model')}
+                    className={giftVariant === 'model' ? 'active' : ''}
+                >
+                    🎯 Konkret
+                </button>
+            </div>
+        )}
+      </div>
 
-        {/* OPIS */}
-        <div className="form-group">
-            <label><FileText size={16}/> Opis</label>
-            <textarea 
-                name="description" rows="5" placeholder="Opisz to marzenie..."
-                value={formData.description} onChange={handleChange}
-            />
-        </div>
+      {/* --- 3. ZMIENNA ZAWARTOŚĆ FORMULARZA --- */}
+      <div className="form-content">
+          {renderFields()}
+      </div>
 
-        <button type="submit" className="btn-save" style={{marginTop: '10px'}}>
-            <Save size={20} /> Dodaj do listy
+      {/* --- 4. PRZYCISKI AKCJI --- */}
+      <div className="form-actions" style={{display: 'flex', gap: '10px', marginTop: '20px'}}>
+        <button type="button" onClick={onCancel} className="btn-secondary" style={{flex: 1}}>
+          Anuluj
         </button>
+        <button type="submit" className="btn-primary" style={{flex: 1}}>
+          Dodaj marzenie
+        </button>
+      </div>
 
-      </form>
-    </div>
+    </form>
   );
 }

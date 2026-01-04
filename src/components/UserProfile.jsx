@@ -10,6 +10,15 @@ export default function UserProfile({ userId, currentUser, friends }) {
   const isAlreadyFriend = friends?.some(friend => friend.id == userId);
   const isMe = currentUser?.id == userId;
 
+  // Funkcja pomocnicza do formatowania ceny
+    const formatPrice = (min, max) => {
+        if (min === null && max === null) return null;
+        if (min !== null && max === null) return `powyżej ${min} zł`;
+        if (min === 0 && max !== null) return `do ${max} zł`;
+        if (min === max) return `${min} zł`; // Jeśli konkretna cena
+        return `${min} – ${max} zł`;
+    };
+
   // Pobieranie danych usera
   useEffect(() => {
     fetch(`/api/users/${userId}/full`)
@@ -85,6 +94,15 @@ export default function UserProfile({ userId, currentUser, friends }) {
                <div className="detail-content">
                   <div className="detail-header">
                       <span className="detail-category">{activeDream.category}</span>
+
+                      {/* POPRAWKA: Używamy activeDream zamiast dream */}
+                      {activeDream.type === 'gift' && (
+                          <div className="dream-price" style={{color: '#64748b', fontSize: '0.9rem', margin: '10px 0'}}>
+                              {/* Tu też activeDream! */}
+                              {formatPrice(activeDream.price_min, activeDream.price_max)}
+                          </div>
+                      )}
+
                       <span className="detail-date">{activeDream.date}</span>
                   </div>
 

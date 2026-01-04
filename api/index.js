@@ -297,7 +297,7 @@ app.post('/api/dreams', (req, res) => {
     jwt.verify(token, process.env.JWT_SECRET, (err, decodedUser) => {
         if (err) return res.status(403).json("Token nieważny!");
 
-        const { title, description, category, image, price } = req.body;
+        const { title, description, category, image, price_min, price_max } = req.body;
         const userId = decodedUser.id;
         const date = new Date().toISOString().slice(0, 10);
 
@@ -312,7 +312,8 @@ app.post('/api/dreams', (req, res) => {
        const values = [
         req.body.title,
         req.body.description,
-        req.body.price,       // Teraz to może być null lub pusty string
+        req.body.price_min || null, 
+        req.body.price_max || null,
         req.body.category,
         req.body.date,
         userInfo.id,
@@ -341,8 +342,8 @@ app.put('/api/dreams/:id', (req, res) => {
         const { title, description, category, image, price } = req.body;
 
         // Ważne: W warunku WHERE sprawdzamy idUser, żeby nikt nie edytował cudzych marzeń!
-        const sql = "UPDATE dreams SET title=?, description=?, category=?, image=?, price=?, type=? WHERE id=? AND idUser=?";
-        const values = [title, description, category, image, price, dreamId, userId];
+        const sql = "UPDATE dreams SET title=?, description=?, category=?, image=?, price_min=?, price_max=?, type=? WHERE id=? AND idUser=?";
+        const values = [title, description, category, image, price_min, price_max, dreamId, userId];
 
         db.query(sql, values, (err, result) => {
             if (err) return res.status(500).json(err);

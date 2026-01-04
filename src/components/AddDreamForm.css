@@ -1,0 +1,203 @@
+/* src/components/AddDreamForm.css */
+
+/* Kontener całego formularza */
+.add-dream-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 10px 5px; /* Mały padding boczny */
+  /* background-color: #f8fafc; */
+  background-color: #ffffffd8;
+  border-radius: 20px;
+  
+}
+
+/* --- 1. GÓRNE KAFELKI (TYP) --- */
+.type-selector-container {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.type-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #64748b;
+}
+
+.type-btn span {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.type-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+/* Aktywny kafelek */
+.type-btn.active {
+  background: #eff6ff; /* Jasny niebieski tło */
+  border-color: #2563eb; /* Niebieska ramka */
+  color: #2563eb;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1);
+}
+
+/* --- 2. SWITCH (POMYSŁ / KONKRET) --- */
+.type-selector-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 40px;
+}
+
+.info-text {
+  font-size: 0.9rem;
+  color: #64748b;
+  text-align: center;
+}
+
+.gift-switch-container {
+  display: flex;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 50px; /* Pigułka */
+  position: relative;
+  gap: 5px;
+}
+
+.gift-switch-container button {
+  padding: 6px 16px;
+  border-radius: 40px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.gift-switch-container button.active {
+  background: white;
+  color: #0f172a;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* --- 3. INPUTY I LABELE --- */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #334155;
+  margin-left: 2px;
+}
+
+/* Stylizacja pól tekstowych */
+.add-dream-form input[type="text"],
+.add-dream-form textarea,
+.add-dream-form select {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  font-size: 0.95rem;
+  color: #1e293b;
+  background: white;
+  transition: border 0.2s;
+  width: 100%; /* Ważne! */
+  box-sizing: border-box; /* Ważne, żeby padding nie rozpychał */
+}
+
+.add-dream-form input:focus,
+.add-dream-form textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* Wiersz z dwoma polami obok siebie */
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+
+/* Input z ikoną w środku */
+.input-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  transition: border 0.2s;
+}
+
+.input-with-icon:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.input-with-icon svg {
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+/* Input wewnątrz wrappera z ikoną musi być "przezroczysty" */
+.input-with-icon input {
+  border: none !important;
+  box-shadow: none !important;
+  padding: 10px 0 !important;
+  background: transparent !important;
+  width: 100%;
+}
+
+.input-with-icon input:focus {
+  outline: none;
+}
+
+
+/* --- 4. PRZYCISKI AKCJI (Dół) --- */
+.form-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.btn-primary, .btn-secondary {
+  padding: 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s;
+  font-size: 0.95rem;
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: white;
+}
+.btn-primary:hover { background: #1d4ed8; }
+
+.btn-secondary {
+  background: #f1f5f9;
+  color: #475569;
+}
+.btn-secondary:hover { background: #e2e8f0; }
