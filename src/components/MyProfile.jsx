@@ -28,7 +28,8 @@ export default function MyProfile({ dreams, setDreams, userData, onUpdateUser })
             category: item.category,
             date: new Date(item.date).toLocaleDateString(),
             image: item.image,
-            price: item.price
+            price: item.price,
+            type: item.type
         }));
 
         // Filtrujemy, żeby pokazać tylko MOJE marzenia
@@ -167,11 +168,9 @@ export default function MyProfile({ dreams, setDreams, userData, onUpdateUser })
                   <h1 className="detail-title">{activeDream.title}</h1>
                   <p className="detail-desc">{activeDream.description}</p>
                   
-                  {/* {activeDream.price && (
-                     <div className="detail-price" style={{marginBottom: '15px', fontWeight: 'bold', color: '#2563eb'}}>
-                        Koszt: {activeDream.price}
-                     </div>
-                  )} */}
+                  {/* --- CENA (Tylko dla typu 'gift') --- */}
+
+
 
                   <div className="detail-footer">
                     <button 
