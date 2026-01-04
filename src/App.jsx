@@ -233,6 +233,8 @@ const handleOpenProfile = (id) => {
            : activeView === 'userProfile' ? (
              <UserProfile 
                userId={selectedUserId} 
+               currentUser={currentUser}
+               friends={friendsList}
                onBack={() => setActiveView('home')}
              />
            )

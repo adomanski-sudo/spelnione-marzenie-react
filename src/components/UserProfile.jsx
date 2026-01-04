@@ -3,10 +3,12 @@ import './MyProfile.css'; // Używamy tych samych stylów layoutu
 import DreamCard from './DreamCard'; 
 import { ArrowLeft, Heart, Lock, PiggyBank } from 'lucide-react'; 
 
-export default function UserProfile({ userId }) {
+export default function UserProfile({ userId, currentUser, friends }) {
   const [userData, setUserData] = useState(null);
   const [dreams, setDreams] = useState([]);
   const [activeDream, setActiveDream] = useState(null);
+  const isAlreadyFriend = friends?.some(friend => friend.id == userId);
+  const isMe = currentUser?.id == userId;
 
   // Pobieranie danych usera
   useEffect(() => {
@@ -47,9 +49,11 @@ export default function UserProfile({ userId }) {
           </div>
           
           {/* Przycisk obserwowania */}
+          {!isMe && !isAlreadyFriend && (
           <button className="btn-primary-large" style={{marginTop: '20px', width: '100%'}}>
              Zaproś do znajomych <Heart size={20} style={{marginRight: '8px'}}/>
           </button>
+          )}
         </div>
       </aside>
 

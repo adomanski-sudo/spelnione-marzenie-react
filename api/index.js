@@ -156,28 +156,42 @@ app.get('/api/user', (req, res) => {
     });
 });
 
-// 3. POBIERANIE ZNAJOMYCH (Wszyscy OPRÓCZ mnie)
+// POBIERANIE ZNAJOMYCH (Logika hybrydowa)
 app.get('/api/friends', (req, res) => {
     const token = req.headers.authorization;
-    
-    // Jeśli ktoś nie jest zalogowany, pokazujemy mu wszystkich użytkowników
+
+    // --- SCENARIUSZ 1: Użytkownik NIEZALOGOWANY ---
+    // Pokazujemy wszystkich użytkowników (jako "społeczność" do odkrycia)
     if (!token) {
-        const sqlAll = "SELECT * FROM users";
+        // Wybieramy konkretne kolumny, żeby nie wysyłać hasła!
+        const sqlAll = "SELECT id, first_name, last_name, image, description FROM users";
+        
         db.query(sqlAll, (err, data) => {
             if (err) return res.status(500).json(err);
             return res.json(data);
         });
-        return;
+        return; // Kończymy funkcję, żeby nie szła dalej
     }
 
-    // Jeśli JEST zalogowany, pokazujemy wszystkich OPRÓCZ niego samego
+    // --- SCENARIUSZ 2: Użytkownik ZALOGOWANY ---
+    // Pokazujemy tylko tych, którzy są w tabeli friendships ze statusem 'accepted'
     jwt.verify(token, process.env.JWT_SECRET, (err, decodedUser) => {
         if (err) return res.status(403).json("Token nieważny");
 
         const userId = decodedUser.id;
-        const sql = "SELECT * FROM users WHERE id != ?"; // Pokaż wszystkich, którzy NIE są mną
 
-        db.query(sql, [userId], (err, data) => {
+        const sqlFriends = `
+            SELECT u.id, u.first_name, u.last_name, u.image, u.description
+            FROM friendships f
+            JOIN users u ON (
+                (f.user_id1 = ? AND f.user_id2 = u.id) 
+                OR 
+                (f.user_id2 = ? AND f.user_id1 = u.id)
+            )
+            WHERE f.status = 'accepted'
+        `;
+
+        db.query(sqlFriends, [userId, userId], (err, data) => {
             if (err) return res.status(500).json(err);
             return res.json(data);
         });
