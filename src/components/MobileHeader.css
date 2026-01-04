@@ -152,6 +152,37 @@
     color: #dc2626;
 }
 
+.mobile-header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Odstęp między ikoną feedu a awatarem */
+}
+
+.header-icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.header-icon-btn:active {
+    background: #0a4580; /* Delikatne tło przy kliknięciu */
+}
+
+.header-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
 /* Pokaż na mobile */
  @media (max-width: 800px) {
   .mobile-header {

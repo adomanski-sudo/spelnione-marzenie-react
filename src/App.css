@@ -124,3 +124,85 @@ body {
   from { transform: translateY(50px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
+
+@media (max-width: 768px) {
+  .desktop-only-feed {
+    display: none; /* Ukryj prawy pasek na telefonie */
+  }
+}
+
+/* --- DOMYŚLNIE (DESKTOP) --- */
+
+/* Prawy pasek jest widoczny */
+.desktop-feed-wrapper {
+    display: block;
+    width: 320px; 
+    flex-shrink: 0;
+    
+    /* --- STICKY MAGIC --- */
+    position: -webkit-sticky; /* Dla Safari */
+    position: sticky;         /* Standard */
+    top: 0px;                /* Przyklej się 20px od góry okna */
+    
+    /* KLUCZOWE DLA FLEXBOXA: */
+    /* Mówi wrapperowi: "Bądź tak wysoki jak Twoja zawartość, a nie jak cała strona" */
+    height: fit-content;      
+    align-self: flex-start;   
+    
+    /* Opcjonalnie: Jeśli feed byłby wyższy niż ekran, dodaj scrolla wewnątrz */
+    overflow-y: auto;
+}
+
+/* Środkowy feed mobilny jest UKRYTY (żeby nie dublować na PC) */
+.mobile-feed-wrapper {
+    display: none;
+}
+
+
+/* --- WERSJA MOBILNA (Maksymalnie 768px lub inna Twoja granica) --- */
+@media (max-width: 1000px) { /* Ustaw tu break-point, przy którym znika prawa kolumna */
+    
+    /* Prawy pasek znika całkowicie */
+    .desktop-feed-wrapper {
+        display: none;
+    }
+
+    /* Środkowy feed staje się widoczny */
+    .mobile-feed-wrapper {
+        display: block;
+        width: 100%; /* Ważne! */
+        padding-bottom: 80px; /* Miejsce na dolny pasek nawigacji */
+    }
+}
+
+/* --- NAPRAWA FEEDU MOBILNEGO --- */
+
+/* 1. Domyślnie na małych ekranach ukrywamy wersję desktopową (PRAWY PASEK) */
+@media (max-width: 1000px) {
+    .desktop-feed-wrapper {
+        display: none !important;
+    }
+}
+
+/* 2. Ale WIDOK MOBILNY (ŚRODEK) musi być widoczny! */
+.mobile-feed-wrapper {
+    display: block;
+    width: 100%;
+    padding-bottom: 80px; /* Miejsce na dolną nawigację */
+}
+
+/* 3. KLUCZOWE: Zmuszamy RightFeed, żeby pokazał się wewnątrz mobile-feed-wrapper */
+.mobile-feed-wrapper .right-feed, 
+.mobile-feed-wrapper .right-feed-container {
+    display: block !important; /* Nadpisujemy wszelkie "display: none" ze starych stylów */
+    width: 100% !important;
+    background: transparent !important; /* Żeby pasowało do tła */
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* 4. Opcjonalnie: Ukrywamy nagłówek z komponentu, bo masz już nagłówek w App.jsx */
+.mobile-feed-wrapper .feed-header {
+    display: none;
+}

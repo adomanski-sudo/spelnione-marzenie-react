@@ -13,12 +13,29 @@ export default function RightFeed() {
   // 1. Pobieramy dane na start (to nasza baza do losowania)
   useEffect(() => {
     fetch('/api/feed')
-      .then(res => res.json())
-      .then(data => {
-        setActivities(data);   // Wyświetl to co mamy w bazie
-        setDataPool(data);     // Zapisz do puli do późniejszego losowania
+      .then(res => {
+          if (!res.ok) {
+              throw new Error("Błąd serwera"); // Rzucamy błąd, jeśli status to 500
+          }
+          return res.json();
       })
-      .catch(err => console.error("Błąd feedu:", err));
+      .then(data => {
+          // DODATKOWE ZABEZPIECZENIE:
+          // Upewniamy się, że to co przyszło, to faktycznie tablica
+          if (Array.isArray(data)) {
+              setDataPool(data);
+              setActivities(data);
+          } else {
+              console.error("RightFeed otrzymał dziwne dane:", data);
+              setActivities([]); // Jak śmieci, to czyścimy
+              setDataPool([]);
+          }
+      })
+      .catch(err => {
+          console.error("Błąd pobierania feedu:", err);
+          setActivities([]); // W razie błędu - pusta lista, a nie crash
+          setDataPool([]);
+      });
   }, []);
 
   // 2. Generator Zdarzeń (Pętla nieskończona)
@@ -104,7 +121,7 @@ export default function RightFeed() {
   return (
     <aside className="right-feed fade-in">
       <h3 className="feed-header">TO SIĘ DZIEJE TERAZ</h3>
-      
+      {activities.length > 0 ? (
       <div className="feed-list">
         {activities.map(item => (
           <div key={item.id} className={`feed-item ${item.is_secret ? 'secret-item' : ''}`}>
@@ -154,11 +171,11 @@ export default function RightFeed() {
           </div>
         ))}
       </div>
-      
-      <div className="feed-footer">
-          <p>Zainspiruj innych!</p>
-          <button className="btn-small">+ Dodaj marzenie</button>
-      </div>
+      ) : (
+        <p style={{padding: '20px', color: '#94a3b8', textAlign: 'center'}}>
+                  Na razie cisza... 🍃
+              </p>
+          )}
 
     </aside>
   );

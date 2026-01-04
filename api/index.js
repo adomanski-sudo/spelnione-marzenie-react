@@ -199,23 +199,31 @@ app.get('/api/friends', (req, res) => {
 });
 
 app.get('/api/feed', (req, res) => {
+    // Używamy grawisów (`), żeby baza nie myliła nazwy kolumny 'date' z typem danych DATE
     const sql = `
         SELECT 
-            d.id, 
-            d.title, 
-            d.is_fulfilled, 
+            d.id,
+            d.title,
+            d.is_fulfilled,
             d.date, 
-            u.first_name, 
-            u.last_name, 
+            u.first_name,
+            u.last_name,
             u.image as userImage
         FROM dreams d
-        JOIN users u ON d.idUser = u.id
-        ORDER BY d.date DESC 
+        JOIN users u ON d.idUser = u.id  
+        ORDER BY d.date DESC
         LIMIT 5
     `;
-    
+
+    // DEBUGOWANIE: Wypisz błąd w terminalu VS Code, jeśli zapytanie padnie
     db.query(sql, (err, data) => {
-        if(err) return res.status(500).json(err);
+        if (err) {
+            console.log("---------------------------------");
+            console.error("❌ BŁĄD SQL W /api/feed:");
+            console.error(err.sqlMessage); // To pokaże konkretny powód błędu
+            console.log("---------------------------------");
+            return res.status(500).json(err);
+        }
         return res.json(data);
     });
 });

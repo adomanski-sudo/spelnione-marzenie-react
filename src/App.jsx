@@ -173,6 +173,7 @@ const handleOpenProfile = (id) => {
           setView={setActiveView} 
           currentUser={currentUser}
           onLoginClick={() => setShowMobileLogin(true)}
+          onOpenFeed={() => setActiveView('feed')}
           onLogout={() => {
             setCurrentUser(null);
             localStorage.removeItem('loggedUser');
@@ -185,6 +186,7 @@ const handleOpenProfile = (id) => {
         <div className="content-container">
            
            {/* LOGIKA WYŚWIETLANIA WIDOKÓW */}
+           
            
            {/* 1. STRONA GŁÓWNA */}
            {activeView === 'home' ? (
@@ -241,6 +243,15 @@ const handleOpenProfile = (id) => {
                onBack={() => setActiveView('home')}
              />
            )
+           
+           : activeView === 'feed' ? (
+              <div className="mobile-feed-wrapper fade-in">
+              <h2 style={{fontSize: '1.5rem', marginBottom: '20px', color: '#1e293b'}}>
+                  To się dzieje teraz:
+              </h2>
+              <RightFeed />
+              </div>
+            )
 
            : (
              <div className="content-card">
@@ -259,7 +270,9 @@ const handleOpenProfile = (id) => {
       </div>
 
       {/* PRAWY PASEK (FEED) */}
+      <div className="desktop-feed-wrapper">
       <RightFeed />
+      </div>
 
       {/* MODAL SZCZEGÓŁÓW MARZENIA */}
       {selectedDream && (

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import './MobileHeader.css';
-import { LogIn, LogOut, Settings, User, Gift } from 'lucide-react'; 
+import { LogOut, Settings, User, Gift, Activity } from 'lucide-react'; 
 
-export default function MobileHeader({ setView, currentUser, onLoginClick, onLogout }) {
+export default function MobileHeader({ setView, currentUser, onLogout, onOpenFeed }) {
   
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -27,6 +27,11 @@ export default function MobileHeader({ setView, currentUser, onLoginClick, onLog
       </div>
 
       {/* PRAWA STRONA (User lub Login) */}
+      {/* Przycisk LIVE FEED (Widoczny dla każdego!) */}
+        <button className="header-icon-btn" onClick={onOpenFeed}>
+            <Activity size={24} color="#64748b" />
+        </button>
+        
       <div className="user-section">
         {currentUser ? (
           <div className="mobile-user-container">

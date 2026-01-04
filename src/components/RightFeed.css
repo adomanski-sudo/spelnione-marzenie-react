@@ -1,11 +1,13 @@
 .right-feed {
     padding: 20px;
     background: #fff; /* lub przezroczysty, zależy od designu */
-    height: 100dvh;
     position: sticky; 
     top: 0;
     overflow-y: auto;
     scrollbar-width: thin;
+    height: 100dvh;
+    overflow: visible; /* Pozwól stronie się scrollować */
+    position: sticky; /* Przyklejony do lewej */
 }
 
 .right-feed::-webkit-scrollbar {
@@ -137,4 +139,16 @@
     border-radius: 8px;
     padding: 5px; /* Lekki padding, żeby tło było widoczne */
     margin: -5px; /* Kompensacja paddingu */
+}
+
+/* Tylko na mobilkach */
+@media (max-width: 1000px) {
+    .right-feed {
+        width: 100% !important;   /* Musi zająć całą szerokość */
+        box-shadow: none;         /* Usuwamy cień, żeby wyglądało płasko */
+        border: none;             /* Usuwamy ramki */
+        background: transparent;  /* Tło przezroczyste, żeby pasowało do reszty */
+        padding: 0;
+        margin: 0;
+    }
 }
