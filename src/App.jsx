@@ -25,6 +25,9 @@ function App() {
 
   const [showMobileLogin, setShowMobileLogin] = useState(false);
 
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+
   const [currentUser, setCurrentUser] = useState(() => {
     const savedUser = localStorage.getItem('loggedUser');
     return savedUser ? JSON.parse(savedUser) : null;
@@ -246,7 +249,13 @@ const handleOpenProfile = (id) => {
            )}
         </div>
 
-        <MobileNav setView={setActiveView} />
+        <MobileNav 
+        setView={setActiveView}
+        setActiveView={setActiveView}
+        currentUser={currentUser}
+        onOpenLogin={() => setIsLoginOpen(true)}
+        onOpenRegister={() => setIsRegisterOpen(true)} 
+        />
       </div>
 
       {/* PRAWY PASEK (FEED) */}
@@ -267,7 +276,7 @@ const handleOpenProfile = (id) => {
 
       {showMobileLogin && !currentUser && (
         <div className="mobile-auth-overlay fade-in">
-        <div className="mobile-auth-container">
+          <div className="mobile-auth-container">
         <button className="close-auth-btn" onClick={() => setShowMobileLogin(false)}>
           <X size={24} />
        </button>
@@ -277,9 +286,47 @@ const handleOpenProfile = (id) => {
            handleLogin(data);       // Logujemy
            setShowMobileLogin(false); // Zamykamy okno
         }} />
-    </div>
-  </div>
-)}
+          </div>
+        </div>
+      )}
+
+      {/* --- MODAL LOGOWANIA --- */}
+      {isLoginOpen && (
+          <div className="modal-overlay fade-in" onClick={() => setIsLoginOpen(false)}>
+              <div className="modal-content" onClick={e => e.stopPropagation()} style={{padding: 0}}>
+                  <button className="close-modal-btn" onClick={() => setIsLoginOpen(false)}>
+                      <X size={24} />
+                  </button>
+                  
+                  <AuthForm 
+                      initialMode="login" // <--- Wysyłamy tryb startowy
+                      onLoginSuccess={(user) => {
+                          handleLogin(user);
+                          setIsLoginOpen(false);
+                      }}
+                  />
+              </div>
+          </div>
+      )}
+
+      {/* --- MODAL REJESTRACJI --- */}
+      {isRegisterOpen && (
+          <div className="modal-overlay fade-in" onClick={() => setIsRegisterOpen(false)}>
+              <div className="modal-content" onClick={e => e.stopPropagation()} style={{padding: 0}}>
+                  <button className="close-modal-btn" onClick={() => setIsRegisterOpen(false)}>
+                      <X size={24} />
+                  </button>
+                  
+                  <AuthForm 
+                      initialMode="register" // <--- Wysyłamy tryb startowy
+                      onLoginSuccess={(user) => { 
+                          handleLogin(user);
+                          setIsRegisterOpen(false);
+                      }}
+                  />
+              </div>
+          </div>
+      )}
 
     </div>
   );

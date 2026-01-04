@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './MobileHeader.css';
 import { LogIn, LogOut, Settings, User, Gift } from 'lucide-react'; 
-import avatarImg from '../assets/avatar.jpg'; 
 
 export default function MobileHeader({ setView, currentUser, onLoginClick, onLogout }) {
   
@@ -33,7 +32,7 @@ export default function MobileHeader({ setView, currentUser, onLoginClick, onLog
           <div className="mobile-user-container">
             {/* AWATAR (Kliknięcie otwiera menu) */}
             <img 
-                src={currentUser.image || avatarImg} 
+                src={currentUser.image} 
                 alt="Profil" 
                 className="mobile-avatar"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -63,10 +62,7 @@ export default function MobileHeader({ setView, currentUser, onLoginClick, onLog
             )}
           </div>
         ) : (
-          <button className="mobile-login-btn" onClick={onLoginClick}>
-            <LogIn size={18} style={{marginRight: '5px'}}/>
-            <span>Wejdź</span>
-          </button>
+          <></>
         )}
       </div>
     </header>

@@ -3,6 +3,26 @@
   display: none;
 }
 
+.nav-item {
+  display: flex;
+  flex-direction: column; /* Ustawienie pionowe (nawet dla samej ikony jest bezpieczniejsze) */
+  justify-content: center; /* <--- TO NAPRAWIA PROBLEM (Centrowanie poziome) */
+  align-items: center;     /* Centrowanie pionowe */
+  flex: 1;                 /* Ważne: Rozciąga przycisk na całą dostępną szerokość */
+  height: 100%;            /* Przycisk zajmuje całą wysokość paska */
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748b;          /* Kolor nieaktywnej ikony */
+  transition: 0.2s;
+}
+
+/* Opcjonalnie: Styl dla aktywnej ikony */
+.nav-item.active {
+  color: #2563eb;          /* Niebieski kolor aktywnego */
+  /* transform: scale(1.1); <--- Możesz dodać lekki efekt powiększenia */
+}
+
 /* Dopiero jak ekran jest mniejszy niż 1024px - włączamy FLEX */
 @media (max-width: 1024px) {
   .mobile-nav {
