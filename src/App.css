@@ -172,6 +172,7 @@ body {
         display: block;
         width: 100%; /* Ważne! */
         padding-bottom: 80px; /* Miejsce na dolny pasek nawigacji */
+        background-color: var(--bg-panel);
     }
 }
 
@@ -206,3 +207,47 @@ body {
 .mobile-feed-wrapper .feed-header {
     display: none;
 }
+
+/* W sekcji @media (max-width: 1000px) w pliku App.css */
+
+@media (max-width: 1000px) {
+
+    /* Styl dla pojedynczego powiadomienia na telefonie */
+    .mobile-feed-wrapper .feed-item {
+        background: #ffffff;          /* Białe tło */
+        border-radius: 15px;          /* Zaokrąglone rogi */
+        padding: 15px;                /* Oddech wewnątrz kafelka */
+        margin-bottom: 0px;          /* Odstęp między kafelkami */
+        
+        /* Delikatny cień i ramka dla efektu 3D */
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
+        border: 1px solid #f1f5f9;
+        
+        /* Układ wewnątrz kafelka */
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    /* Opcjonalnie: Zmniejsz trochę avatar w feedzie na telefonie */
+    .mobile-feed-wrapper .feed-avatar {
+        width: 32px;
+        height: 32px;
+        min-width: 32px; /* Żeby się nie zgniótł */
+    }
+
+    /* Poprawa czytelności tekstu */
+    .mobile-feed-wrapper .feed-content {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    /* Data (np. "2 min temu") */
+    .mobile-feed-wrapper .feed-time {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        margin-top: 4px;
+        display: block;
+    }
+}
+

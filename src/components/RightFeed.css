@@ -152,3 +152,11 @@
         margin: 0;
     }
 }
+
+.feed-mobile-text{
+    text-align: center;
+    font-weight: bold;
+    padding: 15px;
+    color: #5d5675;
+    font-size: 0.75rem;
+}

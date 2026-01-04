@@ -246,8 +246,8 @@ const handleOpenProfile = (id) => {
            
            : activeView === 'feed' ? (
               <div className="mobile-feed-wrapper fade-in">
-              <h2 style={{fontSize: '1.5rem', marginBottom: '20px', color: '#1e293b'}}>
-                  To się dzieje teraz:
+              <h2 className="feed-mobile-text">
+                  TO SIĘ DZIEJE TERAZ:
               </h2>
               <RightFeed />
               </div>
