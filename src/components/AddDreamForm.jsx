@@ -60,36 +60,12 @@ export default function AddDreamForm({ onAdd, onCancel }) {
             <div className="fade-in">
                 <div className="form-group">
                     <label>
-                        {giftVariant === 'model' ? 'Dokładna nazwa produktu' : 'Jaki masz pomysł?'}
+                        {giftVariant === 'model' ? 'Dokładna nazwa produktu' : 'Co chcesz dostać?'}
                     </label>
                     <input 
                         type="text" name="title" 
-                        placeholder={giftVariant === 'model' ? "np. Sony WH-1000XM5" : "np. Kurs gotowania"} 
+                        placeholder={giftVariant === 'model' ? "np. słuchawki Sony WH-1000XM5" : "np. farby olejne lub wełniany sweter?"} 
                         value={formData.title} onChange={handleChange} required 
-                    />
-                </div>
-
-                {/* --- NOWY SELECT Z WIDEŁKAMI --- */}
-                <div className="form-group">
-                    <label>Szacowany budżet</label>
-                    <select 
-                        onChange={handlePriceChange}
-                        className="price-select" // Możesz dodać style w CSS
-                        style={{padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0', background: 'white'}}
-                    >
-                        {PRICE_RANGES.map((range, index) => (
-                            <option key={index} value={index}>
-                                {range.label}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                <div className="form-group">
-                    <label>Opis</label>
-                    <textarea 
-                        name="description" placeholder="Opisz szczegóły..." rows="3"
-                        value={formData.description} onChange={handleChange}
                     />
                 </div>
 
@@ -103,6 +79,44 @@ export default function AddDreamForm({ onAdd, onCancel }) {
                         />
                     </div>
                 </div>
+
+                {/* --- SELECT Z WIDEŁKAMI --- */}
+                {/* --- Model - lista, Pomysł - przybliżona cena --- */}
+                {giftVariant === 'model' ? 
+                <div className="form-group">
+                    <label>Przedział cenowy</label>
+                    <select 
+                        onChange={handlePriceChange}
+                        className="price-select"
+                        style={{padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0', background: 'white'}}
+                    >
+                         {PRICE_RANGES.map((range, index) => (
+                            <option key={index} value={index}>
+                                {range.label}
+                            </option>
+                        ))}
+                    </select>
+                </div> 
+                : 
+                <div className="form-group">
+                    <label>Przybliżona cena</label>
+                        <div className="form-group">
+                        <input 
+                            type="number" name="price" placeholder="np. 100 zł" 
+                            value={formData.price} onChange={handleChange} 
+                        />
+                    </div>
+                </div>
+                }
+
+
+                <div className="form-group">
+                    <label>Opis</label>
+                    <textarea 
+                        name="description" placeholder="Dlaczego właśnie to chcesz dostać w prezenicu?" rows="5"
+                        value={formData.description} onChange={handleChange}
+                    />
+                </div>
             </div>
         );
     }
@@ -114,7 +128,7 @@ export default function AddDreamForm({ onAdd, onCancel }) {
                 <div className="form-group">
                     <label>Co zrobimy razem?</label>
                     <input 
-                        type="text" name="title" placeholder="np. Wyjazd w Bieszczady, Maratona filmowy" 
+                        type="text" name="title" placeholder="np. wycieczka wgóry, wspólne jam session albo wyjście na koncert." 
                         value={formData.title} onChange={handleChange} required 
                     />
                     {/* DODANY INPUT ZDJĘCIA */}
@@ -147,7 +161,7 @@ export default function AddDreamForm({ onAdd, onCancel }) {
                 <div className="form-group">
                     <label>Co sprawi Ci radość?</label>
                     <input 
-                        type="text" name="title" placeholder="np. Ulubiona czekolada, Kwiaty bez okazji" 
+                        type="text" name="title" placeholder="np. ulubiona czekolada, kwiaty bez okazji" 
                         value={formData.title} onChange={handleChange} required 
                     />
                 </div>
@@ -165,7 +179,7 @@ export default function AddDreamForm({ onAdd, onCancel }) {
                 <div className="form-group">
                     <label>Krótka notatka (opcjonalne)</label>
                     <textarea 
-                        name="description" placeholder="Np. Gorzka z orzechami..." rows="2"
+                        name="description" placeholder="Np. gorzka z orzechami..." rows="2"
                         value={formData.description} onChange={handleChange}
                     />
                 </div>
@@ -212,13 +226,13 @@ export default function AddDreamForm({ onAdd, onCancel }) {
         
         {formData.type === 'time' && (
             <div className="info-text fade-in">
-                Budujemy wspomnienia. 🕰️ Nie musisz wydawać milionów.
+                Wspólny czas,doświadczenia, tworzenie wspomnień, aktywności.
             </div>
         )}
 
         {formData.type === 'smile' && (
             <div className="info-text fade-in">
-                Drobne gesty, które robią dzień. 😊
+                Zawsze mile widziane. Drobnostki, które sprawiają, że się uśmiechasz.
             </div>
         )}
 
@@ -229,14 +243,14 @@ export default function AddDreamForm({ onAdd, onCancel }) {
                     onClick={() => setGiftVariant('idea')}
                     className={giftVariant === 'idea' ? 'active' : ''}
                 >
-                    💡 Pomysł
+                    Pomysł
                 </button>
                 <button
                     type="button"
                     onClick={() => setGiftVariant('model')}
                     className={giftVariant === 'model' ? 'active' : ''}
                 >
-                    🎯 Konkret
+                    Konkret
                 </button>
             </div>
         )}
