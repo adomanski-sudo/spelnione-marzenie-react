@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Gift, Clock, Smile, Link as LinkIcon, Image as ImageIcon, Globe, Lock } from 'lucide-react';
+import { Gift, Clock, Smile, Link as LinkIcon, Image as ImageIcon, Globe, Lock, Compass, MousePointerClick} from 'lucide-react';
 import './AuthForm.css'; // Używamy stylów auth, bo są ładne, albo własnych
 import './AddDreamForm.css';
 
 const PRICE_RANGES = [
-  { label: 'Wybierz budżet...', min: null, max: null },
+  { label: 'Wybierz zakres...', min: null, max: null },
   { label: 'do 100 zł', min: 0, max: 100 },
   { label: '100 – 300 zł', min: 100, max: 300 },
   { label: '300 – 700 zł', min: 300, max: 700 },
@@ -61,7 +61,7 @@ export default function AddDreamForm({ onAdd, onCancel }) {
             <div className="fade-in">
                 <div className="form-group">
                     <label>
-                        {giftVariant === 'model' ? 'Dokładna nazwa produktu' : 'Co chcesz dostać?'}
+                        {giftVariant === 'model' ? 'Tytuł' : 'Tytuł'}
                     </label>
                     <input 
                         type="text" name="title" 
@@ -89,7 +89,6 @@ export default function AddDreamForm({ onAdd, onCancel }) {
                     <select 
                         onChange={handlePriceChange}
                         className="price-select"
-                        style={{padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0', background: 'white'}}
                     >
                          {PRICE_RANGES.map((range, index) => (
                             <option key={index} value={index}>
@@ -127,14 +126,14 @@ export default function AddDreamForm({ onAdd, onCancel }) {
         return (
             <div className="fade-in">
                 <div className="form-group">
-                    <label>Co zrobimy razem?</label>
+                    <label>Tytuł</label>
                     <input 
                         type="text" name="title" placeholder="np. wycieczka wgóry, wspólne jam session albo wyjście na koncert." 
                         value={formData.title} onChange={handleChange} required 
                     />
                     {/* DODANY INPUT ZDJĘCIA */}
                 <div className="form-group">
-                    <label>Zdjęcie miejsca / inspiracji</label>
+                    <label>Zdjęcie (URL)</label>
                     <div className="input-with-icon">
                         <ImageIcon size={16} />
                         <input 
@@ -145,7 +144,7 @@ export default function AddDreamForm({ onAdd, onCancel }) {
                 </div>
                 </div>
                 <div className="form-group">
-                    <label>Szczegóły planu</label>
+                    <label>Opis</label>
                     <textarea 
                         name="description" placeholder="Gdzie, kiedy, co trzeba zabrać?..." rows="4"
                         value={formData.description} onChange={handleChange}
@@ -160,7 +159,7 @@ export default function AddDreamForm({ onAdd, onCancel }) {
         return (
             <div className="fade-in">
                 <div className="form-group">
-                    <label>Co sprawi Ci radość?</label>
+                    <label>Tytuł</label>
                     <input 
                         type="text" name="title" placeholder="np. ulubiona czekolada, kwiaty bez okazji" 
                         value={formData.title} onChange={handleChange} required 
@@ -168,7 +167,7 @@ export default function AddDreamForm({ onAdd, onCancel }) {
                 </div>
                 {/* DODANY INPUT ZDJĘCIA */}
                 <div className="form-group">
-                    <label>Zdjęcie miejsca / inspiracji</label>
+                    <label>Zdjęcie (URL)</label>
                     <div className="input-with-icon">
                         <ImageIcon size={16} />
                         <input 
@@ -178,7 +177,7 @@ export default function AddDreamForm({ onAdd, onCancel }) {
                     </div>
                 </div>
                 <div className="form-group">
-                    <label>Krótka notatka (opcjonalne)</label>
+                    <label>Opis (opcjonalne)</label>
                     <textarea 
                         name="description" placeholder="Np. gorzka z orzechami..." rows="2"
                         value={formData.description} onChange={handleChange}
@@ -243,15 +242,17 @@ export default function AddDreamForm({ onAdd, onCancel }) {
                     type="button"
                     onClick={() => setGiftVariant('idea')}
                     className={giftVariant === 'idea' ? 'active' : ''}
+                    style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}
                 >
-                    Pomysł
+                    <Compass /> Pomysł
                 </button>
                 <button
                     type="button"
                     onClick={() => setGiftVariant('model')}
                     className={giftVariant === 'model' ? 'active' : ''}
+                    style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}
                 >
-                    Konkret
+                    <MousePointerClick /> Konkret
                 </button>
             </div>
         )}
