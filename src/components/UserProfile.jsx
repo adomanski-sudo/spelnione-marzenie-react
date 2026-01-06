@@ -211,7 +211,7 @@ export default function UserProfile({ userId, currentUser, friends }) {
                         display: 'flex', 
                         alignItems: 'center',
                         justifyContent: 'space-between', // Rozstrzelenie na boki
-                        width: '100%',                  // <--- KLUCZ DO SUKCESU! 🔑
+                        width: '100%',                  // <--- KLUCZ DO SUKCESU! 
                         gap: '10px'
                     }}>
                         
