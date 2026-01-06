@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './MyProfile.css'; // Używamy tych samych stylów layoutu
 import DreamCard from './DreamCard'; 
-import { ArrowLeft, Heart, Lock, PiggyBank } from 'lucide-react'; 
+import { ArrowLeft, Heart, Lock, PiggyBank, Calendar, Users } from 'lucide-react'; 
 
 export default function UserProfile({ userId, currentUser, friends }) {
   const [userData, setUserData] = useState(null);
@@ -139,14 +139,6 @@ export default function UserProfile({ userId, currentUser, friends }) {
                           );
                       })()}
 
-                      {/* POPRAWKA: Używamy activeDream zamiast dream */}
-                      {activeDream.type === 'gift' && (
-                          <div className="dream-price" style={{color: '#64748b', fontSize: '0.9rem', margin: '10px 0'}}>
-                              {/* Tu też activeDream! */}
-                              {formatPrice(activeDream.price_min, activeDream.price_max)}
-                          </div>
-                      )}
-
                       <span className="detail-date">{activeDream.date}</span>
                   </div>
 
@@ -154,14 +146,129 @@ export default function UserProfile({ userId, currentUser, friends }) {
                   <p className="detail-desc">{activeDream.description}</p>
                   
                   {/* PRZYCISKI GOŚCIA */}
-                  <div className="detail-footer">
-                    <button className="btn-primary-large" style={{background: '#e0f2fe', color: '#0284c7'}}>
-                      <Lock size={20} style={{marginRight: '8px'}}/> Zarezerwuj
-                    </button>
-                    <button className="btn-primary-large2" style={{background: '#dcfce7', color: '#16a34a'}}>
-                      <PiggyBank size={20} style={{marginRight: '8px'}}/> Zrzutka
-                    </button>
-                  </div>
+                  {/* --- FOOTER (PRZYCISKI AKCJI) --- */}
+                    <div className="detail-footer" style={{
+                        marginTop: 'auto',
+                        padding: '20px 25px',
+                        borderTop: '1px solid #f1f5f9',
+                        background: '#f8fafc'
+                    }}>
+                        
+                        {/* SCENARIUSZ 1: WŁAŚCICIEL (Widzi Edycję) */}
+                        {isMe ? (
+                            <div style={{display: 'flex', gap: '10px'}}>
+                                <button 
+                                    className="btn-secondary" 
+                                    onClick={() => setEditingDream(activeDream)} 
+                                    style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}
+                                >
+                                    <Edit size={18} /> Edytuj
+                                </button>
+                                <button 
+                                    className="btn-secondary" 
+                                    style={{flex: 0.4, background: '#fee2e2', color: '#ef4444', borderColor: '#fecaca', display: 'flex', alignItems: 'center', justifyContent: 'center'}}
+                                    onClick={() => handleDelete(activeDream.id)}
+                                >
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
+                        ) : (
+                            
+                        /* SCENARIUSZ 2: GOŚĆ (Widzi przyciski zależne od TYPU) */
+                        /* Używamy switcha wewnątrz JSX dla czytelności */
+                        (() => {
+                            switch (activeDream.type) {
+                                
+                                // PRZYPADEK A: WSPÓLNY CZAS ⏳
+            case 'time':
+                return (
+                    <div style={{display: 'flex', gap: '10px'}}>
+                        <button className="btn-secondary" style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}>
+                            <Calendar size={18} /> Rezerwacja
+                        </button>
+                        <button className="btn-primary" style={{flex: 1, background: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}>
+                            <Users size={18} /> Ekipa
+                        </button>
+                    </div>
+                );
+
+            // PRZYPADEK B: UŚMIECH 😊
+            case 'smile':
+                return (
+                    <div style={{textAlign: 'center', color: '#eab308', fontWeight: '600', fontSize: '1.1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}>
+                        <Smile size={24} />
+                        <span>Zawsze mile widziane!</span>
+                    </div>
+                );
+
+            // PRZYPADEK C: PREZENTY (Pomysł lub Konkret) 🎁
+            case 'gift':
+            default:
+                const isConcrete = activeDream.price_min || activeDream.price_max;
+                
+                return (
+                    <div style={{
+                        display: 'flex', 
+                        alignItems: 'center',
+                        justifyContent: 'space-between', // Rozstrzelenie na boki
+                        width: '100%',                  // <--- KLUCZ DO SUKCESU! 🔑
+                        gap: '10px'
+                    }}>
+                        
+                        {/* LEWA STRONA: CENA */}
+                        <div style={{textAlign: 'left'}}> 
+                            <div style={{
+                                fontSize: '0.7rem', 
+                                color: '#64748b', 
+                                textTransform: 'uppercase', 
+                                letterSpacing: '0.5px',
+                                marginBottom: '4px' // Odstęp między etykietą a ceną
+                            }}>
+                                {isConcrete ? 'Szacowany budżet' : 'Przybliżony koszt'}
+                            </div>
+                            
+                            {/* CENA w nowej linii (div to blok, więc sam spada, ale wymusimy stylami) */}
+                            <div style={{
+                                fontSize: '1.2rem', 
+                                fontWeight: '700', 
+                                color: '#0f172a', 
+                                lineHeight: '1.1'
+                            }}>
+                                {isConcrete ? (
+                                    formatPrice(activeDream.price_min, activeDream.price_max)
+                                ) : (
+                                    activeDream.price ? `${activeDream.price} zł` : 'Dowolny'
+                                )}
+                            </div>
+                        </div>
+
+                        {/* PRAWA STRONA: PRZYCISKI */}
+                        <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+                            <button className="btn-secondary" style={{
+                                padding: '8px 16px', 
+                                display: 'flex', alignItems: 'center', gap: '6px', 
+                                fontSize: '0.9rem', whiteSpace: 'nowrap' // Żeby tekst nie spadał
+                            }}>
+                                <Lock size={16} /> 
+                                <span className="hide-on-very-small">Zarezerwuj</span>
+                            </button>
+                            
+                            <button className="btn-primary" style={{
+                                padding: '8px 16px', 
+                                background: '#ec4899', 
+                                display: 'flex', alignItems: 'center', gap: '6px', 
+                                fontSize: '0.9rem', whiteSpace: 'nowrap'
+                            }}>
+                                <PiggyBank size={16} /> 
+                                <span className="hide-on-very-small">Zrzutka</span>
+                            </button>
+                        </div>
+                    </div>
+                );
+                            }
+                        })()
+                        )}
+                    </div>
                </div>
             </div>
 
