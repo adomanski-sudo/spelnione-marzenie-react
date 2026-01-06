@@ -10,6 +10,28 @@ export default function UserProfile({ userId, currentUser, friends }) {
   const isAlreadyFriend = friends?.some(friend => friend.id == userId);
   const isMe = currentUser?.id == userId;
 
+  // --- HELPER DO ROZPOZNAWANIA TYPU MARZENIA ---
+  const getDreamTypeInfo = (dream) => {
+    switch (dream.type) {
+      case 'time':
+        return { label: 'Wspólny czas', color: '#3b82f6', icon: '⏳' }; // Niebieski
+      
+      case 'smile':
+        return { label: 'Zawsze wywołuje uśmiech', color: '#eab308', icon: '😊' }; // Żółty/Złoty
+      
+      case 'gift':
+        // Jeśli nie ma określonej ceny lub jest przedział -> to raczej Pomysł
+        if (!dream.price_min && !dream.price_max) {
+             return { label: 'Pomysł na prezent', color: '#a855f7', icon: '💡' }; // Fiolet
+        }
+        // Jeśli jest link do zdjęcia/sklepu ALBO konkretna cena -> Konkret
+        return { label: 'Konkretny prezent', color: '#ec4899', icon: '🎁' }; // Różowy
+
+      default:
+        return { label: 'Marzenie', color: '#64748b', icon: '✨' }; // Szary
+    }
+  };
+
   // Funkcja pomocnicza do formatowania ceny
     const formatPrice = (min, max) => {
         if (min === null && max === null) return null;
@@ -93,7 +115,29 @@ export default function UserProfile({ userId, currentUser, friends }) {
                
                <div className="detail-content">
                   <div className="detail-header">
-                      <span className="detail-category">{activeDream.category}</span>
+                      {(() => {
+                          const typeInfo = getDreamTypeInfo(activeDream);
+                          return (
+                              <span 
+                                  className="detail-category"
+                                  style={{
+                                      background: typeInfo.color,
+                                      color: 'white',
+                                      padding: '5px 12px',
+                                      borderRadius: '20px',
+                                      fontSize: '0.85rem',
+                                      fontWeight: '600',
+                                      display: 'inline-flex',
+                                      alignItems: 'center',
+                                      gap: '6px',
+                                      boxShadow: '0 2px 5px rgba(0,0,0,0.1)'
+                                  }}
+                              >
+                                  <span>{typeInfo.icon}</span>
+                                  {typeInfo.label}
+                              </span>
+                          );
+                      })()}
 
                       {/* POPRAWKA: Używamy activeDream zamiast dream */}
                       {activeDream.type === 'gift' && (
