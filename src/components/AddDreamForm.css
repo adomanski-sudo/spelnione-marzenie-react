@@ -68,11 +68,14 @@
 
 .gift-switch-container {
   display: flex;
+  flex: 1;
   background: #f1f5f9;
   padding: 4px;
   border-radius: 50px; /* Pigułka */
   position: relative;
   gap: 5px;
+  align-items: 'center'; 
+  justify-content: 'center';
 }
 
 .gift-switch-container button {
@@ -85,6 +88,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  flex: 1;
 }
 
 .gift-switch-container button.active {

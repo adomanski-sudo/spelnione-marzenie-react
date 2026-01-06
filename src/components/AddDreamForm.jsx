@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Gift, Clock, Smile, Link as LinkIcon, Image as ImageIcon } from 'lucide-react';
+import { Gift, Clock, Smile, Link as LinkIcon, Image as ImageIcon, Globe, Lock } from 'lucide-react';
 import './AuthForm.css'; // Używamy stylów auth, bo są ładne, albo własnych
 import './AddDreamForm.css';
 
@@ -24,7 +24,8 @@ export default function AddDreamForm({ onAdd, onCancel }) {
     price_min: '',
     price_max: '',
     type: 'time',   // Domyślnie prezent
-    image: ''
+    image: '',
+    is_public: true
   });
 
   // Funkcja obsługująca zmianę Selecta z ceną
@@ -259,6 +260,41 @@ export default function AddDreamForm({ onAdd, onCancel }) {
       {/* --- 3. ZMIENNA ZAWARTOŚĆ FORMULARZA --- */}
       <div className="form-content">
           {renderFields()}
+      </div>
+
+      {/* --- PRZEŁĄCZNIK PRYWATNOŚCI --- */}
+      <div className="form-group" style={{marginTop: '10px'}}>
+        
+        <div className="gift-switch-container" style={{maxWidth: '100%'}}>
+            {/* Opcja: PUBLICZNE */}
+            <button
+                type="button"
+                onClick={() => setFormData({...formData, is_public: true})}
+                className={formData.is_public ? 'active' : ''}
+                style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}
+            >
+                <Globe size={16} />
+                <span>Publiczne</span>
+            </button>
+
+            {/* Opcja: PRYWATNE (Dla znajomych) */}
+            <button
+                type="button"
+                onClick={() => setFormData({...formData, is_public: false})}
+                className={!formData.is_public ? 'active' : ''} // Active gdy is_public jest false
+                style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}
+            >
+                <Lock size={16} />
+                <span>Tylko znajomi</span>
+            </button>
+        </div>
+        
+        {/* Mały opis pod spodem dla jasności */}
+        <div style={{textAlign: 'center', fontSize: '0.75rem', color: '#94a3b8', marginTop: '5px'}}>
+            {formData.is_public 
+                ? 'Widoczne dla wszystkich odwiedzających Twój profil.' 
+                : 'Widoczne tylko dla osób, które masz w znajomych.'}
+        </div>
       </div>
 
       {/* --- 4. PRZYCISKI AKCJI --- */}

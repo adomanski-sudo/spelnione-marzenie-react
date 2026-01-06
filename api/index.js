@@ -4,6 +4,7 @@ import mysql from 'mysql2';
 import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
 
 // --- ZMIANA TUTAJ: ---
 import dotenv from 'dotenv';
@@ -35,6 +36,59 @@ db.getConnection((err, connection) => {
         console.log("✅ Połączono z bazą danych MySQL! (Pool działa)");
         connection.release(); // Bardzo ważne: oddajemy połączenie do puli!
     }
+});
+
+// KONFIGURACJA E-MAIL
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  secure: true, // true dla portu 465, false dla innych
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
+
+// Weryfikacja czy poczta działa (odpali się przy starcie serwera)
+transporter.verify(function (error, success) {
+  if (error) {
+    console.log("❌ Błąd konfiguracji SMTP:", error);
+  } else {
+    console.log("✅ Gotowy do wysyłania e-maili z no-reply@spelnionemarzenie.pl");
+  }
+});
+
+// --- TESTOWY ENDPOINT DO WYSYŁKI MAILA ---
+app.post('/api/send-test-email', (req, res) => {
+  const { email } = req.body; // Pobieramy adres docelowy z żądania
+
+  if (!email) {
+      return res.status(400).json("Podaj adres email!");
+  }
+
+  const mailOptions = {
+    from: `"Spełnione Marzenie" <${process.env.SMTP_USER}>`, // Ładna nazwa nadawcy
+    to: email, // Adres, na który wysyłamy (Twój prywatny)
+    subject: '🚀 Test systemów: Spełnione Marzenie',
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+        <h1 style="color: #2563eb;">Witaj w świecie żywych!</h1>
+        <p>Jeśli to czytasz, to znaczy, że konfiguracja SMTP działa poprawnie.</p>
+        <p>Twoja aplikacja właśnie wysłała tego maila samodzielnie.</p>
+        <hr>
+        <p style="font-size: 12px; color: #666;">Wiadomość wygenerowana automatycznie z localhost.</p>
+      </div>
+    `,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error("❌ Błąd wysyłki:", error);
+      return res.status(500).json(error);
+    }
+    console.log("✅ Email wysłany: " + info.response);
+    res.status(200).json("Wiadomość wysłana pomyślnie!");
+  });
 });
 
 // 1. REJESTRACJA
@@ -297,7 +351,7 @@ app.post('/api/dreams', (req, res) => {
     jwt.verify(token, process.env.JWT_SECRET, (err, decodedUser) => {
         if (err) return res.status(403).json("Token nieważny!");
 
-        const { title, description, category, image, price_min, price_max } = req.body;
+        const { title, description, category, image, price_min, price_max, is_public } = req.body;
         const userId = decodedUser.id;
         const date = new Date().toISOString().slice(0, 10);
 
@@ -318,7 +372,8 @@ app.post('/api/dreams', (req, res) => {
         new Date(),
         userInfo.id,
         req.body.image,
-        req.body.type || 'gift' // Zabezpieczenie: jak frontend zapomni wysłać typu, wpisz 'gift'
+        req.body.type || 'gift', // Zabezpieczenie: jak frontend zapomni wysłać typu, wpisz 'gift'
+        req.body.is_public
     ];
 
         db.query(q, [values], (err, data) => {
@@ -342,8 +397,8 @@ app.put('/api/dreams/:id', (req, res) => {
         const { title, description, category, image, price } = req.body;
 
         // Ważne: W warunku WHERE sprawdzamy idUser, żeby nikt nie edytował cudzych marzeń!
-        const sql = "UPDATE dreams SET title=?, description=?, category=?, image=?, price_min=?, price_max=?, type=? WHERE id=? AND idUser=?";
-        const values = [title, description, category, image, price_min, price_max, dreamId, userId];
+        const sql = "UPDATE dreams SET title=?, description=?, category=?, image=?, price_min=?, price_max=?, type=?, is_public=? WHERE id=? AND idUser=?";
+        const values = [title, description, category, image, price_min, price_max, dreamId, userId, is_public];
 
         db.query(sql, values, (err, result) => {
             if (err) return res.status(500).json(err);
