@@ -61,6 +61,16 @@ export default function AuthForm({ onLoginSuccess, initialMode = 'login' }) {
     }
   };
 
+  const login = async (inputs) => {
+    // WAŻNE: Dodaj { withCredentials: true }
+    const res = await axios.post("http://localhost:3000/api/login", inputs, {
+      withCredentials: true 
+    });
+    
+    // Zapisz dane użytkownika (nie token!) w localStorage dla widoku
+    setCurrentUser(res.data);
+  };
+
   return (
     <div className="auth-sidebar-container fade-in">
       

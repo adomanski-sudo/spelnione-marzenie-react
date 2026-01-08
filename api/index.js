@@ -5,6 +5,7 @@ import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
+import cookieParser from "cookie-parser"; // <- czytanie ciastków.
 
 // --- ZMIANA TUTAJ: ---
 import dotenv from 'dotenv';
@@ -12,7 +13,19 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors());
+// --- KONFIGURACJA MIDDLEWARE (Kolejność jest święta!) ---
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Credentials", true);
+  next();
+});
+
+app.use(express.json()); // Żeby czytał JSONy z formularza
+app.use(cookieParser()); // <--- Żeby czytał ciasteczka (accessToken)
+app.use(cors({
+  origin: "http://localhost:5173", // frontend
+  credentials: true, // Pozwól na ciasteczka
+}));
+
 app.use(express.json());
 
 // PULA POŁĄCZEŃ
@@ -141,8 +154,15 @@ app.post('/api/login', (req, res) => {
         const { password, ...others } = data[0]; 
         
         // Zwracamy dane ORAZ token
-        res.status(200).json({ ...others, token });
-    });
+        res
+        .cookie("accessToken", token, {
+            httpOnly: true, // Bezpieczeństwo: JS nie ma dostępu do ciastka
+            secure: false,  // Na localhost: false. Na produkcji (https): true
+            sameSite: "lax",
+        })
+        .status(200)
+        .json(others); // Zwracamy dane użytkownika (bez hasła)
+        });
 });
 
 // Marzenia
@@ -284,7 +304,6 @@ app.get('/api/feed', (req, res) => {
 });
 
 // USUWANIE MARZENIA :(
-// USUWANIE MARZENIA (Wersja Debuggowalna)
 app.delete('/api/dreams/:id', (req, res) => {
     const dreamId = req.params.id;
     console.log(`[DELETE] Próba usunięcia marzenia ID: ${dreamId}`);
@@ -343,45 +362,53 @@ app.delete('/api/dreams/:id', (req, res) => {
     });
 });
 
-// DODAWANIE NOWEGO MARZENIA
-app.post('/api/dreams', (req, res) => {
-    const token = req.headers.authorization;
-    if (!token) return res.status(401).json("Brak autoryzacji!");
+// --- DODAWANIE MARZENIA (Wersja Czysta 2.0) ---
+app.post("/api/dreams", (req, res) => {
+  // 1. Sprawdzamy, czy w ogóle mamy ciasteczka
+    console.log("🍪 Ciasteczka odebrane przez serwer:", req.cookies);
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, decodedUser) => {
-        if (err) return res.status(403).json("Token nieważny!");
+  if (!req.cookies) return res.status(401).json("Błąd serwera: Brak obsługi cookies.");
+  
+  const token = req.cookies.accessToken;
+  if (!token) return res.status(401).json("Nie jesteś zalogowany!");
 
-        const { title, description, category, image, price_min, price_max, is_public } = req.body;
-        const userId = decodedUser.id;
-        const date = new Date().toISOString().slice(0, 10);
+  jwt.verify(token, process.env.JWT_SECRET, (err, userInfo) => {
+    if (err) return res.status(403).json("Token jest nieważny!");
 
-        // Prosta logika ikon
-        let icon = '✨';
-        if (category === 'Podróże') icon = '✈️';
-        if (category === 'Elektronika') icon = '💻';
-        if (category === 'Sport') icon = '⚽';
-        if (category === 'Edukacja') icon = '📚';
-        if (category === 'Motoryzacja') icon = '🚗';
+    // 2. Przygotowanie danych (obsługa ceny)
+    // Frontend wyśle nam gotowe liczby lub null, ale dla pewności:
+    const minPrice = req.body.price_min || null;
+    const maxPrice = req.body.price_max || null;
 
-       const values = [
-        req.body.title,
-        req.body.description,
-        req.body.price_min || null, 
-        req.body.price_max || null,
-        req.body.category || 'Inne',
-        new Date(),
-        userInfo.id,
-        req.body.image,
-        req.body.type || 'gift', // Zabezpieczenie: jak frontend zapomni wysłać typu, wpisz 'gift'
-        req.body.is_public
+    // 3. Zapytanie SQL
+    const q = "INSERT INTO dreams (`title`, `description`, `price_min`, `price_max`, `date`, `idUser`, `image`, `type`, `is_public`, `is_fulfilled`) VALUES (?)";
+
+    const values = [
+      req.body.title,         // title
+      req.body.description,   // description
+      minPrice,               // price_min
+      maxPrice,               // price_max
+      new Date(),             // date (timestamp)
+      userInfo.id,            // idUser (z tokena)
+      req.body.image,         // image
+      req.body.type,          // type (gift/time/smile)
+      req.body.is_public,     // is_public (1 lub 0)
+      0                       // is_fulfilled (Domyślnie 0 - niespełnione)
     ];
 
-        db.query(q, [values], (err, data) => {
-        if (err) return res.status(500).json(err);
-        return res.status(200).json("Marzenie zostało dodane.");
-        });
-        });
+    // 4. Wykonanie zapytania
+    db.query(q, [values], (err, data) => {
+      if (err) {
+        console.error("❌ CRITICAL SQL ERROR:", err); // Zobaczysz to w terminalu
+        return res.status(500).json(err);
+      }
+      console.log("✅ SUKCES! Marzenie dodane ID:", data.insertId);
+      return res.status(200).json("Marzenie dodane pomyślnie.");
+    });
+  });
 });
+
+
 
 // AKTUALIZACJA ISTNIEJĄCEGO MARZENIA
 app.put('/api/dreams/:id', (req, res) => {

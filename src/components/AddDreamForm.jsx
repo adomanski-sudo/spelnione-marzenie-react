@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import axios from "axios";
+import cors from "cors";
 import { Gift, Clock, Smile, Link as LinkIcon, Image as ImageIcon, Globe, Lock, Compass, MousePointerClick} from 'lucide-react';
 import './AuthForm.css'; // Używamy stylów auth, bo są ładne, albo własnych
 import './AddDreamForm.css';
@@ -21,8 +23,7 @@ export default function AddDreamForm({ onAdd, onCancel }) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    price_min: '',
-    price_max: '',
+    price: '',
     type: 'time',   // Domyślnie prezent
     image: '',
     is_public: true
@@ -46,10 +47,55 @@ export default function AddDreamForm({ onAdd, onCancel }) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Upewniamy się, że wysyłamy odpowiedni typ
-    onAdd(formData);
+
+    // 1. Kopia danych z formularza
+    let payload = {
+        title: formData.title,
+        description: formData.description,
+        image: formData.image,
+        type: formData.type,
+        is_public: formData.is_public ? 1 : 0, // Zamiana true/false na 1/0 dla SQL
+        price_min: null,
+        price_max: null
+    };
+
+    // 2. Logika Cenowa
+    if (formData.type === 'gift') {
+        if (giftVariant === 'model') {
+            // Wybrano widełki z listy
+            const index = parseInt(formData.price);
+            if (!isNaN(index) && PRICE_RANGES[index]) {
+                payload.price_min = PRICE_RANGES[index].min;
+                payload.price_max = PRICE_RANGES[index].max;
+            }
+        } else {
+            // Konkretna cena
+            if (formData.price) {
+                payload.price_min = formData.price;
+                payload.price_max = formData.price;
+            }
+        }
+    }
+
+    console.log("🚀 Wysyłam czysty payload:", payload);
+
+    try {
+      // 3. Strzał do API
+      await axios.post("http://localhost:3000/api/dreams", payload, {
+          withCredentials: true // To wyśle ciasteczko, które teraz parser obsłuży!
+      });
+
+      // 4. Sukces
+      if (onAdd) onAdd(); 
+      setFormData({ // Reset
+        title: '', description: '', price: '', type: 'gift', image: '', is_public: true
+      });
+
+    } catch (err) {
+      console.error("❌ Błąd wysyłki:", err.response?.data || err.message);
+    }
   };
 
   // --- FUNKCJA STERUJĄCA POLAMI ---
