@@ -410,30 +410,59 @@ app.post("/api/dreams", (req, res) => {
 
 
 
-// AKTUALIZACJA ISTNIEJĄCEGO MARZENIA
+// --- AKTUALIZACJA ISTNIEJĄCEGO MARZENIA ---
 app.put('/api/dreams/:id', (req, res) => {
-    const token = req.headers.authorization;
-    const dreamId = req.params.id;
-    
-    if (!token) return res.status(401).json("Brak autoryzacji!");
+  // 1. SPRAWDZAMY CIASTECZKA (zamiast nagłówków)
+  if (!req.cookies) return res.status(401).json("Błąd cookie-parser");
+  const token = req.cookies.accessToken;
+  
+  if (!token) return res.status(401).json("Nie jesteś zalogowany!");
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, decodedUser) => {
-        if (err) return res.status(403).json("Token nieważny!");
+  const dreamId = req.params.id;
 
-        const userId = decodedUser.id;
-        const { title, description, category, image, price } = req.body;
+  // 2. WERYFIKACJA TOKENA (Tym samym kluczem co przy logowaniu!)
+  jwt.verify(token, process.env.JWT_SECRET, (err, userInfo) => {
+    if (err) return res.status(403).json("Token jest nieważny!");
 
-        // Ważne: W warunku WHERE sprawdzamy idUser, żeby nikt nie edytował cudzych marzeń!
-        const sql = "UPDATE dreams SET title=?, description=?, category=?, image=?, price_min=?, price_max=?, type=?, is_public=? WHERE id=? AND idUser=?";
-        const values = [title, description, category, image, price_min, price_max, dreamId, userId, is_public];
+    // 3. LOGIKA CENOWA (Kopiujemy to z app.post, żeby było spójnie)
+    let finalMin = null;
+    let finalMax = null;
 
-        db.query(sql, values, (err, result) => {
-            if (err) return res.status(500).json(err);
-            if (result.affectedRows === 0) return res.status(404).json("Nie znaleziono marzenia lub brak uprawnień.");
-            
-            return res.json("Marzenie zaktualizowane!");
-        });
+    if (req.body.price_min || req.body.price_max) {
+        finalMin = req.body.price_min;
+        finalMax = req.body.price_max;
+    } else if (req.body.price) {
+        finalMin = req.body.price;
+        finalMax = req.body.price;
+    }
+
+    // 4. ZAPYTANIE SQL - Usunięto 'category', poprawiono ceny
+    // WAŻNE: Warunek "AND idUser = ?" zapobiega edycji cudzych marzeń!
+    const q = "UPDATE dreams SET `title`=?, `description`=?, `price_min`=?, `price_max`=?, `image`=?, `type`=?, `is_public`=? WHERE `id`=? AND `idUser`=?";
+
+    const values = [
+      req.body.title,
+      req.body.description,
+      finalMin,
+      finalMax,
+      req.body.image,
+      req.body.type,
+      req.body.is_public,
+      dreamId,      // Kogo edytujemy?
+      userInfo.id   // Czy to na pewno Twój rekord?
+    ];
+
+    db.query(q, values, (err, data) => {
+      if (err) {
+          console.error("Błąd edycji SQL:", err);
+          return res.status(500).json(err);
+      }
+      // Sprawdzamy, czy cokolwiek się zmieniło (czy znaleziono rekord)
+      if (data.affectedRows === 0) return res.status(403).json("Nie możesz edytować tego marzenia lub ono nie istnieje!");
+      
+      return res.status(200).json("Marzenie zaktualizowane!");
     });
+  });
 });
 
 // AKTUALIZACJA DANYCH UŻYTKOWNIKA
