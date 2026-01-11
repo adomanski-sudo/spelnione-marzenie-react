@@ -144,6 +144,7 @@ const handleSuccess = () => {
 
         ) : isEditingDream && activeDream ? (
          <EditDreamForm 
+            dream={activeDream}
             dreamData={activeDream}
             onCancel={() => setIsEditingDream(false)} // Powrót do szczegółów
             onSuccess={(updatedDream) => {
@@ -154,6 +155,11 @@ const handleSuccess = () => {
                 // 3. Zamykamy formularz
                 setIsEditingDream(false);
             }}
+            onUpdate={() => {
+                 refreshDreams();      // 1. Pobierz nowe dane z serwera
+                 setIsEditing(false);  // 2. Zamknij formularz edycji!
+                setActiveDream(null);
+             }}
          />
 
         /* SCENARIUSZ 3: SZCZEGÓŁY MARZENIA */

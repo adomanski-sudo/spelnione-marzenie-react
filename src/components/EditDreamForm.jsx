@@ -1,117 +1,240 @@
-import React, { useState } from 'react';
-import './EditProfile.css'; // Używamy tych samych stylów
-import { Save, ArrowLeft, Type, Tag, DollarSign, Image as ImageIcon, FileText } from 'lucide-react';
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { Gift, Clock, Smile, ImageIcon, Globe, Lock, Compass, MousePointerClick } from 'lucide-react';
+import './AuthForm.css';
+import './AddDreamForm.css';
 
-export default function EditDreamForm({ dreamData, onCancel, onSuccess }) {
-  
-  // Wypełniamy formularz danymi startowymi (z activeDream)
+const PRICE_RANGES = [
+  { label: 'Do 100 zł', min: 0, max: 100 },
+  { label: '100 - 300 zł', min: 100, max: 300 },
+  { label: '300 - 500 zł', min: 300, max: 500 },
+  { label: '500 - 1000 zł', min: 500, max: 1000 },
+  { label: 'Powyżej 1000 zł', min: 1000, max: null },
+];
+
+export default function EditDreamForm({ dream, onUpdate, onCancel }) {
+  // 1. Inicjalizacja stanu (domyślne wartości)
   const [formData, setFormData] = useState({
-    title: dreamData.title || '',
-    description: dreamData.description || '',
-    category: dreamData.category || 'Inne',
-    price: dreamData.price || '',
-    image: dreamData.image || ''
+    title: '',
+    description: '',
+    price: '',       
+    type: 'gift',
+    image: '',
+    is_public: true
   });
 
+  const [giftVariant, setGiftVariant] = useState('idea');
+  const [error, setError] = useState(null);
+
+  // 2. WCZYTYWANIE DANYCH (MÓZG OPERACJI 🧠)
+  useEffect(() => {
+    console.log("🛠️ EditDreamForm - dane wejściowe:", dream);
+
+    if (dream) {
+      let initialPrice = '';
+      let initialVariant = 'idea';
+
+      // Konwersja z bazy (string/null) na liczby
+      const pMin = parseFloat(dream.price_min);
+      const pMax = parseFloat(dream.price_max);
+      
+      // Czy to są poprawne liczby?
+      const validMin = !isNaN(pMin);
+      const validMax = !isNaN(pMax);
+
+      // --- DETEKTYW: CZY TO MODEL CZY POMYSŁ? ---
+      if (validMin && validMax && pMin !== pMax) {
+         // Różne min i max -> To był MODEL (Widełki)
+         initialVariant = 'model';
+         // Znajdź, który to przedział (indeks tablicy)
+         const foundIndex = PRICE_RANGES.findIndex(r => r.min == pMin && r.max == pMax);
+         if (foundIndex !== -1) initialPrice = foundIndex.toString();
+      } 
+      else if (validMin) {
+          // Takie same min i max (lub tylko min) -> To był POMYSŁ (Konkret)
+          initialVariant = 'idea';
+          initialPrice = pMin;
+      }
+
+      setGiftVariant(initialVariant);
+      
+      setFormData({
+        title: dream.title || '',
+        description: dream.description || '',
+        image: dream.image || '',
+        type: dream.type || 'gift',
+        // Obsługa różnych formatów boolean (1, "1", true)
+        is_public: (dream.is_public == 1 || dream.is_public === true),
+        price: initialPrice 
+      });
+    }
+  }, [dream]);
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    const storedUser = localStorage.getItem('loggedUser');
-    const token = storedUser ? JSON.parse(storedUser).token : null;
+    setError(null);
 
-    // Wysyłamy PUT na konkretne ID
-    fetch(`/api/dreams/${dreamData.id}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': token
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(res => {
-        if (!res.ok) throw new Error("Błąd aktualizacji");
-        return res.json();
-    })
-    .then(() => {
-        alert("Marzenie zaktualizowane! ✨");
-        // Odsyłamy zaktualizowane dane wyżej, żeby odświeżyć widok szczegółów
-        onSuccess({ ...dreamData, ...formData }); 
-    })
-    .catch(err => alert("Błąd: " + err.message));
+    // Budujemy obiekt do wysyłki
+    let payload = {
+        title: formData.title,
+        description: formData.description,
+        image: formData.image,
+        type: formData.type,
+        is_public: formData.is_public ? 1 : 0,
+        price_min: null,
+        price_max: null
+    };
+
+    // Logika Cenowa (Tłumaczymy formularz na bazę)
+    if (formData.type === 'gift') {
+        if (giftVariant === 'model') {
+            // formData.price to INDEX tablicy
+            const index = parseInt(formData.price);
+            if (!isNaN(index) && PRICE_RANGES[index]) {
+                payload.price_min = PRICE_RANGES[index].min;
+                payload.price_max = PRICE_RANGES[index].max;
+            }
+        } else {
+            // formData.price to KWOTA
+            if (formData.price) {
+                payload.price_min = formData.price;
+                payload.price_max = formData.price;
+            }
+        }
+    }
+    
+    // Usuwamy pole pomocnicze
+    delete payload.price;
+
+    try {
+      await axios.put(`http://localhost:3000/api/dreams/${dream.id}`, payload, {
+          withCredentials: true 
+      });
+      if (onUpdate) onUpdate();
+    } catch (err) {
+      console.error("Błąd edycji:", err);
+      // Sprawdzamy czy to problem z tokenem
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+          setError("Sesja wygasła. Zaloguj się ponownie.");
+      } else {
+          setError("Nie udało się zaktualizować marzenia.");
+      }
+    }
+  };
+
+  // Jeśli brak danych, nie pokazuj formularza
+  if (!dream) return <div className="loading">Ładowanie danych marzenia...</div>;
+
+  // --- RENDERY (Skrócone dla czytelności kodu, są OK w Twoim pliku) ---
+  // ... (Tu możesz wkleić swoje ify renderFields, albo użyć kodu poniżej) ...
+  
+  const renderFields = () => {
+    // 1. PREZENT 💡
+    if (formData.type === 'gift') {
+        return (
+            <div className="fade-in">
+                <div className="form-group">
+                    <label>Tytuł</label>
+                    <input 
+                        type="text" name="title" 
+                        placeholder={giftVariant === 'model' ? "np. Słuchawki Sony" : "np. Wełniany sweter"} 
+                        value={formData.title} onChange={handleChange} required 
+                    />
+                </div>
+                <div className="form-group">
+                    <label>Zdjęcie (URL)</label>
+                    <div className="input-with-icon">
+                        <ImageIcon size={16} />
+                        <input type="text" name="image" placeholder="Wklej link..." value={formData.image} onChange={handleChange} />
+                    </div>
+                </div>
+
+                {/* Sekcja Ceny */}
+                {giftVariant === 'model' ? (
+                <div className="form-group">
+                    <label>Przedział cenowy</label>
+                    <select name="price" value={formData.price} onChange={handleChange} className="price-select">
+                         <option value="">Wybierz widełki...</option>
+                         {PRICE_RANGES.map((range, i) => (
+                            <option key={i} value={i}>{range.label}</option>
+                        ))}
+                    </select>
+                </div> 
+                ) : (
+                <div className="form-group">
+                    <label>Przybliżona cena</label>
+                    <input type="number" name="price" placeholder="np. 100" value={formData.price} onChange={handleChange} />
+                </div>
+                )}
+                <div className="form-group">
+                    <label>Opis</label>
+                    <textarea name="description" placeholder="Opis..." rows="4" value={formData.description} onChange={handleChange} />
+                </div>
+            </div>
+        );
+    }
+    // 2. CZAS 🕰️ i 3. UŚMIECH 😊 (Używają podobnych pól)
+    return (
+        <div className="fade-in">
+            <div className="form-group">
+                <label>Tytuł</label>
+                <input type="text" name="title" value={formData.title} onChange={handleChange} required />
+            </div>
+            <div className="form-group">
+                <label>Zdjęcie (URL)</label>
+                <div className="input-with-icon">
+                    <ImageIcon size={16} />
+                    <input type="text" name="image" value={formData.image} onChange={handleChange} />
+                </div>
+            </div>
+            <div className="form-group">
+                <label>Opis</label>
+                <textarea name="description" rows="4" value={formData.description} onChange={handleChange} />
+            </div>
+        </div>
+    );
   };
 
   return (
-    <div className="edit-profile-container fade-in" style={{height: '100%', width: '100%'}}>
-      
-      {/* Przycisk powrotu (Wraca do szczegółów, nie do listy) */}
-      <button className="btn-back" onClick={onCancel} style={{marginBottom: '20px'}}>
-        <ArrowLeft size={20} /> Anuluj edycję
-      </button>
+    <form onSubmit={handleSubmit} className="add-dream-form fade-in">
+      {/* NAGŁÓWEK TYPU */}
+      <div className="type-selector-container" style={{display: 'flex', gap: '10px', marginBottom: '10px'}}>
+        <button type="button" onClick={() => setFormData({...formData, type: 'time'})} className={`type-btn ${formData.type === 'time' ? 'active' : ''}`}><Clock size={20}/> Czas</button>
+        <button type="button" onClick={() => setFormData({...formData, type: 'gift'})} className={`type-btn ${formData.type === 'gift' ? 'active' : ''}`}><Gift size={20}/> Prezent</button>
+        <button type="button" onClick={() => setFormData({...formData, type: 'smile'})} className={`type-btn ${formData.type === 'smile' ? 'active' : ''}`}><Smile size={20}/> Uśmiech</button>
+      </div>
 
-      <h2 className="section-title">Edytuj Marzenie</h2>
-      
-      <form onSubmit={handleSubmit} className="edit-form">
-        
-        {/* TYTUŁ */}
-        <div className="form-group">
-            <label><Type size={16}/> Tytuł</label>
-            <input 
-                type="text" name="title" required 
-                value={formData.title} onChange={handleChange}
-            />
+      {/* SWITCH IDEA/MODEL (Tylko dla Prezentu) */}
+      {formData.type === 'gift' && (
+        <div className="gift-switch-container fade-in" style={{marginBottom: '15px'}}>
+             <button type="button" onClick={() => setGiftVariant('idea')} className={giftVariant === 'idea' ? 'active' : ''} style={{flex:1}}><Compass size={16}/> Pomysł</button>
+             <button type="button" onClick={() => setGiftVariant('model')} className={giftVariant === 'model' ? 'active' : ''} style={{flex:1}}><MousePointerClick size={16}/> Konkret</button>
         </div>
+      )}
 
-        {/* KATEGORIA I CENA */}
-        <div className="form-row">
-            <div className="form-group">
-                <label><Tag size={16}/> Kategoria</label>
-                <select name="category" value={formData.category} onChange={handleChange} 
-                        style={{padding: '12px', borderRadius: '10px', border: '1px solid #e2e8f0'}}>
-                    <option value="Inne">Inne</option>
-                    <option value="Podróże">Podróże ✈️</option>
-                    <option value="Elektronika">Elektronika 💻</option>
-                    <option value="Sport">Sport ⚽</option>
-                    <option value="Sztuka">Sztuka 🎨</option>
-                    <option value="Motoryzacja">Motoryzacja 🚗</option>
-                    <option value="Dom">Dom 🏠</option>
-                </select>
-            </div>
-            <div className="form-group">
-                <label><DollarSign size={16}/> Cena</label>
-                <input 
-                    type="text" name="price" 
-                    value={formData.price} onChange={handleChange}
-                />
-            </div>
-        </div>
+      {/* ZAWARTOŚĆ */}
+      <div className="form-content">{renderFields()}</div>
 
-        {/* LINK DO ZDJĘCIA */}
-        <div className="form-group">
-            <label><ImageIcon size={16}/> Link do zdjęcia</label>
-            <input 
-                type="text" name="image" 
-                value={formData.image} onChange={handleChange}
-            />
-        </div>
+      {/* PUBLICZNE */}
+      <div className="gift-switch-container" style={{marginTop: '15px'}}>
+            <button type="button" onClick={() => setFormData({...formData, is_public: true})} className={formData.is_public ? 'active' : ''} style={{flex:1}}><Globe size={16}/> Publiczne</button>
+            <button type="button" onClick={() => setFormData({...formData, is_public: false})} className={!formData.is_public ? 'active' : ''} style={{flex:1}}><Lock size={16}/> Prywatne</button>
+      </div>
 
-        {/* OPIS */}
-        <div className="form-group">
-            <label><FileText size={16}/> Opis</label>
-            <textarea 
-                name="description" rows="5"
-                value={formData.description} onChange={handleChange}
-            />
-        </div>
+      {error && <p className="error-text" style={{color: 'red', textAlign:'center', marginTop:'10px'}}>{error}</p>}
 
-        <button type="submit" className="btn-save" style={{marginTop: '10px'}}>
-            <Save size={20} /> Zapisz Zmiany
-        </button>
-
-      </form>
-    </div>
+      <div className="form-actions" style={{display: 'flex', gap: '10px', marginTop: '20px'}}>
+        <button type="button" onClick={onCancel} className="btn-secondary" style={{flex: 1}}>Anuluj</button>
+        <button type="submit" className="btn-primary" style={{flex: 1}}>Zapisz zmiany</button>
+      </div>
+    </form>
   );
 }
