@@ -4,7 +4,7 @@ import DreamCard from './DreamCard';
 import EditProfile from './EditProfile'; 
 import AddDreamForm from './AddDreamForm'; 
 import EditDreamForm from './EditDreamForm';
-import avatarImg from '../assets/avatar.jpg'; 
+import axios from "axios";
 import { Edit3, Plus, ArrowLeft, Trash2, Edit } from 'lucide-react'; 
 
 // Dodajemy onUpdateUser do propsów
@@ -16,28 +16,36 @@ export default function MyProfile({ dreams, setDreams, userData, onUpdateUser })
   const [isEditingDream, setIsEditingDream] = useState(false); // Edycja marzenia
 
   const refreshDreams = () => {
-    fetch('/api/dreams')
-    .then(res => res.json())
-    .then(data => {
-        // Formatujemy dane tak jak w App.jsx
-        const formatted = data.map(item => ({
-            id: item.id,
-            userId: item.idUser, // Ważne do filtrowania!
-            title: item.title,
-            description: item.description,
-            date: new Date(item.date).toLocaleDateString(),
-            image: item.image,
-            price: item.price,
-            type: item.type
+    fetch('/api/dreams') // lub axios.get...
+      .then((res) => res.json())
+      .then((data) => {
+        
+        // 👇 TU BYŁ PROBLEM: Musimy przepisać WSZYSTKIE nowe pola z bazy
+        const formatted = data.map((item) => ({
+          id: item.id,
+          userId: item.idUser,
+          title: item.title,
+          description: item.description,
+          image: item.image,
+          date: new Date(item.date).toLocaleDateString(),
+          type: item.type,
+          
+          // --- NOWE POLA (DODAJ JE KONIECZNIE) ---
+          price_min: item.price_min, // Ważne dla Edycji
+          price_max: item.price_max, // Ważne dla Edycji
+          is_public: item.is_public, // Ważne dla Edycji (0 lub 1)
+          // ---------------------------------------
+          
+          // Stare 'price' i 'category' możesz usunąć, bo to śmieci
         }));
 
-        // Filtrujemy, żeby pokazać tylko MOJE marzenia
+        // Filtrowanie (bez zmian)
         if (userData) {
-            const myOnly = formatted.filter(d => d.userId === userData.id);
-            setDreams(myOnly);
+          const myOnly = formatted.filter((d) => d.userId === userData.id);
+          setDreams(myOnly);
         }
-    });
-};
+      });
+  };
 
   // Prosta funkcja sukcesu
 const handleSuccess = () => {
@@ -45,28 +53,29 @@ const handleSuccess = () => {
     refreshDreams();    // Odśwież listę (masz tę funkcję w linii 18)
 };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (!window.confirm("Czy na pewno chcesz usunąć to marzenie?")) return;
 
-    const storedUser = localStorage.getItem('loggedUser');
-    const token = storedUser ? JSON.parse(storedUser).token : null;
+    try {
+      // AXIOS z obsługą ciasteczek
+      await axios.delete(`http://localhost:3000/api/dreams/${id}`, {
+        withCredentials: true // <--- KLUCZ
+      });
 
-    if (!token) { alert("Błąd: Brak tokena."); return; }
+      // Aktualizujemy stan lokalnie
+      setDreams((prev) => prev.filter((d) => d.id !== id));
+      setActiveDream(null); // Jeśli usunięto aktywne marzenie, czyścimy podgląd
+      alert("Marzenie usunięte!");
 
-    fetch(`/api/dreams/${id}`, { 
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json', 'Authorization': token }
-    })
-    .then(res => {
-        if (!res.ok) throw new Error("Błąd usuwania");
-        return res.json();
-    })
-    .then(() => {
-        setDreams(prev => prev.filter(d => d.id !== id));
-        setActiveDream(null); 
-        alert("Marzenie usunięte!");
-    })
-    .catch(err => alert(err.message));
+    } catch (err) {
+      console.error("Błąd usuwania:", err);
+      // Obsługa błędów
+      if (err.response && (err.response.status === 401 || err.response.status === 403)) {
+          alert("Sesja wygasła. Zaloguj się ponownie.");
+      } else {
+          alert("Nie udało się usunąć marzenia.");
+      }
+    }
   };
 
   return (

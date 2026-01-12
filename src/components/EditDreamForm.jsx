@@ -18,7 +18,7 @@ export default function EditDreamForm({ dream, onUpdate, onCancel }) {
     title: '',
     description: '',
     price: '',       
-    type: 'gift',
+    type: 'time',
     image: '',
     is_public: true
   });
@@ -26,44 +26,47 @@ export default function EditDreamForm({ dream, onUpdate, onCancel }) {
   const [giftVariant, setGiftVariant] = useState('idea');
   const [error, setError] = useState(null);
 
-  // 2. WCZYTYWANIE DANYCH (MÓZG OPERACJI 🧠)
+  // 2. WCZYTYWANIE DANYCH
+  // --- 1. WCZYTYWANIE DANYCH (Poprawiona logika dla "Powyżej 1000") ---
   useEffect(() => {
-    console.log("🛠️ EditDreamForm - dane wejściowe:", dream);
-
     if (dream) {
       let initialPrice = '';
       let initialVariant = 'idea';
 
-      // Konwersja z bazy (string/null) na liczby
       const pMin = parseFloat(dream.price_min);
       const pMax = parseFloat(dream.price_max);
-      
-      // Czy to są poprawne liczby?
-      const validMin = !isNaN(pMin);
-      const validMax = !isNaN(pMax);
 
-      // --- DETEKTYW: CZY TO MODEL CZY POMYSŁ? ---
-      if (validMin && validMax && pMin !== pMax) {
-         // Różne min i max -> To był MODEL (Widełki)
-         initialVariant = 'model';
-         // Znajdź, który to przedział (indeks tablicy)
-         const foundIndex = PRICE_RANGES.findIndex(r => r.min == pMin && r.max == pMax);
-         if (foundIndex !== -1) initialPrice = foundIndex.toString();
+      // 1. Najpierw sprawdzamy, czy te liczby pasują do któregoś z naszych PRZEDZIAŁÓW (Model)
+      const foundIndex = PRICE_RANGES.findIndex(range => {
+          // Przypadek A: Zwykły przedział zamknięty (np. 100-300)
+          if (range.max !== null) {
+              return range.min == pMin && range.max == pMax;
+          }
+          // Przypadek B: Przedział otwarty (np. Powyżej 1000) - TU BYŁ PIES POGRZEBANY 🐕
+          // Sprawdzamy czy min się zgadza ORAZ czy max w bazie jest nullem
+          else {
+              return range.min == pMin && (dream.price_max === null);
+          }
+      });
+
+      if (foundIndex !== -1) {
+          // ZNALEZIONO PASUJĄCY PRZEDZIAŁ!
+          initialVariant = 'model';
+          initialPrice = foundIndex.toString();
       } 
-      else if (validMin) {
-          // Takie same min i max (lub tylko min) -> To był POMYSŁ (Konkret)
+      // 2. Jeśli nie pasuje do żadnego przedziału, ale ma cenę -> to "Pomysł"
+      else if (!isNaN(pMin)) {
           initialVariant = 'idea';
           initialPrice = pMin;
       }
 
+      // Ustawiamy stany
       setGiftVariant(initialVariant);
-      
       setFormData({
         title: dream.title || '',
         description: dream.description || '',
         image: dream.image || '',
-        type: dream.type || 'gift',
-        // Obsługa różnych formatów boolean (1, "1", true)
+        type: dream.type || 'time',
         is_public: (dream.is_public == 1 || dream.is_public === true),
         price: initialPrice 
       });
@@ -215,8 +218,8 @@ export default function EditDreamForm({ dream, onUpdate, onCancel }) {
       {/* SWITCH IDEA/MODEL (Tylko dla Prezentu) */}
       {formData.type === 'gift' && (
         <div className="gift-switch-container fade-in" style={{marginBottom: '15px'}}>
-             <button type="button" onClick={() => setGiftVariant('idea')} className={giftVariant === 'idea' ? 'active' : ''} style={{flex:1}}><Compass size={16}/> Pomysł</button>
-             <button type="button" onClick={() => setGiftVariant('model')} className={giftVariant === 'model' ? 'active' : ''} style={{flex:1}}><MousePointerClick size={16}/> Konkret</button>
+             <button type="button" onClick={() => setGiftVariant('idea')} className={giftVariant === 'idea' ? 'active' : ''} style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}><Compass size={16}/> Pomysł</button>
+             <button type="button" onClick={() => setGiftVariant('model')} className={giftVariant === 'model' ? 'active' : ''} style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}><MousePointerClick size={16}/> Konkret</button>
         </div>
       )}
 
@@ -225,8 +228,8 @@ export default function EditDreamForm({ dream, onUpdate, onCancel }) {
 
       {/* PUBLICZNE */}
       <div className="gift-switch-container" style={{marginTop: '15px'}}>
-            <button type="button" onClick={() => setFormData({...formData, is_public: true})} className={formData.is_public ? 'active' : ''} style={{flex:1}}><Globe size={16}/> Publiczne</button>
-            <button type="button" onClick={() => setFormData({...formData, is_public: false})} className={!formData.is_public ? 'active' : ''} style={{flex:1}}><Lock size={16}/> Prywatne</button>
+            <button type="button" onClick={() => setFormData({...formData, is_public: true})} className={formData.is_public ? 'active' : ''} style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}><Globe size={16}/> Publiczne</button>
+            <button type="button" onClick={() => setFormData({...formData, is_public: false})} className={!formData.is_public ? 'active' : ''} style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}><Lock size={16}/> Prywatne</button>
       </div>
 
       {error && <p className="error-text" style={{color: 'red', textAlign:'center', marginTop:'10px'}}>{error}</p>}

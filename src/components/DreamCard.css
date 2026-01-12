@@ -69,6 +69,9 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
+  
+  margin-bottom: 10px;
 }
 
 .card-footer {
@@ -84,4 +87,36 @@
 
 .btn-fulfill:hover {
   background-color: #059669;
+}
+
+
+/* 1. Karta - musi zajmować całą wysokość kafelka Grid */
+.dream-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Rozciąga kartę na wysokość najwyższego sąsiada w rzędzie */
+  background: white; /* Upewnij się, że masz tło, żeby widzieć efekt */
+  border-radius: 12px; /* Twoje style */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Twoje style */
+  overflow: hidden; /* Żeby obrazek nie wyłaził */
+}
+
+/* 2. Content - musi rosnąć I SAM TEŻ BYĆ FLEXBOXEM */
+.card-content {
+  flex: 1; /* Zajmuje całe dostępne miejsce w karcie (zostawione przez obrazek) */
+  display: flex; /* <--- TO JEST KLUCZ DO SUKCESU */
+  flex-direction: column; /* Układa elementy (tytuł, opis, stopka) w pionie */
+  padding: 16px;
+}
+
+/* 3. Stopka - wypychana na sam dół kontenera card-content */
+.card-footer {
+  margin-top: auto; /* <--- To działa jak sprężyna, która spycha stopkę na dół */
+  
+  /* Reszta Twoich stylów */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 15px;
+  border-top: 1px solid #f1f5f9; /* Opcjonalna linia oddzielająca */
 }

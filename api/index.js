@@ -218,7 +218,7 @@ app.get('/api/user', (req, res) => {
     jwt.verify(token, process.env.JWT_SECRET, (err, decodedUser) => {
         if (err) return res.status(403).json("Token nieważny");
 
-        const userId = decodedUser.id; // To jest to magiczne ID z tokena!
+        const userId = decodedUser.id; // To jest to ID z tokena!
 
         const sql = "SELECT * FROM users WHERE id = ?";
         db.query(sql, [userId], (err, data) => {
@@ -305,15 +305,17 @@ app.get('/api/feed', (req, res) => {
 
 // USUWANIE MARZENIA :(
 app.delete('/api/dreams/:id', (req, res) => {
+
+    console.log("Ciasteczka odebrane przez serwer:", req.cookies);
+
+    if (!req.cookies) return res.status(401).json("Błąd serwera: Brak obsługi cookies.");
+
     const dreamId = req.params.id;
     console.log(`[DELETE] Próba usunięcia marzenia ID: ${dreamId}`);
 
     // 1. Sprawdzenie tokena
-    const token = req.headers.authorization;
-    if (!token) {
-        console.error("[DELETE] Brak tokena w nagłówku");
-        return res.status(401).json("Brak uprawnień!");
-    }
+    const token = req.cookies.accessToken;
+    if (!token) return res.status(401).json("Nie jesteś zalogowany!");
 
     // 2. Weryfikacja tokena
     jwt.verify(token, process.env.JWT_SECRET, (err, decodedUser) => {
@@ -365,7 +367,7 @@ app.delete('/api/dreams/:id', (req, res) => {
 // --- DODAWANIE MARZENIA (Wersja Czysta 2.0) ---
 app.post("/api/dreams", (req, res) => {
   // 1. Sprawdzamy, czy w ogóle mamy ciasteczka
-    console.log("🍪 Ciasteczka odebrane przez serwer:", req.cookies);
+    console.log("Ciasteczka odebrane przez serwer:", req.cookies);
 
   if (!req.cookies) return res.status(401).json("Błąd serwera: Brak obsługi cookies.");
   
@@ -411,33 +413,38 @@ app.post("/api/dreams", (req, res) => {
 
 
 // --- AKTUALIZACJA ISTNIEJĄCEGO MARZENIA ---
+// --- AKTUALIZACJA MARZENIA (WERSJA DEBUG) ---
 app.put('/api/dreams/:id', (req, res) => {
-  // 1. SPRAWDZAMY CIASTECZKA (zamiast nagłówków)
   if (!req.cookies) return res.status(401).json("Błąd cookie-parser");
   const token = req.cookies.accessToken;
-  
   if (!token) return res.status(401).json("Nie jesteś zalogowany!");
 
   const dreamId = req.params.id;
 
-  // 2. WERYFIKACJA TOKENA (Tym samym kluczem co przy logowaniu!)
   jwt.verify(token, process.env.JWT_SECRET, (err, userInfo) => {
     if (err) return res.status(403).json("Token jest nieważny!");
 
-    // 3. LOGIKA CENOWA (Kopiujemy to z app.post, żeby było spójnie)
+    // 1. Logowanie tego, co przyszło z Frontendu
+    console.log("📥 [PUT] Otrzymano dane:", req.body);
+
+    // 2. Logika Cenowa (Poprawiona: uwzględnia 0 i puste stringi)
     let finalMin = null;
     let finalMax = null;
 
-    if (req.body.price_min || req.body.price_max) {
-        finalMin = req.body.price_min;
-        finalMax = req.body.price_max;
-    } else if (req.body.price) {
+    // Sprawdzamy czy wartości nie są undefined (bo 0 jest fałszem w JS!)
+    if (req.body.price_min !== undefined || req.body.price_max !== undefined) {
+        finalMin = req.body.price_min !== "" ? req.body.price_min : null;
+        finalMax = req.body.price_max !== "" ? req.body.price_max : null;
+    } 
+    else if (req.body.price !== undefined && req.body.price !== "") {
         finalMin = req.body.price;
         finalMax = req.body.price;
     }
 
-    // 4. ZAPYTANIE SQL - Usunięto 'category', poprawiono ceny
-    // WAŻNE: Warunek "AND idUser = ?" zapobiega edycji cudzych marzeń!
+    // 3. Konwersja is_public na liczbę (dla pewności)
+    const isPublic = req.body.is_public ? 1 : 0;
+
+    // 4. Zapytanie SQL
     const q = "UPDATE dreams SET `title`=?, `description`=?, `price_min`=?, `price_max`=?, `image`=?, `type`=?, `is_public`=? WHERE `id`=? AND `idUser`=?";
 
     const values = [
@@ -447,19 +454,18 @@ app.put('/api/dreams/:id', (req, res) => {
       finalMax,
       req.body.image,
       req.body.type,
-      req.body.is_public,
-      dreamId,      // Kogo edytujemy?
-      userInfo.id   // Czy to na pewno Twój rekord?
+      isPublic,     // Używamy przeliczonej zmiennej
+      dreamId,
+      userInfo.id
     ];
+
+    console.log("[SQL] Wartości do zapisu:", values); 
 
     db.query(q, values, (err, data) => {
       if (err) {
-          console.error("Błąd edycji SQL:", err);
+          console.error("Błąd SQL:", err);
           return res.status(500).json(err);
       }
-      // Sprawdzamy, czy cokolwiek się zmieniło (czy znaleziono rekord)
-      if (data.affectedRows === 0) return res.status(403).json("Nie możesz edytować tego marzenia lub ono nie istnieje!");
-      
       return res.status(200).json("Marzenie zaktualizowane!");
     });
   });
