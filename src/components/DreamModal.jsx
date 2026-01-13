@@ -1,127 +1,139 @@
-import React, { useState } from 'react';
-import { X, Calendar, Tag, Edit, Trash2 } from 'lucide-react';
-import EditDreamForm from './EditDreamForm'; // <--- Importujemy gotowca!
-import './DreamModal.css'; // Zakładam, że masz tu style modala
+import React from 'react';
+import './DreamModal.css';
+import './DreamCard.css';
+import { X, Edit, Trash2, CheckCircle, Lock } from 'lucide-react'; // ArrowLeft już niepotrzebne
 
-export default function DreamModal({ dream, onClose, currentUser, onUpdateDream, onDeleteDream }) {
-  
-  // Lokalny stan: Czy jesteśmy w trybie edycji?
-  const [isEditing, setIsEditing] = useState(false);
-  
-  // Lokalny stan danych (żeby po edycji od razu widzieć zmiany bez zamykania okna)
-  const [currentDream, setCurrentDream] = useState(dream);
+// --- (Funkcje pomocnicze: formatPrice, getCategoryLabel, getFooterClass - BEZ ZMIAN) ---
+const formatPrice = (min, max) => {
+  const pMin = parseFloat(min);
+  const pMax = parseFloat(max);
+  if (!isNaN(pMin) && !isNaN(pMax) && pMin === pMax) return `${pMin} zł`;
+  if ((isNaN(pMin) || pMin === 0) && !isNaN(pMax)) return `Do ${pMax} zł`;
+  if (!isNaN(pMin) && isNaN(pMax)) return `Powyżej ${pMin} zł`;
+  if (!isNaN(pMin) && !isNaN(pMax)) return `${pMin} - ${pMax} zł`;
+  return null;
+};
 
-  // Sprawdzamy, czy to marzenie należy do zalogowanego użytkownika
-  const isOwner = currentUser && currentUser.id === currentDream.userId; 
-  // (Upewnij się, że w bazie masz userId lub idUser - dostosuj tę linię do swojego API)
+const getCategoryLabel = (dream) => {
+  if (dream.type === 'time') return 'Czas';
+  if (dream.type === 'smile') return 'Uśmiech';
+  if (dream.type === 'gift') {
+      const pMin = parseFloat(dream.price_min);
+      const pMax = parseFloat(dream.price_max);
+      if (!isNaN(pMin) && !isNaN(pMax) && pMin === pMax) return 'Pomysł';
+      return 'Konkret';
+  }
+  return '';
+};
 
-  const handleSuccess = (updatedData) => {
-      setCurrentDream(updatedData); // Aktualizujemy widok w modalu
-      setIsEditing(false);          // Wracamy do widoku
-      if (onUpdateDream) onUpdateDream(updatedData); // Odświeżamy listę pod spodem (np. w Feedzie)
-  };
+const getFooterClass = (dream) => {
+  if (dream.type === 'time') return 'footer-time';
+  if (dream.type === 'smile') return 'footer-smile';
+  if (dream.type === 'gift') {
+      const pMin = parseFloat(dream.price_min);
+      const pMax = parseFloat(dream.price_max);
+      if (!isNaN(pMin) && !isNaN(pMax) && pMin === pMax) return 'footer-idea';
+      return 'footer-model';
+  }
+  return '';
+};
 
-  return (
-    <div className="modal-overlay fade-in" onClick={onClose}>
-      {/* Kliknięcie w tło zamyka, ale kliknięcie w okno (stopPropagation) nie */}
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        
-        {/* Przycisk Zamknij (X) - Zawsze widoczny */}
-        <button className="close-modal-btn" onClick={onClose}>
-            <X size={24} />
-        </button>
+export default function DreamModal({ dream, onClose, isOwner, onEdit, onDelete, isInline = false }) {
+  if (!dream) return null;
 
-        {/* --- TRYB 1: EDYCJA --- */}
-        {isEditing ? (
-            <div style={{padding: '20px'}}>
-                <EditDreamForm 
-                    dreamData={currentDream}
-                    onCancel={() => setIsEditing(false)}
-                    onSuccess={handleSuccess}
-                />
+  const priceLabel = dream.type === 'gift' ? formatPrice(dream.price_min, dream.price_max) : null;
+  const footerClass = getFooterClass(dream);
+  const isPrivate = !dream.is_public;
+
+  // Wnętrze karty
+  const modalContent = (
+    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        {/* 1. OBRAZ */}
+        <div className="modal-image-section">
+            
+            {/* ZMIANA: Usunęliśmy warunek !isInline. X wyświetla się ZAWSZE. */}
+            <button className="close-btn" onClick={onClose}>
+                <X size={20} />
+            </button>
+            
+            {dream.image ? (
+               <img src={dream.image} alt={dream.title} className="modal-image" onError={(e) => e.target.style.display = 'none'} />
+            ) : (
+               <div className="card-image-placeholder" style={{fontSize: '5rem'}}>🎁</div>
+            )}
+
+            {isPrivate && (
+                <div className="private-badge" style={{top: '15px', left: '15px', right: 'auto'}}>
+                    <Lock size={16} color="white" />
+                </div>
+            )}
+        </div>
+
+        {/* 2. TREŚĆ (Bez zmian) */}
+        <div className="modal-body">
+            <div className="modal-user-info">
+                 <img 
+                    src={`https://ui-avatars.com/api/?name=${dream.first_name || 'U'}+${dream.last_name || 'T'}&background=random`} 
+                    alt="User" 
+                    className="modal-avatar"
+                 />
+                 <div>
+                    <div className="modal-username">{dream.first_name || 'Użytkownik'} {dream.last_name}</div>
+                    <div style={{fontSize: '0.8rem', color: '#94a3b8'}}>Autor marzenia</div>
+                 </div>
             </div>
 
-        /* --- TRYB 2: WIDOK (Skarpetki) --- */
-        ) : (
-            <>
-                <div className="modal-image-wrapper">
-                    <img src={currentDream.image} alt={currentDream.title} />
-                    {currentDream.category && (
-                        <span className="modal-category-badge">
-                            {currentDream.category}
-                        </span>
-                    )}
+            <div className="modal-header-row">
+                <div className="modal-title-group">
+                    <h2 className="modal-title">{dream.title}</h2>
+                    {priceLabel && <span className="modal-price-tag">{priceLabel}</span>}
                 </div>
+            </div>
 
-                <div className="modal-body">
-                    <h2 className="modal-title">{currentDream.title}</h2>
-                    
-                    <div className="modal-meta">
-                        {currentDream.category && (
-                            <div className="meta-item">
-                                <Tag size={16} /> <span>{currentDream.category}</span>
-                            </div>
-                        )}
-                        <div className="meta-item">
-                            <Calendar size={16} /> 
-                            <span style={{fontSize: '0.9rem', color: '#64748b'}}>
-                                {(() => {
-                                    // 1. Jeśli nie ma daty -> nic nie wyświetlaj (lub napisz "Brak daty")
-                                    if (!currentDream.date) return "";
+            <p className="modal-description">
+                {dream.description || "Brak opisu."}
+            </p>
+        </div>
 
-                                    // 2. Jeśli data ma już kropki (np. z formatowania w bazie) -> wyświetl jak jest
-                                    if (typeof currentDream.date === 'string' && currentDream.date.includes('.')) {
-                                        return currentDream.date;
-                                    }
+        {/* 3. STOPKA (Bez zmian) */}
+        <div className={`modal-footer-section ${footerClass}`}>
+            <div className="modal-footer-info">
+                <span>{getCategoryLabel(dream)}</span>
+                <span>{dream.date ? dream.date.split(' ')[0] : ''}</span>
+            </div>
+            <div className="modal-footer-actions">
+                {isOwner ? (
+                    <>
+                        <button className="btn-action btn-edit" onClick={() => onEdit(dream)}>
+                            <Edit size={18} /> Edytuj
+                        </button>
+                        <button className="btn-action btn-delete" onClick={() => onDelete(dream.id)}>
+                            <Trash2 size={18} /> Usuń
+                        </button>
+                    </>
+                ) : (
+                    <button className="btn-action btn-fulfill" onClick={() => alert("Wkrótce!")}>
+                        <CheckCircle size={18} /> Spełnij
+                    </button>
+                )}
+            </div>
+        </div>
+    </div>
+  );
 
-                                    // 3. Spróbuj sformatować
-                                    const d = new Date(currentDream.date);
-                                    // Jeśli data jest błędna (Invalid Date), nie wyświetlaj jej
-                                    if (isNaN(d.getTime())) return ""; 
-                                    
-                                    return d.toLocaleDateString('pl-PL');
-                                })()}
-                            </span>
-                        </div>
-                    </div>
+  // ZMIANA: Usunęliśmy przycisk "Wróć do listy" z widoku Inline
+  if (isInline) {
+      return (
+          <div className="dream-inline-view">
+              {modalContent}
+          </div>
+      );
+  }
 
-                    <p className="modal-description">
-                        {currentDream.description}
-                    </p>
-                    
-                    {currentDream.price && (
-                        <div className="modal-price">
-                            Koszt: <strong>{currentDream.price}</strong>
-                        </div>
-                    )}
-
-                    {/* PRZYCISKI AKCJI (Tylko dla właściciela!) */}
-                    {isOwner && (
-                        <div className="modal-actions">
-                            <button 
-                                className="action-btn edit" 
-                                onClick={() => setIsEditing(true)} // <--- TU WŁĄCZAMY EDYCJĘ
-                            >
-                                <Edit size={18} /> Edytuj
-                            </button>
-                            
-                            <button 
-                                className="action-btn delete"
-                                onClick={() => {
-                                    if(window.confirm("Usunąć to marzenie?")) {
-                                        if(onDeleteDream) onDeleteDream(currentDream.id);
-                                        onClose();
-                                    }
-                                }}
-                            >
-                                <Trash2 size={18} /> Usuń
-                            </button>
-                        </div>
-                    )}
-                </div>
-            </>
-        )}
-      </div>
+  // Domyślny Overlay
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      {modalContent}
     </div>
   );
 }

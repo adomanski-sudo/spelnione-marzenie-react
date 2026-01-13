@@ -6,6 +6,7 @@ import AddDreamForm from './AddDreamForm';
 import EditDreamForm from './EditDreamForm';
 import axios from "axios";
 import { Edit3, Plus, ArrowLeft, Trash2, Edit } from 'lucide-react'; 
+import DreamModal from './DreamModal'; //
 
 // Dodajemy onUpdateUser do propsów
 export default function MyProfile({ dreams, setDreams, userData, onUpdateUser }) {
@@ -15,20 +16,18 @@ export default function MyProfile({ dreams, setDreams, userData, onUpdateUser })
   const [isAdding, setIsAdding] = useState(false); // Czy dodajemy marzenie?
   const [isEditingDream, setIsEditingDream] = useState(false); // Edycja marzenia
 
+  // --- ODŚWIEŻANIE LISTY (AXIOS) ---
   const refreshDreams = () => {
-    fetch('/api/dreams')
-      .then((res) => res.json())
-      .then((data) => {
-        
-        // DEBUG: Zobaczmy w konsoli co przyszło z bazy
-        console.log("🔥 [MyProfile] Dane surowe z API:", data);
+    axios.get('http://localhost:3000/api/dreams', { withCredentials: true })
+      .then((res) => {
+        // W axios dane są pod 'res.data'
+        const data = res.data;
 
         const formatted = data.map((item) => {
-          // Zabezpieczenie daty: zamieniamy 'T' na spację (format ISO na SQL)
-          // Dzięki temu split(' ')[0] w DreamCard zawsze zadziała
+          // Zabezpieczenie daty (zamiana T na spację dla formatu SQL)
           let safeDate = item.date;
           if (safeDate && safeDate.includes('T')) {
-              safeDate = safeDate.replace('T', ' ').split('.')[0];
+             safeDate = safeDate.replace('T', ' ').split('.')[0];
           }
 
           return {
@@ -37,10 +36,9 @@ export default function MyProfile({ dreams, setDreams, userData, onUpdateUser })
             title: item.title,
             description: item.description,
             image: item.image,
-            
-            date: safeDate, // Używamy naprawionej daty
+            date: safeDate,
 
-            // Kluczowe pola dla kategorii i ceny:
+            // Kluczowe pola dla edycji i wyświetlania
             type: item.type,
             price_min: item.price_min,
             price_max: item.price_max,
@@ -48,14 +46,15 @@ export default function MyProfile({ dreams, setDreams, userData, onUpdateUser })
           };
         });
 
-        console.log("✨ [MyProfile] Dane sformatowane:", formatted);
-
+        // Filtrujemy tylko marzenia zalogowanego użytkownika
         if (userData) {
           const myOnly = formatted.filter((d) => d.userId === userData.id);
           setDreams(myOnly);
         }
       })
-      .catch(err => console.error("Błąd pobierania:", err));
+      .catch((err) => {
+        console.error("Błąd odświeżania listy:", err);
+      });
   };
 
   // Prosta funkcja sukcesu
@@ -87,6 +86,12 @@ const handleSuccess = () => {
           alert("Nie udało się usunąć marzenia.");
       }
     }
+  };
+
+  const handleEditClick = (dream) => {
+      //  Przełącza widok na formularz edycji
+      setIsEditing(true);
+      // Modal sam zniknie, bo w renderowaniu warunkowym EditForm ma priorytet
   };
 
   return (
@@ -138,27 +143,27 @@ const handleSuccess = () => {
         
         {/* SCENARIUSZ 1: DODAWANIE MARZENIA */}
         {isAdding ? (
-            <AddDreamForm 
-                onAdd={handleSuccess}
-                onCancel={() => setIsAdding(false)} 
-                onSuccess={() => {
-                    refreshDreams();    
-                    setIsAdding(false); 
-                }}
-            />
+            <div className="form-container fade-in">
+                <AddDreamForm 
+                    onAdd={() => { setIsAdding(false); refreshDreams(); }} 
+                    onCancel={() => setIsAdding(false)} 
+                />
+            </div>
 
         /* SCENARIUSZ 2: EDYCJA PROFILU */
-        ) : isEditing ? (
-            <div className="fade-in">
-                <button className="btn-back" onClick={() => setIsEditing(false)} style={{marginBottom: '15px'}}>
-                    <ArrowLeft size={20} /> Anuluj edycję
-                </button>
-                <EditProfile 
-                    currentUser={userData} 
-                    onUpdateUser={(updatedData) => {
-                        onUpdateUser(updatedData);
-                        setIsEditing(false);
+        ) : 
+        isEditing && activeDream ? (
+            <div className="form-container fade-in">
+                <EditDreamForm 
+                    dream={activeDream}
+                    onUpdate={() => { 
+                        setIsEditing(false); 
+                        // Nie czyścimy activeDream, żeby wrócić do widoku szczegółów (opcjonalnie)
+                        // Ale dla bezpieczeństwa wróćmy do listy lub odświeżmy szczegóły:
+                        setActiveDream(null); 
+                        refreshDreams(); 
                     }}
+                    onCancel={() => setIsEditing(false)}
                 />
             </div>
 
@@ -184,68 +189,36 @@ const handleSuccess = () => {
 
         /* SCENARIUSZ 3: SZCZEGÓŁY MARZENIA */
         ) : activeDream ? (
-          
-          <div className="dream-detail-view fade-in">
-            <button className="btn-back" onClick={() => setActiveDream(null)}>
-              <ArrowLeft size={20} /> Wróć do listy
-            </button>
-
-            <div className="detail-card">
-               <img src={activeDream.image} alt={activeDream.title} className="detail-image" />
-               <div className="detail-content">
-                  <div className="detail-header">
-                      <span className="detail-category">{activeDream.category}</span>
-                      <span className="detail-date">{activeDream.date}</span>
-                  </div>
-                  <h1 className="detail-title">{activeDream.title}</h1>
-                  <p className="detail-desc">{activeDream.description}</p>
-                  
-                  {/* --- CENA (Tylko dla typu 'gift') --- */}
-
-
-
-                  <div className="detail-footer">
-                    <button 
-                      className="btn-primary-large" 
-                      style={{background: '#f1f5f9', color: '#334155'}}
-                      onClick={() => setIsEditingDream(true)}
-                    >
-                      <Edit size={20} style={{marginRight: '8px'}}/> Edytuj
-                    </button>
-                    
-                    {/* Przycisk Usuń */}
-                    <button 
-                        className="btn-primary-large2" 
-                        style={{background: '#fee2e2', color: '#ef4444', border: '1px solid #fecaca'}}
-                        onClick={() => handleDelete(activeDream.id)}
-                    >
-                      <Trash2 size={20} style={{marginRight: '8px'}}/> Usuń
-                    </button>
-                  </div>
-               </div>
+            <div className="form-container fade-in">
+                 <DreamModal 
+                    dream={activeDream}
+                    onClose={() => setActiveDream(null)}
+                    isOwner={true}
+                    onEdit={handleEditClick}
+                    onDelete={handleDelete}
+                    isInline={true}
+                 />
             </div>
-          </div>
 
         /* SCENARIUSZ 4: LISTA MARZEŃ */
         ) : (
-          <div className="dreams-grid-compact fade-in">
-             {dreams && dreams.length > 0 ? (
-                dreams.map(dream => (
-                  <div 
-                    key={dream.id} 
-                    onClick={() => setActiveDream(dream)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                      <DreamCard dream={dream} showAuthor={false} />
-                  </div>
-                ))
-             ) : (
-                <div style={{textAlign: 'center', padding: '40px', color: '#94a3b8'}}>
-                   <p>Nie masz jeszcze marzeń na liście.</p>
-                   <p>Kliknij "+" żeby dodać pierwsze!</p>
+          <>
+                <div className="dreams-grid-compact fade-in">
+                    {dreams && dreams.length > 0 ? (
+                        dreams.map((dream) => (
+                            <div 
+                                key={dream.id} 
+                                onClick={() => setActiveDream(dream)} 
+                                style={{ cursor: 'pointer', height: '100%' }}
+                            >
+                                <DreamCard dream={dream} />
+                            </div>
+                        ))
+                    ) : (
+                        <p className="empty-state">Nie masz jeszcze żadnych marzeń.</p>
+                    )}
                 </div>
-             )}
-          </div>
+            </>
         )}
 
       </main>
