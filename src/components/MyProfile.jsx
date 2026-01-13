@@ -16,35 +16,46 @@ export default function MyProfile({ dreams, setDreams, userData, onUpdateUser })
   const [isEditingDream, setIsEditingDream] = useState(false); // Edycja marzenia
 
   const refreshDreams = () => {
-    fetch('/api/dreams') // lub axios.get...
+    fetch('/api/dreams')
       .then((res) => res.json())
       .then((data) => {
         
-        // 👇 TU BYŁ PROBLEM: Musimy przepisać WSZYSTKIE nowe pola z bazy
-        const formatted = data.map((item) => ({
-          id: item.id,
-          userId: item.idUser,
-          title: item.title,
-          description: item.description,
-          image: item.image,
-          date: new Date(item.date).toLocaleDateString(),
-          type: item.type,
-          
-          // --- NOWE POLA (DODAJ JE KONIECZNIE) ---
-          price_min: item.price_min, // Ważne dla Edycji
-          price_max: item.price_max, // Ważne dla Edycji
-          is_public: item.is_public, // Ważne dla Edycji (0 lub 1)
-          // ---------------------------------------
-          
-          // Stare 'price' i 'category' możesz usunąć, bo to śmieci
-        }));
+        // DEBUG: Zobaczmy w konsoli co przyszło z bazy
+        console.log("🔥 [MyProfile] Dane surowe z API:", data);
 
-        // Filtrowanie (bez zmian)
+        const formatted = data.map((item) => {
+          // Zabezpieczenie daty: zamieniamy 'T' na spację (format ISO na SQL)
+          // Dzięki temu split(' ')[0] w DreamCard zawsze zadziała
+          let safeDate = item.date;
+          if (safeDate && safeDate.includes('T')) {
+              safeDate = safeDate.replace('T', ' ').split('.')[0];
+          }
+
+          return {
+            id: item.id,
+            userId: item.idUser,
+            title: item.title,
+            description: item.description,
+            image: item.image,
+            
+            date: safeDate, // Używamy naprawionej daty
+
+            // Kluczowe pola dla kategorii i ceny:
+            type: item.type,
+            price_min: item.price_min,
+            price_max: item.price_max,
+            is_public: item.is_public
+          };
+        });
+
+        console.log("✨ [MyProfile] Dane sformatowane:", formatted);
+
         if (userData) {
           const myOnly = formatted.filter((d) => d.userId === userData.id);
           setDreams(myOnly);
         }
-      });
+      })
+      .catch(err => console.error("Błąd pobierania:", err));
   };
 
   // Prosta funkcja sukcesu

@@ -2,7 +2,7 @@ import React from 'react';
 import './DreamCard.css';
 import { Lock, Gift } from 'lucide-react';
 
-// --- FUNKCJA FORMATOWANIA CENY (Bez zmian) ---
+// --- (formatPrice bez zmian) ---
 const formatPrice = (min, max) => {
   const pMin = parseFloat(min);
   const pMax = parseFloat(max);
@@ -17,87 +17,97 @@ const formatPrice = (min, max) => {
   return null;
 };
 
-// --- NOWA FUNKCJA: ETYKIETA KATEGORII ---
+// --- (getCategoryLabel bez zmian) ---
 const getCategoryLabel = (dream) => {
   if (dream.type === 'time') return 'Czas';
   if (dream.type === 'smile') return 'Uśmiech';
-  
   if (dream.type === 'gift') {
       const pMin = parseFloat(dream.price_min);
       const pMax = parseFloat(dream.price_max);
-      
-      // Jeśli min == max (i są liczbami), to "Pomysł" (konkretna cena)
-      if (!isNaN(pMin) && !isNaN(pMax) && pMin === pMax) {
-          return 'Pomysł';
-      }
-      // W przeciwnym razie (widełki, brak max itp.) to "Konkret"
+      if (!isNaN(pMin) && !isNaN(pMax) && pMin === pMax) return 'Pomysł';
       return 'Konkret';
   }
   return '';
 };
 
-export default function DreamCard({ dream, showAuthor = true }) {
+// --- NOWA FUNKCJA: DOBIERANIE KOLORU TŁA ---
+const getFooterClass = (dream) => {
+  if (dream.type === 'time') return 'footer-time';   // Błękit
+  if (dream.type === 'smile') return 'footer-smile'; // Kremowy
+  
+  if (dream.type === 'gift') {
+      const pMin = parseFloat(dream.price_min);
+      const pMax = parseFloat(dream.price_max);
+      
+      // Jeśli konkretna cena -> Pomysł (Lawenda)
+      if (!isNaN(pMin) && !isNaN(pMax) && pMin === pMax) return 'footer-idea';
+      
+      // Jeśli widełki -> Konkret (Mięta)
+      return 'footer-model';
+  }
+  return '';
+};
+
+export default function DreamCard({ dream }) {
   if (!dream) return null;
+
+  const priceLabel = dream.type === 'gift' ? formatPrice(dream.price_min, dream.price_max) : null;
+  const isPrivate = !dream.is_public;
+
+  // Pobieramy odpowiednią klasę koloru
+  const footerColorClass = getFooterClass(dream);
 
   return (
     <div className="dream-card fade-in">
-      {/* Obrazek */}
-      <div className="card-image-wrapper">
+      
+      {/* SEKCJA 1: GRAFIKA */}
+      <div className="card-image-section">
         {dream.image ? (
-            <img src={dream.image} alt={dream.title} className="card-image" onError={(e) => e.target.style.display = 'none'} />
+            <img 
+              src={dream.image} 
+              alt={dream.title} 
+              className="card-image" 
+              onError={(e) => e.target.style.display = 'none'} 
+            />
         ) : (
             <div className="card-image-placeholder"><Gift /></div> 
         )}
+        
+        {isPrivate && (
+            <div className="private-badge" title="Tylko dla znajomych">
+                <Lock size={14} color="white" />
+            </div>
+        )}
       </div>
 
-      <div className="card-content">
-        {/* Autor */}
-        {showAuthor && dream.first_name && (
-          <div className="card-header">
-            <img 
-                src={dream.userImage || `https://ui-avatars.com/api/?name=${dream.first_name}+${dream.last_name}&background=random`} 
-                alt="User" 
-                className="user-avatar" 
-            />
-            <span className="user-name">{dream.first_name} {dream.last_name}</span>
-          </div>
+      {/* SEKCJA 2: KONTENT */}
+      <div className="card-content-section">
+        <div className="title-price-row">
+            <h3 className="card-title" title={dream.title}>{dream.title}</h3>
+            {priceLabel && (
+                <span className="card-price-tag">
+                    {priceLabel}
+                </span>
+            )}
+        </div>
+        {dream.description && (
+            <p className="card-description">
+                {dream.description}
+            </p>
         )}
+      </div>
 
-        {/* Treść */}
-        <h3 className="card-title">{dream.title}</h3>
-        <p className="card-desc">{dream.description}</p>
-
-        {/* Cena (Tylko dla Prezentu) */}
-        {dream.type === 'gift' && (
-          <div className="dream-price" style={{ color: '#64748b', fontWeight: '600', marginTop: '10px' }}>
-            {formatPrice(dream.price_min, dream.price_max)}
-          </div>
-        )}
-
-        {/* --- STOPKA Z KATEGORIĄ --- */}
-        <div className="card-footer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '15px' }}>
-          
-          {/* LEWA STRONA: Kategoria */}
-          <span className="card-category" style={{ 
-              fontWeight: 'bold', 
-              fontSize: '0.8rem', 
-              textTransform: 'uppercase', 
-              color: '#83828f', // Niebieski kolor dla wyróżnienia
-              marginRight: 'auto' // Wypycha datę na prawo
-          }}>
+      {/* SEKCJA 3: STOPKA (Z KOLOREM) */}
+      {/* Dodajemy zmienną footerColorClass do listy klas */}
+      <div className={`card-footer-section ${footerColorClass}`}>
+          <span className="footer-category">
               {getCategoryLabel(dream)}
           </span>
-
-          {/* PRAWA STRONA: Data i Kłódka */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <span className="card-date" style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
-                  {dream.date}
-              </span>
-              {!dream.is_public && <span title="Prywatne"><Lock /></span>}
-          </div>
-
-        </div>
+          <span className="footer-date">
+              {dream.date.split(' ')[0]}
+          </span>
       </div>
+
     </div>
   );
 }

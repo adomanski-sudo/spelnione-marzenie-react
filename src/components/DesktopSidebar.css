@@ -104,7 +104,7 @@
 /* Aktywny przycisk (zaznaczony na niebiesko) */
 .nav-item.active {
     background: #eff6ff;
-    color: #3b82f6;
+    color: #8fb4f0;
     font-weight: 600;
 }
 

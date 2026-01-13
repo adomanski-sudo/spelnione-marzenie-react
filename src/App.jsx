@@ -117,28 +117,38 @@ const handleOpenProfile = (id) => {
   }, []); // Pusta tablica [] oznacza: wykonaj tylko raz po odświeżeniu strony
   
 
-  // Pobieranie wszystkich marzeń (Feed na środku)
-  useEffect(() => {
-    fetch('/api/dreams')
-      .then(res => res.json())
-      .then(data => {
-        const formattedDreams = data.map(item => ({
-          id: item.id,
-          userId: item.idUser,
-          title: item.title,
-          description: item.description,
-          category: item.category,
-          date: new Date(item.date).toLocaleDateString('pl-PL', {
-            year: 'numeric', month: 'long', day: 'numeric'
-          }),
-          userName: `${item.first_name} ${item.last_name}`,
-          userAvatar: item.userImage, 
-          image: item.image
-        }));
-        setDreams(formattedDreams);
-      })
-      .catch(err => console.error("Błąd pobierania marzeń:", err));
-  }, []); 
+
+
+  fetch('/api/dreams')
+    .then(res => res.json())
+    .then(data => {
+        const formatted = data.map(item => {
+            // 1. Naprawa daty (zamiana T na spację dla SQL-like formatu)
+            let safeDate = item.date;
+            if (safeDate && safeDate.includes('T')) {
+                safeDate = safeDate.replace('T', ' ').split('.')[0];
+            }
+
+            return {
+                id: item.id,
+                userId: item.idUser,
+                title: item.title,
+                description: item.description,
+                image: item.image,
+                
+                date: safeDate, // <--- Tutaj trafia naprawiona data
+
+                // 2. NOWE POLA (Konieczne dla DreamCard)
+                type: item.type,
+                price_min: item.price_min,
+                price_max: item.price_max,
+                is_public: item.is_public
+            };
+        });
+
+        setDreams(formatted); // Zapisz do głównego stanu aplikacji
+    })
+    .catch(err => console.log(err));
 
   // Pobieranie znajomych (dla sekcji Friends)
   useEffect(() => {

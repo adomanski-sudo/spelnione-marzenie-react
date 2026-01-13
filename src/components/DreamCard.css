@@ -1,122 +1,175 @@
+/* GŁÓWNY KONTENER */
 .dream-card {
-  background: #ffffff;
-  border-radius: 16px;
-  overflow: hidden; /* Żeby zdjęcie nie wystawało poza zaokrąglenia */
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-  transition: transform 0.2s, box-shadow 0.2s;
-  border: 1px solid #f1f5f9;
   display: flex;
   flex-direction: column;
-  height: 480px;
+  height: 100%;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  cursor: pointer;
 }
 
 .dream-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* --- SEKCJA 1: GRAFIKA --- */
+.card-image-section {
+  height: 180px;
+  width: 100%;
+  position: relative;
+  background-color: #f8fafc;
+  flex-shrink: 0;
 }
 
 .card-image {
   width: 100%;
-  height: 200px;
-  object-fit: cover; /* Zdjęcie wypełni obszar nie tracąc proporcji */
-  background-color: #cbd5e1;
+  height: 100%;
+  object-fit: cover;
 }
 
-.card-content {
-  padding: 20px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.card-header {
+.card-image-placeholder {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+  justify-content: center;
+  font-size: 3rem;
+  color: #cbd5e1;
 }
 
-.user-avatar {
-  width: 40px;
-  height: 40px;
+.private-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(0, 0, 0, 0.6);
   border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
 }
 
-.user-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: #475569;
+/* --- SEKCJA 2: KONTENT --- */
+.card-content-section {
+  flex: 1; /* Wypełnia środek */
+  padding: 16px;
+  
+  display: flex;
+  flex-direction: column; /* Układamy elementy jeden pod drugim */
+  justify-content: flex-start; /* Startujemy od góry */
+  gap: 8px; /* Odstęp między wierszem tytułu a opisem */
+}
+
+.title-price-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
 }
 
 .card-title {
-  font-size: 18px;
+  font-size: 1rem;
   font-weight: 700;
   color: #1e293b;
-  margin: 0 0 8px 0;
-  line-height: 1.4;
+  margin: 0;
+  line-height: 1.3;
+  
+  /* Ucinanie tytułu po 2 liniach */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.card-desc {
-  font-size: 14px;
+.card-price-tag {
+  font-size: 0.75rem; /* Troszkę mniejsza czcionka, żeby nie dominowała */
+  font-weight: 600;
+  color: #ffffff;
+  background-color: #64748b;
+  padding: 3px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px; /* Lekka korekta optyczna względem tytułu */
+}
+
+/* NOWE STYLES DLA OPISU */
+.card-description {
+  font-size: 0.85rem;
   color: #64748b;
-  margin-bottom: 20px;
   line-height: 1.5;
-  /* Ograniczenie do 3 linii tekstu */
+  margin: 0;
+  
+  /* Magia ucinania po 3 liniach */
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  
-  margin-bottom: 10px;
 }
 
-.card-footer {
-  margin-top: auto; /* Wypycha stopkę na sam dół */
-  display: flex;
-  justify-content: right;
-  align-items: center;
-  padding-top: 15px;
+/* --- SEKCJA 3: STOPKA --- */
+.card-footer-section {
+  height: 50px;
+  padding: 0 16px;
   border-top: 1px solid #f1f5f9;
-  font-size: 14px;
-  color: #64748b;
-}
-
-.btn-fulfill:hover {
-  background-color: #059669;
-}
-
-
-/* 1. Karta - musi zajmować całą wysokość kafelka Grid */
-.dream-card {
   display: flex;
-  flex-direction: column;
-  height: 100%; /* Rozciąga kartę na wysokość najwyższego sąsiada w rzędzie */
-  background: white; /* Upewnij się, że masz tło, żeby widzieć efekt */
-  border-radius: 12px; /* Twoje style */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); /* Twoje style */
-  overflow: hidden; /* Żeby obrazek nie wyłaził */
-}
-
-/* 2. Content - musi rosnąć I SAM TEŻ BYĆ FLEXBOXEM */
-.card-content {
-  flex: 1; /* Zajmuje całe dostępne miejsce w karcie (zostawione przez obrazek) */
-  display: flex; /* <--- TO JEST KLUCZ DO SUKCESU */
-  flex-direction: column; /* Układa elementy (tytuł, opis, stopka) w pionie */
-  padding: 16px;
-}
-
-/* 3. Stopka - wypychana na sam dół kontenera card-content */
-.card-footer {
-  margin-top: auto; /* <--- To działa jak sprężyna, która spycha stopkę na dół */
-  
-  /* Reszta Twoich stylów */
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding-top: 15px;
-  border-top: 1px solid #f1f5f9; /* Opcjonalna linia oddzielająca */
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.footer-category {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: #94a3b8;
+  letter-spacing: 0.5px;
+}
+
+.footer-date {
+  font-size: 0.75rem;
+  color: #cbd5e1;
+}
+
+/* 1. CZAS: Subtelny błękit (AliceBlue) */
+.footer-time {
+  background-color: #f0f9ff; 
+  color: #0369a1; /* Lekko ciemniejszy tekst dla kontrastu */
+}
+
+/* 2. POMYSŁ: Subtelna lawenda/fiolet */
+.footer-idea {
+  background-color: #fff5f5;
+  color: #7e22ce;
+}
+
+/* 3. KONKRET: Subtelna mięta/zieleń */
+.footer-model {
+  background-color: #f0fdf4;
+  color: #15803d;
+}
+
+/* 4. UŚMIECH: Subtelny kremowy/żółty */
+.footer-smile {
+  background-color: #fffbeb;
+  color: #b45309;
+}
+
+/* Animacja */
+.fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
