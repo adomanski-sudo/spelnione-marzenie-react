@@ -165,18 +165,23 @@ app.post('/api/login', (req, res) => {
         });
 });
 
-// Marzenia
+// Marzenia - do DreamCard.ksx
 app.get('/api/dreams', (req, res) => {
-    const sql = `
-        SELECT dreams.*, users.first_name, users.last_name, users.image as userImage 
-        FROM dreams 
-        JOIN users ON dreams.idUser = users.id
-        ORDER BY dreams.date DESC
-    `;
-    db.query(sql, (err, data) => {
-        if(err) return res.status(500).json(err);
-        return res.json(data);
-    })
+  const sql = `
+    SELECT 
+      dreams.*, 
+      users.first_name, 
+      users.last_name, 
+      users.image AS user_avatar 
+    FROM dreams 
+    LEFT JOIN users ON dreams.idUser = users.id
+    ORDER BY dreams.date DESC
+  `;
+
+  db.query(sql, (err, data) => {
+    if (err) return res.status(500).json(err);
+    return res.json(data);
+  });
 });
 
 // Szukanie

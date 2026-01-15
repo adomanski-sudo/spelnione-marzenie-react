@@ -37,6 +37,21 @@ function App() {
   const [selectedDream, setSelectedDream] = useState(null);
   const [dreams, setDreams] = useState([]);
   const [friendsList, setFriendsList] = useState([]);
+  const [visitingUserId, setVisitingUserId] = useState(null);
+
+  // Funkcja obsługująca kliknięcie w autora (nawigacja)
+  const handleOpenProfile = (userId) => {
+    console.log("Przechodzę do profilu użytkownika ID:", userId);
+    
+    // Jeśli klikam w siebie -> idź do mojego profilu
+    if (currentUser && userId === currentUser.id) {
+        setActiveView('myProfile');
+    } else {
+        // Jeśli w kogoś innego -> ustaw ID i zmień widok
+        setVisitingUserId(userId);
+        setActiveView('userProfile');
+    }
+  };
 
   // 2. FUNKCJE LOGIKI 
   
@@ -58,16 +73,6 @@ function App() {
 
     // Opcjonalnie: wróć do profilu po zapisaniu
     // setActiveView('myProfil'); 
-};
-
-const handleOpenProfile = (id) => {
-  // Jeśli kliknęliśmy siebie (sprawdzamy ID zalogowanego), idź do MyProfile
-  if (currentUser && id === currentUser.id) { 
-      setActiveView('myProfil');
-  } else {
-      setSelectedUserId(id);
-      setActiveView('userProfile');
-  }
 };
 
   // Wylogowanie
@@ -119,36 +124,47 @@ const handleOpenProfile = (id) => {
 
 
 
-  fetch('/api/dreams')
-    .then(res => res.json())
-    .then(data => {
+  const fetchDreams = () => {
+    fetch('/api/dreams')
+      .then(res => res.json())
+      .then(data => {
         const formatted = data.map(item => {
-            // 1. Naprawa daty (zamiana T na spację dla SQL-like formatu)
-            let safeDate = item.date;
-            if (safeDate && safeDate.includes('T')) {
-                safeDate = safeDate.replace('T', ' ').split('.')[0];
-            }
+           // Naprawa daty
+           let safeDate = item.date;
+           if (safeDate && safeDate.includes('T')) {
+               safeDate = safeDate.replace('T', ' ').split('.')[0];
+           }
 
-            return {
-                id: item.id,
-                userId: item.idUser,
-                title: item.title,
-                description: item.description,
-                image: item.image,
-                
-                date: safeDate, // <--- Tutaj trafia naprawiona data
+           return {
+             id: item.id,
+             userId: item.idUser,
+             title: item.title,
+             description: item.description,
+             image: item.image,
+             date: safeDate,
 
-                // 2. NOWE POLA (Konieczne dla DreamCard)
-                type: item.type,
-                price_min: item.price_min,
-                price_max: item.price_max,
-                is_public: item.is_public
-            };
+             // Mapowanie pól
+             type: item.type,
+             price_min: item.price_min,
+             price_max: item.price_max,
+             is_public: item.is_public,
+
+             // DANE AUTORA (Kluczowe dla Avatara!)
+             first_name: item.first_name,
+             last_name: item.last_name,
+             // backend wysyła 'user_avatar', mapuje na 'userImage', bo tak będzie "prościej xD"
+             userImage: item.user_avatar 
+           };
         });
+        setDreams(formatted);
+      })
+      .catch(err => console.error("Błąd pobierania:", err));
+  };
 
-        setDreams(formatted); // Zapisz do głównego stanu aplikacji
-    })
-    .catch(err => console.log(err));
+  // 2. useEffect wywołuje fetchDreams TYLKO RAZ
+  useEffect(() => {
+    fetchDreams();
+  }, []);
 
   // Pobieranie znajomych (dla sekcji Friends)
   useEffect(() => {
@@ -210,7 +226,10 @@ const handleOpenProfile = (id) => {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
                   {dreams.map((dream) => (
                     <div key={dream.id} onClick={() => setSelectedDream(dream)}>
-                        <DreamCard dream={dream} showAuthor={true} />
+                        <DreamCard 
+                        dream={dream} 
+                        showAuthor={true} 
+                        onAuthorClick={handleOpenProfile} />
                     </div>
                   ))}
                 </div>
@@ -247,12 +266,26 @@ const handleOpenProfile = (id) => {
            /* 6. PROFIL INNEGO UŻYTKOWNIKA */
            : activeView === 'userProfile' ? (
              <UserProfile 
-               userId={selectedUserId} 
+              //  userId={selectedUserId} 
+               userId={visitingUserId}
                currentUser={currentUser}
                friends={friendsList}
                onBack={() => setActiveView('home')}
              />
            )
+
+           : activeView === 'myProfile' ? (
+            <MyProfile 
+                dreams={dreams} // Przekazujemy wszystkie marzenia (MyProfile sam sobie przefiltruje po currentUser.id)
+                setDreams={setDreams}
+                userData={currentUser}
+                onUpdateUser={(updated) => {
+                    // Tutaj Twoja logika aktualizacji usera, np:
+                    setCurrentUser(updated);
+                    localStorage.setItem('loggedUser', JSON.stringify(updated));
+                }}
+            />
+            )
            
            : activeView === 'feed' ? (
               <div className="mobile-feed-wrapper fade-in">
@@ -290,9 +323,12 @@ const handleOpenProfile = (id) => {
           dream={selectedDream} 
           onClose={() => setSelectedDream(null)}
           currentUser={currentUser}  // Żeby wiedział, czy pokazać przyciski
+          isOwner={currentUser && selectedDream.userId === currentUser.id}
+          onAuthorClick={handleOpenProfile}
           onUpdateDream={(updated) => {
              // Tu opcjonalnie odświeżamy listę główną w App/Feed
              // np. setDreams(prev => prev.map(d => d.id === updated.id ? updated : d));
+            
           }}
         />
       )}

@@ -1,23 +1,19 @@
 import React from 'react';
 import './DreamCard.css';
-import { Lock, Gift } from 'lucide-react';
+import { Lock } from 'lucide-react';
 
-// --- (formatPrice bez zmian) ---
+// --- Formatowanie Ceny (Bez zmian) ---
 const formatPrice = (min, max) => {
   const pMin = parseFloat(min);
   const pMax = parseFloat(max);
-  const hasMin = !isNaN(pMin);
-  const hasMax = !isNaN(pMax);
-
-  if (!hasMin && !hasMax) return null;
-  if (hasMin && hasMax && pMin === pMax) return `${pMin} zł`;
-  if ((!hasMin || pMin === 0) && hasMax) return `Do ${pMax} zł`;
-  if (hasMin && !hasMax) return `Powyżej ${pMin} zł`;
-  if (hasMin && hasMax) return `${pMin} - ${pMax} zł`;
+  if (!isNaN(pMin) && !isNaN(pMax) && pMin === pMax) return `${pMin} zł`;
+  if ((isNaN(pMin) || pMin === 0) && !isNaN(pMax)) return `Do ${pMax} zł`;
+  if (!isNaN(pMin) && isNaN(pMax)) return `Powyżej ${pMin} zł`;
+  if (!isNaN(pMin) && !isNaN(pMax)) return `${pMin} - ${pMax} zł`;
   return null;
 };
 
-// --- (getCategoryLabel bez zmian) ---
+// --- Etykiety i Kolory (Bez zmian) ---
 const getCategoryLabel = (dream) => {
   if (dream.type === 'time') return 'Czas';
   if (dream.type === 'smile') return 'Uśmiech';
@@ -30,32 +26,28 @@ const getCategoryLabel = (dream) => {
   return '';
 };
 
-// --- NOWA FUNKCJA: DOBIERANIE KOLORU TŁA ---
 const getFooterClass = (dream) => {
-  if (dream.type === 'time') return 'footer-time';   // Błękit
-  if (dream.type === 'smile') return 'footer-smile'; // Kremowy
-  
+  if (dream.type === 'time') return 'footer-time';
+  if (dream.type === 'smile') return 'footer-smile';
   if (dream.type === 'gift') {
       const pMin = parseFloat(dream.price_min);
       const pMax = parseFloat(dream.price_max);
-      
-      // Jeśli konkretna cena -> Pomysł (Lawenda)
       if (!isNaN(pMin) && !isNaN(pMax) && pMin === pMax) return 'footer-idea';
-      
-      // Jeśli widełki -> Konkret (Mięta)
       return 'footer-model';
   }
   return '';
 };
 
-export default function DreamCard({ dream }) {
+// 👇 ZMIANA 1: Dodajemy 'showAuthor' do propsów
+export default function DreamCard({ dream, showAuthor = true, onAuthorClick }) {
   if (!dream) return null;
 
   const priceLabel = dream.type === 'gift' ? formatPrice(dream.price_min, dream.price_max) : null;
   const isPrivate = !dream.is_public;
-
-  // Pobieramy odpowiednią klasę koloru
   const footerColorClass = getFooterClass(dream);
+
+  // Generowanie linku do avatara (Logic from Modal)
+  const avatarSrc = dream.userImage || `https://ui-avatars.com/api/?name=${dream.first_name || 'U'}+${dream.last_name || 'D'}&background=random`;
 
   return (
     <div className="dream-card fade-in">
@@ -70,7 +62,7 @@ export default function DreamCard({ dream }) {
               onError={(e) => e.target.style.display = 'none'} 
             />
         ) : (
-            <div className="card-image-placeholder"><Gift /></div> 
+            <div className="card-image-placeholder">🎁</div> 
         )}
         
         {isPrivate && (
@@ -82,6 +74,22 @@ export default function DreamCard({ dream }) {
 
       {/* SEKCJA 2: KONTENT */}
       <div className="card-content-section">
+        
+        {/* 👇 ZMIANA 2: Wyświetlanie Autora (jeśli showAuthor=true i mamy imię) */}
+        {showAuthor && dream.first_name && (
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                <img 
+                    src={avatarSrc} 
+                    alt="Author" 
+                    style={{ width: '20px', height: '20px', borderRadius: '50%', marginRight: '8px', objectFit: 'cover' }}
+                    onError={(e) => { e.target.onerror = null; e.target.src=`https://ui-avatars.com/api/?name=${dream.first_name}+${dream.last_name}&background=random` }}
+                />
+                <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#64748b' }}>
+                    {dream.first_name} {dream.last_name}
+                </span>
+            </div>
+        )}
+
         <div className="title-price-row">
             <h3 className="card-title" title={dream.title}>{dream.title}</h3>
             {priceLabel && (
@@ -90,6 +98,7 @@ export default function DreamCard({ dream }) {
                 </span>
             )}
         </div>
+
         {dream.description && (
             <p className="card-description">
                 {dream.description}
@@ -97,8 +106,7 @@ export default function DreamCard({ dream }) {
         )}
       </div>
 
-      {/* SEKCJA 3: STOPKA (Z KOLOREM) */}
-      {/* Dodajemy zmienną footerColorClass do listy klas */}
+      {/* SEKCJA 3: STOPKA */}
       <div className={`card-footer-section ${footerColorClass}`}>
           <span className="footer-category">
               {getCategoryLabel(dream)}

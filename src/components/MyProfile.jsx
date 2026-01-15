@@ -42,7 +42,10 @@ export default function MyProfile({ dreams, setDreams, userData, onUpdateUser })
             type: item.type,
             price_min: item.price_min,
             price_max: item.price_max,
-            is_public: item.is_public
+            is_public: item.is_public,
+            first_name: item.first_name || "Tajemniczy", 
+            last_name: item.last_name || "Marzyciel",
+            userImage: item.user_avatar || "https://cdn.pixabay.com/photo/2015/10/31/12/00/question-1015308_1280.jpg"
           };
         });
 
@@ -197,6 +200,7 @@ const handleSuccess = () => {
                     onEdit={handleEditClick}
                     onDelete={handleDelete}
                     isInline={true}
+                    showAuthor={false}
                  />
             </div>
 
@@ -211,7 +215,10 @@ const handleSuccess = () => {
                                 onClick={() => setActiveDream(dream)} 
                                 style={{ cursor: 'pointer', height: '100%' }}
                             >
-                                <DreamCard dream={dream} />
+                            <DreamCard 
+                              dream={dream} 
+                              showAuthor={false} 
+                                />
                             </div>
                         ))
                     ) : (

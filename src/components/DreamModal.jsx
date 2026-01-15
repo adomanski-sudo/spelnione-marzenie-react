@@ -1,9 +1,9 @@
 import React from 'react';
 import './DreamModal.css';
 import './DreamCard.css';
-import { X, Edit, Trash2, CheckCircle, Lock } from 'lucide-react'; // ArrowLeft już niepotrzebne
+import { X, Edit, Trash2, CheckCircle, Lock } from 'lucide-react';
 
-// --- (Funkcje pomocnicze: formatPrice, getCategoryLabel, getFooterClass - BEZ ZMIAN) ---
+// --- (Funkcje pomocnicze: formatPrice, getCategoryLabel, getFooterClass) ---
 const formatPrice = (min, max) => {
   const pMin = parseFloat(min);
   const pMax = parseFloat(max);
@@ -38,12 +38,20 @@ const getFooterClass = (dream) => {
   return '';
 };
 
-export default function DreamModal({ dream, onClose, isOwner, onEdit, onDelete, isInline = false }) {
+export default function DreamModal({ dream, onClose, isOwner, onEdit, onDelete, isInline = false, showAuthor = true, onAuthorClick }) {
   if (!dream) return null;
+
+  const handleAuthorContainerClick = () => {
+      if (!isInline && onAuthorClick && dream.userId) {
+          onClose(); // Zamykamy modal
+          onAuthorClick(dream.userId); // Wołamy funkcję z App.jsx
+      }
+  };
 
   const priceLabel = dream.type === 'gift' ? formatPrice(dream.price_min, dream.price_max) : null;
   const footerClass = getFooterClass(dream);
   const isPrivate = !dream.is_public;
+  const avatarSrc = dream.userImage || `https://ui-avatars.com/api/?name=${dream.first_name || 'U'}+${dream.last_name || 'D'}&background=random`;
 
   // Wnętrze karty
   const modalContent = (
@@ -71,17 +79,23 @@ export default function DreamModal({ dream, onClose, isOwner, onEdit, onDelete, 
 
         {/* 2. TREŚĆ (Bez zmian) */}
         <div className="modal-body">
-            <div className="modal-user-info">
-                 <img 
-                    src={`https://ui-avatars.com/api/?name=${dream.first_name || 'U'}+${dream.last_name || 'T'}&background=random`} 
-                    alt="User" 
-                    className="modal-avatar"
-                 />
-                 <div>
-                    <div className="modal-username">{dream.first_name || 'Użytkownik'} {dream.last_name}</div>
-                    <div style={{fontSize: '0.8rem', color: '#94a3b8'}}>Autor marzenia</div>
-                 </div>
-            </div>
+            {/* Warunkowe wyświetlanie autora + obrazek */}
+            {showAuthor && (
+                <div className="modal-user-info clickable-author"
+                onClick={handleAuthorContainerClick}
+                title="Przejdź do profilu użytkownika">
+                     <img 
+                        src={avatarSrc} 
+                        alt="User" 
+                        className="modal-avatar"
+                        onError={(e) => { e.target.onerror = null; e.target.src=`https://ui-avatars.com/api/?name=${dream.first_name}+${dream.last_name}&background=random` }}
+                     />
+                     <div>
+                        <div className="modal-username">{dream.first_name || 'Użytkownik'} {dream.last_name}</div>
+                        <div style={{fontSize: '0.8rem', color: '#94a3b8'}}>Autor marzenia</div>
+                     </div>
+                </div>
+            )}
 
             <div className="modal-header-row">
                 <div className="modal-title-group">
