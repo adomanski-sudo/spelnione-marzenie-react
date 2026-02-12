@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import "./App.css"; 
 
 // Importy Komponentów
@@ -124,17 +125,18 @@ function App() {
 
 
 
+  // 👇 2. Próbuję z AXIOS bo był problem z tokenami i ciastkami.
   const fetchDreams = () => {
-    fetch('/api/dreams')
-      .then(res => res.json())
-      .then(data => {
+    // Używam axios z flagą withCredentials, żeby wysłać ciasteczko
+    axios.get('/api/dreams', { withCredentials: true })
+      .then((res) => {
+        const data = res.data;
+
         const formatted = data.map(item => {
-           // Naprawa daty
            let safeDate = item.date;
            if (safeDate && safeDate.includes('T')) {
                safeDate = safeDate.replace('T', ' ').split('.')[0];
            }
-
            return {
              id: item.id,
              userId: item.idUser,
@@ -142,23 +144,27 @@ function App() {
              description: item.description,
              image: item.image,
              date: safeDate,
-
-             // Mapowanie pól
              type: item.type,
              price_min: item.price_min,
              price_max: item.price_max,
              is_public: item.is_public,
-
-             // DANE AUTORA (Kluczowe dla Avatara!)
+             
+             // Autor
              first_name: item.first_name,
              last_name: item.last_name,
-             // backend wysyła 'user_avatar', mapuje na 'userImage', bo tak będzie "prościej xD"
              userImage: item.user_avatar 
            };
         });
         setDreams(formatted);
       })
-      .catch(err => console.error("Błąd pobierania:", err));
+      .catch((err) => {
+        // Obsługa błędów - teraz aplikacja nie wybuchnie przy 401
+        console.error("Błąd pobierania marzeń:", err);
+        if (err.response && err.response.status === 401) {
+            console.warn("Użytkownik niezalogowany - widok publiczny ograniczony");
+            // Opcjonalnie: setDreams([]) lub przekierowanie do logowania
+        }
+      });
   };
 
   // 2. useEffect wywołuje fetchDreams TYLKO RAZ

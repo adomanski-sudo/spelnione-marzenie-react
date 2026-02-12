@@ -5,13 +5,13 @@ import { EyeOff } from 'lucide-react';
 export default function RightFeed() {
 
   // Wyłączam na chwilę, bo sypie błędami.
-  return (
-    <div className="dreams-column">
-       <div style={{padding: '20px', textAlign: 'center', color: '#cbd5e1'}}>
-          🚧 Przebudowa systemu...
-       </div>
-    </div>
-  );
+  // return (
+  //   <div className="dreams-column">
+  //      <div style={{padding: '20px', textAlign: 'center', color: '#cbd5e1'}}>
+  //         🚧 Przebudowa systemu...
+  //      </div>
+  //   </div>
+  // );
 
 
 

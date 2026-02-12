@@ -1,7 +1,7 @@
 import React from 'react';
 import './DreamModal.css';
 import './DreamCard.css';
-import { X, Edit, Trash2, CheckCircle, Lock } from 'lucide-react';
+import { X, Edit, Trash2, CheckCircle, Lock, CalendarClock, Users, BookmarkCheck, PiggyBank, Smile } from 'lucide-react';
 
 // --- (Funkcje pomocnicze: formatPrice, getCategoryLabel, getFooterClass) ---
 const formatPrice = (min, max) => {
@@ -48,6 +48,44 @@ export default function DreamModal({ dream, onClose, isOwner, onEdit, onDelete, 
       }
   };
 
+  const renderGuestActions = () => {
+    switch (dream.type) {
+      case 'time': // Kategoria: CZAS
+        return (
+          <>
+            <button className="btn-action btn-reserve" onClick={() => alert("Rezerwacja czasu - wkrótce!")}>
+               <CalendarClock size={18} /> Zarezerwuj
+            </button>
+            <button className="btn-action btn-crew" onClick={() => alert("Zwoływanie ekipy - wkrótce!")}>
+               <Users size={18} /> Zwołaj ekipę
+            </button>
+          </>
+        );
+
+      case 'gift': // Kategoria: POMYSŁ / KONKRET
+        return (
+          <>
+            <button className="btn-action btn-reserve" onClick={() => alert("Rezerwacja prezentu - wkrótce!")}>
+               <BookmarkCheck size={18} /> Zarezerwuj
+            </button>
+            <button className="btn-action btn-fund" onClick={() => alert("Zrzutka - wkrótce!")}>
+               <PiggyBank size={18} /> Zrzutka
+            </button>
+          </>
+        );
+
+      case 'smile': // Kategoria: UŚMIECH
+        return (
+          <div className="smile-message">
+             <Smile size={20} /> <span>Zawsze mile widziane!</span>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   const priceLabel = dream.type === 'gift' ? formatPrice(dream.price_min, dream.price_max) : null;
   const footerClass = getFooterClass(dream);
   const isPrivate = !dream.is_public;
@@ -77,7 +115,7 @@ export default function DreamModal({ dream, onClose, isOwner, onEdit, onDelete, 
             )}
         </div>
 
-        {/* 2. TREŚĆ (Bez zmian) */}
+        {/* 2. TREŚĆ */}
         <div className="modal-body">
             {/* Warunkowe wyświetlanie autora + obrazek */}
             {showAuthor && (
@@ -126,9 +164,8 @@ export default function DreamModal({ dream, onClose, isOwner, onEdit, onDelete, 
                         </button>
                     </>
                 ) : (
-                    <button className="btn-action btn-fulfill" onClick={() => alert("Wkrótce!")}>
-                        <CheckCircle size={18} /> Spełnij
-                    </button>
+                    // Przyciski dla gości.
+                    renderGuestActions()
                 )}
             </div>
         </div>

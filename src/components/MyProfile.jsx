@@ -10,21 +10,23 @@ import DreamModal from './DreamModal'; //
 
 // Dodajemy onUpdateUser do propsów
 export default function MyProfile({ dreams, setDreams, userData, onUpdateUser }) {
+
+  const myDreams = dreams 
+    ? dreams.filter(d => d.userId === userData?.id) 
+    : [];
   
   const [activeDream, setActiveDream] = useState(null);
   const [isEditing, setIsEditing] = useState(false); // Czy edytujemy?
   const [isAdding, setIsAdding] = useState(false); // Czy dodajemy marzenie?
   const [isEditingDream, setIsEditingDream] = useState(false); // Edycja marzenia
 
-  // --- ODŚWIEŻANIE LISTY (AXIOS) ---
+  // --- ODSWIEŻANIE (Lokalne) ---
   const refreshDreams = () => {
-    axios.get('http://localhost:3000/api/dreams', { withCredentials: true })
+    axios.get('/api/dreams', { withCredentials: true })
       .then((res) => {
-        // W axios dane są pod 'res.data'
         const data = res.data;
-
         const formatted = data.map((item) => {
-          // Zabezpieczenie daty (zamiana T na spację dla formatu SQL)
+          // Zabezpieczenie daty
           let safeDate = item.date;
           if (safeDate && safeDate.includes('T')) {
              safeDate = safeDate.replace('T', ' ').split('.')[0];
@@ -37,23 +39,19 @@ export default function MyProfile({ dreams, setDreams, userData, onUpdateUser })
             description: item.description,
             image: item.image,
             date: safeDate,
-
-            // Kluczowe pola dla edycji i wyświetlania
             type: item.type,
             price_min: item.price_min,
             price_max: item.price_max,
             is_public: item.is_public,
-            first_name: item.first_name || "Tajemniczy", 
-            last_name: item.last_name || "Marzyciel",
-            userImage: item.user_avatar || "https://cdn.pixabay.com/photo/2015/10/31/12/00/question-1015308_1280.jpg"
+            
+            // Dane autora
+            first_name: item.first_name,
+            last_name: item.last_name,
+            userImage: item.user_avatar
           };
         });
 
-        // Filtrujemy tylko marzenia zalogowanego użytkownika
-        if (userData) {
-          const myOnly = formatted.filter((d) => d.userId === userData.id);
-          setDreams(myOnly);
-        }
+        setDreams(formatted); 
       })
       .catch((err) => {
         console.error("Błąd odświeżania listy:", err);
@@ -208,8 +206,8 @@ const handleSuccess = () => {
         ) : (
           <>
                 <div className="dreams-grid-compact fade-in">
-                    {dreams && dreams.length > 0 ? (
-                        dreams.map((dream) => (
+                    {myDreams && myDreams.length > 0 ? (
+                        myDreams.map((dream) => (
                             <div 
                                 key={dream.id} 
                                 onClick={() => setActiveDream(dream)} 

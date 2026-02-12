@@ -212,3 +212,41 @@
   border-radius: 16px;
   animation: none;
 }
+
+/* --- NOWE PRZYCISKI AKCJI (Dla Gości) --- */
+
+/* Wspólne dla przycisków rezerwacji */
+.btn-reserve {
+  background-color: #3b82f6; /* Niebieski */
+  color: white;
+}
+.btn-reserve:hover { background-color: #2563eb; }
+
+/* Przycisk "Zwołaj ekipę" */
+.btn-crew {
+  background-color: #8b5cf6; /* Fioletowy */
+  color: white;
+}
+.btn-crew:hover { background-color: #7c3aed; }
+
+/* Przycisk "Zrzutka" */
+.btn-fund {
+  background-color: #10b981; /* Zielony */
+  color: white;
+}
+.btn-fund:hover { background-color: #059669; }
+
+/* Wiadomość dla typu Uśmiech */
+.smile-message {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px;
+  background-color: #fff1f2; /* Bardzo jasny róż */
+  color: #be123c; /* Ciemny róż */
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+}

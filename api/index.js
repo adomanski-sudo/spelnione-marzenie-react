@@ -3,9 +3,10 @@ import express from 'express';
 import mysql from 'mysql2';
 import cors from 'cors';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import cookieParser from "cookie-parser"; // <- czytanie ciastków.
+import jwt from "jsonwebtoken"; // <-- token z ciastków. 
+import axios from 'axios'; // <-- jeszcze inne rozwiązanie z tokenami
 
 // --- ZMIANA TUTAJ: ---
 import dotenv from 'dotenv';
@@ -167,20 +168,60 @@ app.post('/api/login', (req, res) => {
 
 // Marzenia - do DreamCard.ksx
 app.get('/api/dreams', (req, res) => {
-  const sql = `
-    SELECT 
-      dreams.*, 
-      users.first_name, 
-      users.last_name, 
-      users.image AS user_avatar 
-    FROM dreams 
-    LEFT JOIN users ON dreams.idUser = users.id
-    ORDER BY dreams.date DESC
-  `;
+  const token = req.cookies.accessToken;
 
-  db.query(sql, (err, data) => {
-    if (err) return res.status(500).json(err);
-    return res.json(data);
+  // SCENARIUSZ 1: GOŚĆ (Brak tokena)
+  if (!token) {
+    const guestSql = `
+      SELECT 
+        d.*, 
+        u.first_name, 
+        u.last_name, 
+        u.image AS user_avatar 
+      FROM dreams d
+      JOIN users u ON d.idUser = u.id
+      WHERE d.is_public = 1
+      ORDER BY d.date DESC
+    `;
+    
+    db.query(guestSql, (err, data) => {
+      if (err) return res.status(500).json(err);
+      return res.json(data); // Zwracamy tylko publiczne
+    });
+    return; // Kończymy funkcję tutaj dla gościa
+  }
+
+  // SCENARIUSZ 2: UŻYTKOWNIK ZALOGOWANY
+  jwt.verify(token, "secretKey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token jest nieważny!");
+
+    const myId = userInfo.id;
+
+    // Logika dla znajomych (Publiczne + Moje + Znajomych)
+    const sql = `
+      SELECT DISTINCT
+        d.*, 
+        u.first_name, 
+        u.last_name, 
+        u.image AS user_avatar
+      FROM dreams d
+      JOIN users u ON d.idUser = u.id
+      LEFT JOIN friendships f ON (
+        (f.user_id1 = ? AND f.user_id2 = d.idUser AND f.status = 'accepted')
+        OR 
+        (f.user_id2 = ? AND f.user_id1 = d.idUser AND f.status = 'accepted')
+      )
+      WHERE 
+        d.is_public = 1        
+        OR d.idUser = ?        
+        OR f.id IS NOT NULL    
+      ORDER BY d.date DESC
+    `;
+
+    db.query(sql, [myId, myId, myId], (err, data) => {
+      if (err) return res.status(500).json(err);
+      return res.json(data);
+    });
   });
 });
 
